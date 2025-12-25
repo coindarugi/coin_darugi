@@ -3,13 +3,27 @@ import devServer from '@hono/vite-dev-server'
 import adapter from '@hono/vite-dev-server/cloudflare'
 import { defineConfig } from 'vite'
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
-    build(),
+    build({
+      outputDir: 'dist',
+      emptyOutDir: true,
+      minify: true,
+      external: [],
+      entry: 'src/index.tsx'
+    }),
     devServer({
       adapter,
       entry: 'src/index.tsx'
     })
   ],
-  publicDir: 'public'
-})
+  publicDir: 'public',
+  build: {
+    rollupOptions: {
+      output: {
+        // Cloudflare Pages static assets
+        assetFileNames: '[name].[ext]'
+      }
+    }
+  }
+}))
