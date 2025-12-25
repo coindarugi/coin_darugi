@@ -1184,7 +1184,7 @@ app.get('/', (c) => {
         </div>
       </nav>
       
-      {/* 광고 영역 1: 헤더 아래 배너 (A-ads Adaptive) */}
+      {/* 광고 영역 1: 헤더 아래 배너 (상단) */}
       <div class="ad-container ad-header">
         <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998'}}>
           <iframe 
@@ -1205,25 +1205,6 @@ app.get('/', (c) => {
       
       <div id="app">
         <div class="loading">데이터 로딩 중...</div>
-      </div>
-      
-      {/* 광고 영역 2: 가운데 배너 (A-ads Adaptive) */}
-      <div class="ad-container ad-middle" style={{marginTop: '2rem', marginBottom: '2rem'}}>
-        <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998'}}>
-          <iframe 
-            data-aa='2421980' 
-            src='//acceptable.a-ads.com/2421980/?size=Adaptive'
-            style={{
-              border: '0',
-              padding: '0',
-              width: '70%',
-              height: 'auto',
-              overflow: 'hidden',
-              display: 'block',
-              margin: 'auto'
-            }}
-          />
-        </div>
       </div>
       
       {/* 코인 브라우저 모달 */}
@@ -1672,12 +1653,12 @@ app.get('/', (c) => {
         </div>
       </div>
       
-      {/* 광고 영역 3: 푸터 위 배너 (A-ads Adaptive) */}
+      {/* 광고 영역 3: 하단 배너 */}
       <div class="ad-container ad-footer" style={{marginTop: '3rem', marginBottom: '2rem'}}>
         <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998'}}>
           <iframe 
-            data-aa='2421976' 
-            src='//acceptable.a-ads.com/2421976/?size=Adaptive'
+            data-aa='2421980' 
+            src='//acceptable.a-ads.com/2421980/?size=Adaptive'
             style={{
               border: '0',
               padding: '0',

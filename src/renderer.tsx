@@ -17,8 +17,8 @@ export const renderer = jsxRenderer(({ children }) => {
         <link rel="apple-touch-icon" href="/favicon.svg" />
         
         {/* SEO Meta Tags */}
-        <title>암호화폐 실시간 대시보드 | AI 전망, 10,000+ 코인 추적, 김치 프리미엄</title>
-        <meta name="description" content="AI 기반 코인 전망과 10,000개 이상의 암호화폐를 실시간 추적. 김치 프리미엄 계산기, 포트폴리오 관리, 실시간 뉴스 번역. 비트코인, 이더리움, 리플 등 모든 코인 정보를 한눈에!" />
+        <title>암호화폐 실시간 대시보드 | AI 전망·김치 프리미엄</title>
+        <meta name="description" content="AI 기반 암호화폐 실시간 추적. 10,000+ 코인, 김치 프리미엄 계산기, 포트폴리오 관리. 비트코인·이더리움 등 모든 코인 정보를 한눈에!" />
         <meta name="keywords" content="암호화폐, 비트코인, 이더리움, AI 전망, 코인 분석, 김치 프리미엄, 업비트, 빗썸, 코인원, 실시간 시세, 포트폴리오, 크립토, Bitcoin, Ethereum, Crypto AI, Crypto Dashboard" />
         <meta name="author" content="Crypto Dashboard" />
         <meta name="robots" content="index, follow" />
@@ -45,11 +45,11 @@ export const renderer = jsxRenderer(({ children }) => {
         <link rel="canonical" href="https://crypto-darugi.com/" />
         
         {/* 🌍 다국어 hreflang 태그 */}
-        <link rel="alternate" hreflang="ko" href="https://crypto-darugi.com/?lang=ko" />
-        <link rel="alternate" hreflang="en" href="https://crypto-darugi.com/?lang=en" />
-        <link rel="alternate" hreflang="fr" href="https://crypto-darugi.com/?lang=fr" />
-        <link rel="alternate" hreflang="de" href="https://crypto-darugi.com/?lang=de" />
-        <link rel="alternate" hreflang="es" href="https://crypto-darugi.com/?lang=es" />
+        <link rel="alternate" hreflang="ko" href="https://crypto-darugi.com/" />
+        <link rel="alternate" hreflang="en" href="https://crypto-darugi.com/" />
+        <link rel="alternate" hreflang="fr" href="https://crypto-darugi.com/" />
+        <link rel="alternate" hreflang="de" href="https://crypto-darugi.com/" />
+        <link rel="alternate" hreflang="es" href="https://crypto-darugi.com/" />
         <link rel="alternate" hreflang="x-default" href="https://crypto-darugi.com/" />
         
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -66,6 +66,18 @@ export const renderer = jsxRenderer(({ children }) => {
         <link href={`/static/style.css?v=${version}`} rel="stylesheet" />
         {/* Google AdSense */}
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6947020717333296" crossorigin="anonymous"></script>
+        
+        {/* Google Analytics (GA4) */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-4M57WPZ083"></script>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-4M57WPZ083');
+          `
+        }}></script>
+        
         {/* Cloudflare Web Analytics */}
         <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e9e8757e23c242308640019549bcd05a"}'></script>
         

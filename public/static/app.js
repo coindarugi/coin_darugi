@@ -100,14 +100,6 @@ window.addEventListener('DOMContentLoaded', () => {
   loadPrices();
   loadCryptoNews();
   // AI 전망은 사용자가 버튼 클릭 시에만 로드 (API 비용 절약)
-  // setupAIForecastLazyLoading(); // 제거됨
-  
-  // AI 전망이 이미 로드되었으면 페이지 로드 시 자동으로 다시 로드 (언어 변경 시 유지)
-  if (aiForecastLoaded) {
-    setTimeout(() => {
-      loadAIForecastOnDemand();
-    }, 500); // DOM 로딩 완료 후 실행
-  }
   
   startAutoRefresh();
 });
@@ -1006,7 +998,6 @@ async function loadFearGreedIndex() {
 let newsTranslations = {}; // 번역 캐시
 
 // AI 전망 버튼 클릭 로딩
-let aiForecastLoaded = localStorage.getItem('aiForecastLoaded') === 'true'; // AI 전망 로드 여부 (localStorage에서 복원)
 let aiForecastCurrentlyLoaded = false; // 현재 페이지에서 실제로 로드되었는지 여부
 
 // 버튼 클릭 시 AI 전망 로드
@@ -1017,10 +1008,6 @@ async function loadAIForecastOnDemand() {
   // 현재 페이지에서 이미 로드했으면 다시 로드하지 않음
   if (aiForecastCurrentlyLoaded) return;
   aiForecastCurrentlyLoaded = true;
-  
-  // localStorage에 저장 (언어 변경 시에도 유지)
-  localStorage.setItem('aiForecastLoaded', 'true');
-  aiForecastLoaded = true;
   
   // 로딩 표시
   container.innerHTML = `
@@ -1768,15 +1755,18 @@ async function loadPrices() {
     
     coinsHTML += '</div>';
     
-    // 광고 영역 2: 뉴스 섹션 위 (300x250 중형 직사각형)
-    const adNewsHTML = (aiForecastHTML || newsHTML) ? `
-      <div class="ad-container ad-news">
-        <div class="ad-label">${t('advertisement')}</div>
-        <div class="ad-placeholder">
-          <iframe data-aa='2378970' src='//ad.a-ads.com/2378970?size=300x250' style='width:300px; height:250px; border:0px; padding:0; overflow:hidden; background-color: transparent;'></iframe>
+    // 광고 영역 2: 중단 배너
+    const adMiddleHTML = `
+      <div class="ad-container ad-middle" style="margin-top: 2rem; margin-bottom: 2rem;">
+        <div id="frame" style="width: 100%; margin: auto; position: relative; z-index: 99998;">
+          <iframe 
+            data-aa='2421975' 
+            src='//acceptable.a-ads.com/2421975/?size=Adaptive'
+            style='border:0; padding:0; width:70%; height:auto; overflow:hidden; display: block; margin: auto'>
+          </iframe>
         </div>
       </div>
-    ` : '';
+    `;
     
     // 새로고침 버튼
     const refreshButton = `
@@ -1785,7 +1775,7 @@ async function loadPrices() {
       </button>
     `;
     
-    appDiv.innerHTML = searchHTML + statsHTML + portfolioSummaryHTML + coinsHTML + adNewsHTML + aiForecastHTML + newsHTML + refreshButton;
+    appDiv.innerHTML = searchHTML + statsHTML + portfolioSummaryHTML + coinsHTML + adMiddleHTML + aiForecastHTML + newsHTML + refreshButton;
     
     // 🌍 각 코인별로 해당 국가 거래소 가격 로드
     loadExchangePrices(coinsArray);
