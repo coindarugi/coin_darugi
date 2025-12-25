@@ -135,8 +135,6 @@ export const renderer = jsxRenderer(({ children, lang }) => {
         <link rel="preconnect" href="https://cdn.tailwindcss.com" />
         <link rel="preconnect" href="https://cdn.jsdelivr.net" />
         <link rel="preconnect" href="https://api.coingecko.com" />
-        <link rel="dns-prefetch" href="https://acceptable.a-ads.com" />
-        <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
         <script src="https://cdn.tailwindcss.com"></script>
         <script dangerouslySetInnerHTML={{
@@ -158,9 +156,6 @@ export const renderer = jsxRenderer(({ children, lang }) => {
             gtag('config', 'G-4M57WPZ083');
           `
         }}></script>
-        
-        {/* Cloudflare Web Analytics */}
-        <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e9e8757e23c242308640019549bcd05a"}'></script>
         
         {/* Structured Data (JSON-LD) */}
         <script type="application/ld+json">{`

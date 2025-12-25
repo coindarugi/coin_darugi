@@ -3,6 +3,7 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: interest-cohort=()
+  Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; connect-src 'self' https://api.upbit.com https://api.bithumb.com https://api.coinone.co.kr https://api.korbit.co.kr; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.tailwindcss.com; img-src 'self' data: https:; font-src 'self' data: https://cdn.jsdelivr.net;
   
 # Allow CORS for API endpoints
 /api/*
@@ -10,6 +11,9 @@
   Access-Control-Allow-Methods: GET, POST, OPTIONS
   Access-Control-Allow-Headers: Content-Type
 
-# Block analytics and ads
-/cdn-cgi/rum
+# Block analytics and ads completely
+/cdn-cgi/*
+  X-Robots-Tag: noindex
+  
+/googlea*.js
   X-Robots-Tag: noindex
