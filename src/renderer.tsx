@@ -139,6 +139,9 @@ export const renderer = jsxRenderer(({ children, lang }) => {
         <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
         <script src="https://cdn.tailwindcss.com"></script>
+        <script dangerouslySetInnerHTML={{
+          __html: `tailwind.config = { corePlugins: { preflight: false } }`
+        }}></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet" />
         <link href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" rel="stylesheet" />
         <link href={`/static/style.css?v=${version}`} rel="stylesheet" />
