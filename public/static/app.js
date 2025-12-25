@@ -2115,6 +2115,14 @@ function toggleForecastText(forecastId) {
   const btnText = document.getElementById(`${forecastId}-btn-text`);
   const btnIcon = document.getElementById(`${forecastId}-btn-icon`);
   
+  // CRITICAL: 디버깅 로그 추가
+  console.log('[toggleForecastText] Found elements:', {
+    reasoningDiv: reasoningDiv?.id,
+    adviceDiv: adviceDiv?.id,
+    reasoningText: reasoningText?.id,
+    adviceText: adviceText?.id
+  });
+  
   // null 체크 (탭 전환 후에도 작동하도록)
   if (!reasoningDiv || !adviceDiv || !reasoningText || !adviceText || !btnText || !btnIcon) {
     console.error('[toggleForecastText] Forecast elements not found:', forecastId);

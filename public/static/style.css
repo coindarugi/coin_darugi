@@ -2259,6 +2259,8 @@ h1 {
   grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
   margin-top: 1rem;
+  /* CRITICAL: 각 아이템이 독립적인 높이를 가지도록 설정 */
+  align-items: start;
 }
 
 @media (max-width: 1200px) {
@@ -2287,8 +2289,8 @@ h1 {
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
-  min-height: 480px; /* 최소 높이로 변경 */
-  overflow: hidden; /* 넘치는 내용 숨김 */
+  /* REMOVED: min-height to allow independent heights */
+  height: auto; /* 각 카드가 독립적인 높이를 가지도록 */
 }
 
 .forecast-item:hover {
