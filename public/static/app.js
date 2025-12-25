@@ -1141,11 +1141,26 @@ async function loadAIForecast() {
       const reasoning = forecast.analysis.reasoning || '';
       const advice = forecast.analysis.advice || '';
       
+      // HTML 속성 안전 처리 (따옴표, 특수문자 등)
+      const escapeHtml = (text) => {
+        return text
+          .replace(/&/g, '&amp;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/\n/g, ' ')
+          .replace(/\r/g, '');
+      };
+      
+      const reasoningEscaped = escapeHtml(reasoning);
+      const adviceEscaped = escapeHtml(advice);
+      
       const reasoningShort = reasoning.length > MAX_LENGTH ? reasoning.substring(0, MAX_LENGTH) + '...' : reasoning;
       const adviceShort = advice.length > MAX_LENGTH ? advice.substring(0, MAX_LENGTH) + '...' : advice;
       
       const needsReadMore = reasoning.length > MAX_LENGTH || advice.length > MAX_LENGTH;
-      const forecastId = `forecast-${index}`;
+      const forecastId = `forecast-${forecast.coinId}-${index}`;
       
       forecastHTML += `
         <div class="forecast-item">
@@ -1177,11 +1192,11 @@ async function loadAIForecast() {
               <span class="confidence-percentage"><strong>${forecast.analysis.confidence}%</strong></span>
             </div>
           </div>
-          <div class="forecast-reasoning" id="${forecastId}-reasoning" data-full-text="${reasoning.replace(/"/g, '&quot;')}" data-expanded="false" style="max-height: 140px; overflow-y: auto;">
+          <div class="forecast-reasoning" id="${forecastId}-reasoning" data-full-text="${reasoningEscaped}" data-expanded="false" style="max-height: 140px; overflow-y: auto;">
             <i class="fas fa-lightbulb" style="color: #f59e0b;"></i>
             <span id="${forecastId}-reasoning-text">${reasoningShort}</span>
           </div>
-          <div class="forecast-advice" id="${forecastId}-advice" data-full-text="${advice.replace(/"/g, '&quot;')}" data-expanded="false" style="max-height: 120px; overflow-y: auto;">
+          <div class="forecast-advice" id="${forecastId}-advice" data-full-text="${adviceEscaped}" data-expanded="false" style="max-height: 120px; overflow-y: auto;">
             <i class="fas fa-hand-point-right" style="color: #3b82f6;"></i>
             <strong>${t('forecastAdvice')}:</strong> <span id="${forecastId}-advice-text">${adviceShort}</span>
           </div>
@@ -2028,6 +2043,13 @@ function getForecastState(forecastId) {
 
 // 페이지 로드 후 모든 전망 카드의 상태 복원
 function restoreForecastStates() {
+  // HTML 엔티티 디코딩 함수
+  const decodeHtml = (text) => {
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = text;
+    return textarea.value;
+  };
+  
   // 잠시 후 DOM이 준비될 때까지 기다림
   setTimeout(() => {
     try {
@@ -2046,9 +2068,9 @@ function restoreForecastStates() {
             const btnIcon = document.getElementById(`${forecastId}-btn-icon`);
             
             if (reasoningText && adviceText && btnText && btnIcon) {
-              // 전체 텍스트 표시
-              reasoningText.textContent = reasoningDiv.dataset.fullText || '';
-              adviceText.textContent = adviceDiv.dataset.fullText || '';
+              // 전체 텍스트 표시 (HTML 엔티티 디코딩)
+              reasoningText.textContent = decodeHtml(reasoningDiv.dataset.fullText || '');
+              adviceText.textContent = decodeHtml(adviceDiv.dataset.fullText || '');
               
               // 스타일 적용
               reasoningDiv.style.maxHeight = 'none';
@@ -2088,6 +2110,13 @@ function toggleForecastText(forecastId) {
     return;
   }
   
+  // HTML 엔티티 디코딩 함수
+  const decodeHtml = (text) => {
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = text;
+    return textarea.value;
+  };
+  
   const isExpanded = reasoningDiv.dataset.expanded === 'true';
   console.log('[toggleForecastText] Current state - isExpanded:', isExpanded);
   
@@ -2096,8 +2125,8 @@ function toggleForecastText(forecastId) {
   if (isExpanded) {
     // 접기 - 인라인 스타일로 이 요소만 제어
     console.log('[toggleForecastText] Collapsing:', forecastId);
-    const reasoningFull = reasoningDiv.dataset.fullText || '';
-    const adviceFull = adviceDiv.dataset.fullText || '';
+    const reasoningFull = decodeHtml(reasoningDiv.dataset.fullText || '');
+    const adviceFull = decodeHtml(adviceDiv.dataset.fullText || '');
     
     reasoningText.textContent = reasoningFull.length > MAX_LENGTH ? reasoningFull.substring(0, MAX_LENGTH) + '...' : reasoningFull;
     adviceText.textContent = adviceFull.length > MAX_LENGTH ? adviceFull.substring(0, MAX_LENGTH) + '...' : adviceFull;
@@ -2119,8 +2148,8 @@ function toggleForecastText(forecastId) {
   } else {
     // 펼치기 - 인라인 스타일로 이 요소만 제어
     console.log('[toggleForecastText] Expanding:', forecastId);
-    const reasoningFull = reasoningDiv.dataset.fullText || '';
-    const adviceFull = adviceDiv.dataset.fullText || '';
+    const reasoningFull = decodeHtml(reasoningDiv.dataset.fullText || '');
+    const adviceFull = decodeHtml(adviceDiv.dataset.fullText || '');
     
     reasoningText.textContent = reasoningFull;
     adviceText.textContent = adviceFull;
