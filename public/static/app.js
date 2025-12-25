@@ -98,6 +98,9 @@ window.addEventListener('DOMContentLoaded', () => {
   loadFavorites();
   loadSelectedExchange();
   loadPrices();
+  
+  // AI 전망이 이전에 로드되었으면 자동으로 로드
+  setTimeout(() => autoLoadAIForecastIfNeeded(), 1000);
   loadCryptoNews();
   // AI 전망은 사용자가 버튼 클릭 시에만 로드 (API 비용 절약)
   
@@ -1000,14 +1003,34 @@ let newsTranslations = {}; // 번역 캐시
 // AI 전망 버튼 클릭 로딩
 let aiForecastCurrentlyLoaded = false; // 현재 페이지에서 실제로 로드되었는지 여부
 
+// AI 전망 로드 상태를 localStorage에서 확인
+function isAIForecastLoaded() {
+  return localStorage.getItem('aiForecastLoaded') === 'true';
+}
+
+// AI 전망 로드 상태를 localStorage에 저장
+function setAIForecastLoaded(loaded) {
+  localStorage.setItem('aiForecastLoaded', loaded ? 'true' : 'false');
+}
+
+// 페이지 로드 시 AI 전망이 이전에 로드되었으면 자동으로 로드
+function autoLoadAIForecastIfNeeded() {
+  if (isAIForecastLoaded() && !aiForecastCurrentlyLoaded) {
+    loadAIForecastOnDemand();
+  }
+}
+
 // 버튼 클릭 시 AI 전망 로드
 async function loadAIForecastOnDemand() {
   const container = document.getElementById('ai-forecast-container');
   if (!container) return;
   
-  // 현재 페이지에서 이미 로드했으면 다시 로드하지 않음
+  // 이미 로드했으면 다시 로드하지 않음
   if (aiForecastCurrentlyLoaded) return;
   aiForecastCurrentlyLoaded = true;
+  
+  // 상태를 localStorage에 저장
+  setAIForecastLoaded(true);
   
   // 로딩 표시
   container.innerHTML = `
@@ -1776,17 +1799,17 @@ async function loadPrices() {
       </div>
     `;
     
-    // 새로고침 버튼 (왼쪽 정렬)
+    // 새로고침 버튼 (가운데 정렬)
     const refreshButton = `
-      <div style="text-align: left !important; padding: 0 1rem; margin: 1rem 0;">
-        <button class="refresh-btn" onclick="loadPrices()" style="margin: 0 !important; display: inline-block !important;">
+      <div style="text-align: center !important; padding: 0 1rem; margin: 2rem 0;">
+        <button class="refresh-btn" onclick="loadPrices()" style="margin: 0 auto !important; display: inline-block !important;">
           <i class="fas fa-sync-alt"></i> ${t('refresh')}
         </button>
       </div>
     `;
     
-    // 순서: 검색 → 통계 → 포트폴리오 요약 → 코인 목록 → AI 전망 → 뉴스 → 새로고침 → 중간 광고
-    appDiv.innerHTML = searchHTML + statsHTML + portfolioSummaryHTML + coinsHTML + aiForecastHTML + newsHTML + refreshButton + adMiddleHTML;
+    // 순서: 검색 → 통계 → 포트폴리오 요약 → 코인 목록 → 중간 광고 → AI 전망 → 뉴스 → 새로고침
+    appDiv.innerHTML = searchHTML + statsHTML + portfolioSummaryHTML + coinsHTML + adMiddleHTML + aiForecastHTML + newsHTML + refreshButton;
     
     // 🌍 각 코인별로 해당 국가 거래소 가격 로드
     loadExchangePrices(coinsArray);

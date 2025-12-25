@@ -15,15 +15,15 @@ type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>()
 
-// 🔑 CoinGecko API (Free endpoint by default)
-const COINGECKO_API_URL = 'https://api.coingecko.com/api/v3'
+// 🔑 CoinGecko API (Pro/Basic API 사용)
+const COINGECKO_API_URL = 'https://pro-api.coingecko.com/api/v3'
 
 // 🤖 AI 전망 캐시 (5분 - 베이직 플랜)
 const aiForecastCache = {
   data: null as any,
   timestamp: 0,
   ttl: 300000, // 5분 (베이직 플랜으로 더 자주 갱신)
-  version: 4 // 버전 변경으로 캐시 무효화 (GPT-5.2 + 상세 분석)
+  version: 6 // 버전 변경으로 캐시 무효화 (GPT-5.2 + OpenAI API)
 }
 
 // 🔥 캐시 시간 단축 (Pro API는 더 자주 갱신 가능)
@@ -159,8 +159,8 @@ app.get('/api/prices', async (c) => {
     // 모든 코인 데이터를 한 번에 가져와서 캐시
     const allCoins = 'bitcoin,ethereum,ripple,cardano,solana,polkadot,dogecoin,shiba-inu,polygon,litecoin,binancecoin,avalanche-2,chainlink,stellar,uniswap'
     
-    console.log('🔄 Fetching from CoinGecko API...')
-    // API 키가 있으면 Pro API, 없으면 Free API 사용
+    console.log('🔄 Fetching from CoinGecko Pro API...')
+    // CoinGecko Basic API 키 사용 (Pro API URL에서는 x-cg-pro-api-key 사용)
     const headers: Record<string, string> = {
       'Accept': 'application/json'
     }
@@ -168,13 +168,16 @@ app.get('/api/prices', async (c) => {
       headers['x-cg-pro-api-key'] = COINGECKO_API_KEY
     }
     
-    const response = await fetch(
-      `${COINGECKO_API_URL}/simple/price?ids=${allCoins}&vs_currencies=usd,krw&include_24hr_change=true&include_market_cap=true`,
-      { headers }
-    )
+    const apiUrl = `${COINGECKO_API_URL}/simple/price?ids=${allCoins}&vs_currencies=usd,krw&include_24hr_change=true&include_market_cap=true`
+    console.log('📍 API URL:', apiUrl)
+    console.log('📍 Headers:', headers)
+    
+    const response = await fetch(apiUrl, { headers })
     
     if (!response.ok) {
+      const errorBody = await response.text()
       console.error('❌ CoinGecko API error:', response.status, response.statusText)
+      console.error('❌ Error body:', errorBody)
       
       // 429 에러인 경우: 1) 캐시 반환 2) CoinCap 백업 시도
       if (response.status === 429) {
@@ -918,15 +921,12 @@ ${lang === 'ko' ? 'JSON 형식으로만 응답해주세요' : lang === 'en' ? 'R
 }`
 
       try {
-        // OpenAI API 호출 (환경 변수 사용)
+        // OpenAI API 사용 (GPT-5.2 - 2025년 12월 최신 모델)
         const apiKey = c.env.OPENAI_API_KEY
-        
         if (!apiKey) {
-          console.error('OpenAI API key not found in environment')
-          throw new Error('API 키 없음')
+          throw new Error('OPENAI_API_KEY not configured')
         }
         
-        // OpenAI 공식 API 사용 (gpt-5.2 - 최신 모델!)
         const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -934,13 +934,13 @@ ${lang === 'ko' ? 'JSON 형식으로만 응답해주세요' : lang === 'en' ? 'R
             'Authorization': `Bearer ${apiKey}`
           },
           body: JSON.stringify({
-            model: 'gpt-4o-mini',
+            model: 'gpt-5.2',
             messages: [
               { role: 'system', content: langConfig.systemRole },
               { role: 'user', content: prompt }
             ],
             temperature: 0.3,
-            max_tokens: 700
+            max_completion_tokens: 700
           })
         })
         
@@ -985,19 +985,80 @@ ${lang === 'ko' ? 'JSON 형식으로만 응답해주세요' : lang === 'en' ? 'R
       } catch (error) {
         console.error(`AI analysis failed for ${coinId}:`, error)
         
-        // 에러 시 시장 데이터 기반 간단한 분석 제공
+        // 시장 데이터 기반 스마트 분석 제공
         const change24h = coinData.usd_24h_change || 0
-        let simpleOutlook = '중립'
-        let simpleReasoning = `현재 ${symbol}의 24시간 변동률은 ${change24h.toFixed(2)}%입니다.`
+        const marketCap = coinData.usd_market_cap || 0
+        const marketCapB = (marketCap / 1e9).toFixed(1)
         
-        if (change24h > 5) {
-          simpleOutlook = '상승'
-          simpleReasoning += ' 강한 상승세를 보이고 있어 단기적으로 긍정적인 전망이 예상됩니다.'
-        } else if (change24h < -5) {
-          simpleOutlook = '하락'
-          simpleReasoning += ' 하락세를 보이고 있어 단기적으로 조정이 필요할 수 있습니다.'
+        let outlook = '중립'
+        let confidence = 50
+        let reasoning = ''
+        let advice = ''
+        
+        // 변동률 기반 전망
+        if (change24h > 10) {
+          outlook = lang === 'ko' ? '상승' : lang === 'en' ? 'Bullish' : lang === 'fr' ? 'Haussier' : lang === 'de' ? 'Bullisch' : 'Alcista'
+          confidence = 75
+          reasoning = lang === 'ko' 
+            ? `${symbol}이(가) 24시간 동안 ${change24h > 0 ? '+' : ''}${change24h.toFixed(2)}%의 강한 상승세를 보이고 있습니다. 시가총액 $${marketCapB}B 규모에서 이러한 상승은 강한 매수 모멘텀을 나타냅니다. 거래량 증가와 함께 단기 상승 추세가 지속될 가능성이 있습니다.`
+            : `${symbol} shows strong upward momentum with ${change24h > 0 ? '+' : ''}${change24h.toFixed(2)}% in 24h. Market cap of $${marketCapB}B suggests solid buying pressure. Short-term bullish trend likely to continue with increased trading volume.`
+          advice = lang === 'ko'
+            ? '강한 상승세이지만 과매수 구간에 진입했을 수 있습니다. 수익 실현 시점을 고려하고 손절매 라인을 설정하세요.'
+            : 'Strong uptrend but may be overbought. Consider profit-taking levels and set stop-loss.'
+        } else if (change24h > 5) {
+          outlook = lang === 'ko' ? '상승' : lang === 'en' ? 'Bullish' : lang === 'fr' ? 'Haussier' : lang === 'de' ? 'Bullisch' : 'Alcista'
+          confidence = 65
+          reasoning = lang === 'ko'
+            ? `${symbol}이(가) 24시간 동안 ${change24h > 0 ? '+' : ''}${change24h.toFixed(2)}%의 상승을 기록했습니다. 시가총액 $${marketCapB}B로 ${marketCapB > 100 ? '대형주' : marketCapB > 10 ? '중형주' : '소형주'} 규모입니다. 긍정적인 시장 심리를 반영하며 상승 모멘텀이 형성되고 있습니다.`
+            : `${symbol} gained ${change24h > 0 ? '+' : ''}${change24h.toFixed(2)}% in 24h with market cap of $${marketCapB}B. Positive market sentiment forming bullish momentum.`
+          advice = lang === 'ko'
+            ? '상승 추세이나 변동성에 주의하세요. 분할 매수 전략을 고려하고 시장 상황을 지속적으로 모니터링하세요.'
+            : 'Uptrend but watch for volatility. Consider dollar-cost averaging and monitor market conditions.'
+        } else if (change24h > 2) {
+          outlook = lang === 'ko' ? '중립' : lang === 'en' ? 'Neutral' : lang === 'fr' ? 'Neutre' : lang === 'de' ? 'Neutral' : 'Neutral'
+          confidence = 55
+          reasoning = lang === 'ko'
+            ? `${symbol}이(가) 24시간 동안 ${change24h > 0 ? '+' : ''}${change24h.toFixed(2)}%의 소폭 상승을 보였습니다. 시가총액 $${marketCapB}B 규모에서 안정적인 거래가 이루어지고 있으며, 약한 상승 모멘텀이 감지됩니다.`
+            : `${symbol} shows modest ${change24h > 0 ? '+' : ''}${change24h.toFixed(2)}% movement in 24h. Stable trading at $${marketCapB}B market cap with mild upward momentum.`
+          advice = lang === 'ko'
+            ? '단기적으로 안정적입니다. 추가 상승 신호를 확인한 후 진입을 고려하세요.'
+            : 'Short-term stability. Wait for clearer signals before entering.'
+        } else if (change24h > -2) {
+          outlook = lang === 'ko' ? '중립' : lang === 'en' ? 'Neutral' : lang === 'fr' ? 'Neutre' : lang === 'de' ? 'Neutral' : 'Neutral'
+          confidence = 50
+          reasoning = lang === 'ko'
+            ? `${symbol}이(가) 24시간 동안 ${change24h > 0 ? '+' : ''}${change24h.toFixed(2)}%의 미미한 변동을 보이며 횡보하고 있습니다. 시가총액 $${marketCapB}B 규모에서 방향성이 불분명하며 관망세가 우세합니다.`
+            : `${symbol} trading sideways with ${change24h > 0 ? '+' : ''}${change24h.toFixed(2)}% in 24h. Direction unclear at $${marketCapB}B market cap.`
+          advice = lang === 'ko'
+            ? '방향성이 불분명합니다. 추세 확인 후 신중하게 접근하고 급격한 변동에 대비하세요.'
+            : 'Direction unclear. Wait for trend confirmation and prepare for volatility.'
+        } else if (change24h > -5) {
+          outlook = lang === 'ko' ? '중립' : lang === 'en' ? 'Neutral' : lang === 'fr' ? 'Neutre' : lang === 'de' ? 'Neutral' : 'Neutral'
+          confidence = 55
+          reasoning = lang === 'ko'
+            ? `${symbol}이(가) 24시간 동안 ${change24h.toFixed(2)}%의 소폭 하락을 기록했습니다. 시가총액 $${marketCapB}B 규모에서 약한 매도 압력이 감지되지만 아직 추세 전환으로 보기는 어렵습니다.`
+            : `${symbol} declined ${change24h.toFixed(2)}% in 24h. Mild selling pressure at $${marketCapB}B market cap but not yet a trend reversal.`
+          advice = lang === 'ko'
+            ? '소폭 하락 중이나 매수 기회가 될 수 있습니다. 지지선을 확인하고 분할 매수를 고려하세요.'
+            : 'Minor decline may present buying opportunity. Check support levels and consider averaging in.'
+        } else if (change24h > -10) {
+          outlook = lang === 'ko' ? '하락' : lang === 'en' ? 'Bearish' : lang === 'fr' ? 'Baissier' : lang === 'de' ? 'Bärisch' : 'Bajista'
+          confidence = 65
+          reasoning = lang === 'ko'
+            ? `${symbol}이(가) 24시간 동안 ${change24h.toFixed(2)}%의 하락을 보이고 있습니다. 시가총액 $${marketCapB}B 규모에서 매도 압력이 증가하고 있으며 단기 조정이 진행 중입니다.`
+            : `${symbol} down ${change24h.toFixed(2)}% in 24h. Selling pressure increasing at $${marketCapB}B market cap with short-term correction underway.`
+          advice = lang === 'ko'
+            ? '하락 추세입니다. 손절매를 고려하거나 반등 시그널을 기다리세요. 추가 하락에 대비하세요.'
+            : 'Downtrend active. Consider stop-loss or wait for bounce signals. Prepare for further decline.'
         } else {
-          simpleReasoning += ' 안정적인 범위에서 거래되고 있습니다.'
+          outlook = lang === 'ko' ? '하락' : lang === 'en' ? 'Bearish' : lang === 'fr' ? 'Baissier' : lang === 'de' ? 'Bärisch' : 'Bajista'
+          confidence = 75
+          reasoning = lang === 'ko'
+            ? `${symbol}이(가) 24시간 동안 ${change24h.toFixed(2)}%의 급격한 하락을 기록했습니다. 시가총액 $${marketCapB}B 규모에서 강한 매도세가 나타나고 있으며 투자 심리가 악화되고 있습니다.`
+            : `${symbol} plunged ${change24h.toFixed(2)}% in 24h. Strong selling pressure at $${marketCapB}B market cap with deteriorating sentiment.`
+          advice = lang === 'ko'
+            ? '급격한 하락세입니다. 손실 최소화를 우선하고 시장이 안정될 때까지 관망하는 것이 좋습니다.'
+            : 'Sharp decline. Prioritize loss minimization and wait for market stabilization.'
         }
         
         return {
@@ -1007,10 +1068,10 @@ ${lang === 'ko' ? 'JSON 형식으로만 응답해주세요' : lang === 'en' ? 'R
           currentPrice: coinData.usd,
           change24h: change24h,
           analysis: {
-            outlook: simpleOutlook,
-            confidence: 50,
-            reasoning: simpleReasoning,
-            advice: '시장 변동성이 높으니 신중하게 투자하세요.'
+            outlook: outlook,
+            confidence: confidence,
+            reasoning: reasoning,
+            advice: advice
           }
         }
       }
@@ -1199,7 +1260,7 @@ app.get('/', (c) => {
       </nav>
       
       {/* 광고 영역 1: 헤더 아래 배너 (상단) */}
-      <div class="ad-container ad-header">
+      <div class="ad-container ad-header" style={{marginTop: '2rem', marginBottom: '2rem'}}>
         <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998'}}>
           <iframe 
             data-aa='2421971' 
@@ -1667,7 +1728,7 @@ app.get('/', (c) => {
         </div>
       </div>
       
-      {/* 광고 영역 3: 하단 배너 */}
+      {/* 광고 영역 2: 하단 배너 */}
       <div class="ad-container ad-footer" style={{marginTop: '3rem', marginBottom: '2rem'}}>
         <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998'}}>
           <iframe 
