@@ -38,7 +38,6 @@ jobs:
           echo "TWITTER_API_SECRET=$TWITTER_API_SECRET" >> .dev.vars
           echo "TWITTER_ACCESS_TOKEN=$TWITTER_ACCESS_TOKEN" >> .dev.vars
           echo "TWITTER_ACCESS_SECRET=$TWITTER_ACCESS_SECRET" >> .dev.vars
-          echo "OPENAI_API_KEY=$OPENAI_API_KEY" >> .dev.vars
           
           # 트윗 봇 실행
           node crypto-tweet-bot.js
