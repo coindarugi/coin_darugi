@@ -99,7 +99,8 @@ window.addEventListener('DOMContentLoaded', () => {
   loadSelectedExchange();
   loadPrices();
   loadCryptoNews();
-  // AI 전망은 사용자가 버튼 클릭 시에만 로드 (API 비용 절약)
+  // AI 전망 자동 복원 (이전에 로드했던 경우)
+  autoLoadAIForecastIfNeeded();
   
   startAutoRefresh();
 });
@@ -1010,12 +1011,49 @@ function setAIForecastLoaded(loaded) {
   localStorage.setItem('aiForecastLoaded', loaded ? 'true' : 'false');
 }
 
+// AI 전망 HTML을 localStorage에 캐시
+function saveAIForecastHTML(html) {
+  try {
+    localStorage.setItem('aiForecastHTML', html);
+    localStorage.setItem('aiForecastTimestamp', Date.now().toString());
+  } catch (e) {
+    console.error('Failed to save AI forecast to localStorage:', e);
+  }
+}
+
+// 캐시된 AI 전망 HTML 가져오기 (5분 이내면 유효)
+function getCachedAIForecastHTML() {
+  const html = localStorage.getItem('aiForecastHTML');
+  const timestamp = localStorage.getItem('aiForecastTimestamp');
+  
+  if (!html || !timestamp) return null;
+  
+  const now = Date.now();
+  const fiveMinutes = 5 * 60 * 1000;
+  
+  if (now - parseInt(timestamp) < fiveMinutes) {
+    return html;
+  }
+  
+  return null;
+}
+
 // 페이지 로드 시 AI 전망이 이전에 로드되었으면 자동으로 로드
 function autoLoadAIForecastIfNeeded() {
-  // 이 함수는 더 이상 사용하지 않음 - 사용자가 명시적으로 버튼을 클릭해야만 로드
-  // if (isAIForecastLoaded() && !aiForecastCurrentlyLoaded) {
-  //   loadAIForecastOnDemand();
-  // }
+  if (isAIForecastLoaded() && !aiForecastCurrentlyLoaded) {
+    const cachedHTML = getCachedAIForecastHTML();
+    if (cachedHTML) {
+      const container = document.getElementById('ai-forecast-container');
+      if (container) {
+        container.innerHTML = cachedHTML;
+        aiForecastCurrentlyLoaded = true;
+        restoreForecastStates(); // 접기/펼치기 상태 복원
+      }
+    } else {
+      // 캐시가 없으면 새로 로드
+      loadAIForecastOnDemand();
+    }
+  }
 }
 
 // 버튼 클릭 시 AI 전망 로드
@@ -1037,6 +1075,10 @@ async function loadAIForecastOnDemand() {
   
   const forecastHTML = await loadAIForecast();
   container.innerHTML = forecastHTML;
+  
+  // HTML을 localStorage에 캐시
+  saveAIForecastHTML(forecastHTML);
+  setAIForecastLoaded(true);
 }
 
 // AI 전망 로드
@@ -1962,6 +2004,73 @@ function closeUserGuide() {
 // 📈 AI 전망 더보기/접기 기능
 // ===========================================
 
+// 각 전망 카드의 펼침/접힘 상태 저장
+function saveForecastState(forecastId, isExpanded) {
+  try {
+    const states = JSON.parse(localStorage.getItem('forecastStates') || '{}');
+    states[forecastId] = isExpanded;
+    localStorage.setItem('forecastStates', JSON.stringify(states));
+  } catch (e) {
+    console.error('Failed to save forecast state:', e);
+  }
+}
+
+// 전망 카드의 상태 불러오기
+function getForecastState(forecastId) {
+  try {
+    const states = JSON.parse(localStorage.getItem('forecastStates') || '{}');
+    return states[forecastId] || false;
+  } catch (e) {
+    console.error('Failed to get forecast state:', e);
+    return false;
+  }
+}
+
+// 페이지 로드 후 모든 전망 카드의 상태 복원
+function restoreForecastStates() {
+  // 잠시 후 DOM이 준비될 때까지 기다림
+  setTimeout(() => {
+    try {
+      const states = JSON.parse(localStorage.getItem('forecastStates') || '{}');
+      
+      Object.keys(states).forEach(forecastId => {
+        if (states[forecastId]) {
+          // 펼쳐진 상태였다면 다시 펼치기
+          const reasoningDiv = document.getElementById(`${forecastId}-reasoning`);
+          const adviceDiv = document.getElementById(`${forecastId}-advice`);
+          
+          if (reasoningDiv && adviceDiv) {
+            const reasoningText = document.getElementById(`${forecastId}-reasoning-text`);
+            const adviceText = document.getElementById(`${forecastId}-advice-text`);
+            const btnText = document.getElementById(`${forecastId}-btn-text`);
+            const btnIcon = document.getElementById(`${forecastId}-btn-icon`);
+            
+            if (reasoningText && adviceText && btnText && btnIcon) {
+              // 전체 텍스트 표시
+              reasoningText.textContent = reasoningDiv.dataset.fullText || '';
+              adviceText.textContent = adviceDiv.dataset.fullText || '';
+              
+              // 스타일 적용
+              reasoningDiv.style.maxHeight = 'none';
+              reasoningDiv.style.overflowY = 'visible';
+              adviceDiv.style.maxHeight = 'none';
+              adviceDiv.style.overflowY = 'visible';
+              
+              reasoningDiv.dataset.expanded = 'true';
+              adviceDiv.dataset.expanded = 'true';
+              
+              btnText.textContent = currentLang === 'ko' ? '접기' : currentLang === 'fr' ? 'Réduire' : currentLang === 'de' ? 'Einklappen' : currentLang === 'es' ? 'Ocultar' : 'Show less';
+              btnIcon.className = 'fas fa-chevron-up';
+            }
+          }
+        }
+      });
+    } catch (e) {
+      console.error('Failed to restore forecast states:', e);
+    }
+  }, 100);
+}
+
 // AI 전망 텍스트 펼치기/접기
 function toggleForecastText(forecastId) {
   console.log('[toggleForecastText] Called with forecastId:', forecastId);
@@ -2004,6 +2113,9 @@ function toggleForecastText(forecastId) {
     
     btnText.textContent = currentLang === 'ko' ? '더보기' : currentLang === 'fr' ? 'Lire la suite' : currentLang === 'de' ? 'Mehr lesen' : currentLang === 'es' ? 'Leer más' : 'Read more';
     btnIcon.className = 'fas fa-chevron-down';
+    
+    // 상태 저장
+    saveForecastState(forecastId, false);
   } else {
     // 펼치기 - 인라인 스타일로 이 요소만 제어
     console.log('[toggleForecastText] Expanding:', forecastId);
@@ -2024,6 +2136,9 @@ function toggleForecastText(forecastId) {
     
     btnText.textContent = currentLang === 'ko' ? '접기' : currentLang === 'fr' ? 'Réduire' : currentLang === 'de' ? 'Einklappen' : currentLang === 'es' ? 'Ocultar' : 'Show less';
     btnIcon.className = 'fas fa-chevron-up';
+    
+    // 상태 저장
+    saveForecastState(forecastId, true);
   }
   
   console.log('[toggleForecastText] New state - expanded:', reasoningDiv.dataset.expanded);
