@@ -1,13 +1,14 @@
 import { jsxRenderer } from 'hono/jsx-renderer'
 
 export const renderer = jsxRenderer(({ children, lang }) => {
-  const version = `v5.3.7-${Date.now()}` // 🔥 타임스탬프로 강제 캐시 무효화
+  // 고정 버전 번호 (배포 시에만 변경)
+  const version = `v5.3.8`
   
   // 🌍 다국어 이미지 지원
   const currentLang = (lang as string) || 'ko'
   const validLangs = ['ko', 'en', 'fr', 'de', 'es']
   const imageLang = validLangs.includes(currentLang) ? currentLang : 'ko'
-  const ogImageUrl = `https://crypto-darugi.com/og-image-${imageLang}.png?v=${Date.now()}`
+  const ogImageUrl = `https://crypto-darugi.com/og-image-${imageLang}.png?v=${version}`
   
   // 🌍 다국어 메타 태그
   const metaData: Record<string, any> = {
@@ -70,9 +71,6 @@ export const renderer = jsxRenderer(({ children, lang }) => {
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-        <meta http-equiv="Pragma" content="no-cache" />
-        <meta http-equiv="Expires" content="0" />
         <meta name="coinzilla" content="e512e39981091254c6e7fe6b3e725329" />
         
         {/* Favicon */}
