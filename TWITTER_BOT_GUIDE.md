@@ -1,172 +1,79 @@
-# 🤖 암호화폐 자동 트윗 봇 배포 가이드
+# 🤖 트위터 자동 홍보 봇 가이드
 
-## ✨ 기능
+## ✨ 특징
 
 - 🌍 **5개 언어 자동 트윗** (한국어, 영어, 프랑스어, 독일어, 스페인어)
-- 💰 **다국어 화폐 단위** (₩ 원화, $ 달러, € 유로)
-- 📊 **실시간 비트코인 데이터** (CoinGecko API)
-- 🤖 **AI 분석** (OpenAI GPT-4o-mini)
-- ⏰ **자동 스케줄링** (Cloudflare Cron - 하루 2회)
-- 🔗 **사이트 홍보** (모든 트윗에 사이트 URL 포함)
+- 🚀 **웹사이트 홍보용** - 주요 기능 소개
+- 🎲 **랜덤 기능 선택** - 매번 다른 기능 3개 표시
+- ⏰ **하루 2회 자동 실행**
+  - 1차: UTC 00:00 = 한국 오전 9시 (아시아 타임)
+  - 2차: UTC 12:00 = 한국 오후 9시 (미국/유럽 타임)
+- 🆓 **완전 무료** (GitHub Actions 무료 플랜)
+- 🔧 **수동 실행 가능**
+- 💡 **간단한 구조** - OpenAI API 불필요 (비용 절감!)
 
-## 📅 자동 실행 시간
+## 📝 트윗 내용 예시
 
+### 한국어
 ```
-1회: UTC 00:00 = 한국 오전 9시  (아시아 타임)
-2회: UTC 12:00 = 한국 오후 9시  (미국/유럽 타임)
-```
+🚀 암호화폐 실시간 대시보드
 
-## 🚀 배포 방법
+✨ 10,000개 이상 암호화폐 실시간 추적
+🤖 AI 기반 코인 전망 분석 (GPT-5.2)
+💰 김치 프리미엄 계산기 (업비트/빗썸/코인원)
 
-### 1️⃣ Cloudflare 환경 변수 설정
-
-```bash
-# Cloudflare API 인증
-npx wrangler login
-
-# X (Twitter) API 키 설정
-npx wrangler pages secret put TWITTER_API_KEY --project-name webapp
-# 입력: your_twitter_api_key_here
-
-npx wrangler pages secret put TWITTER_API_SECRET --project-name webapp
-# 입력: your_twitter_api_secret_here
-
-npx wrangler pages secret put TWITTER_ACCESS_TOKEN --project-name webapp
-# 입력: your_twitter_access_token_here
-
-npx wrangler pages secret put TWITTER_ACCESS_SECRET --project-name webapp
-# 입력: your_twitter_access_secret_here
-
-# OpenAI API 키 설정
-npx wrangler pages secret put OPENAI_API_KEY --project-name webapp
-# 입력: your_openai_api_key_here
-```
-
-### 2️⃣ 프로젝트 배포
-
-```bash
-# 빌드
-npm run build
-
-# Cloudflare Pages에 배포
-npx wrangler pages deploy dist --project-name webapp
-```
-
-### 3️⃣ 수동 테스트
-
-배포 완료 후 바로 테스트:
-
-```bash
-# 브라우저에서
-https://webapp.pages.dev/api/run-crypto-bot
-
-# 또는 curl로
-curl https://webapp.pages.dev/api/run-crypto-bot
-```
-
-## 📝 트윗 예시
-
-### 한국어 (원화)
-```
-🪙 비트코인(BTC) 오늘의 AI 분석
-
-💰 ₩1.27억 (↑0.91%)
-📊 24h Vol: ₩36.01조
-
-🤖 현재 비트코인은 ₩1.27억으로 거래되고 있으며...
-
-⚠️ 투자 판단은 신중히! 본 정보는 투자 조언이 아닙니다.
+👉 지금 무료로 사용해보세요!
 
 🔗 https://crypto-dashboard-secure.pages.dev/
 
-#비트코인 #BTC #암호화폐 #AI분석
+#암호화폐 #비트코인 #코인추적 #무료대시보드
 ```
 
-### 영어 (달러)
+### English
 ```
-🪙 Bitcoin(BTC) Daily AI Analysis
+🚀 Crypto Real-time Dashboard
 
-💰 $87,743 (↑0.91%)
-📊 24h Vol: $24.91B
+✨ Track 10,000+ cryptocurrencies in real-time
+🤖 AI-powered coin forecast (GPT-5.2)
+📊 Portfolio management & profit tracking
 
-🤖 Bitcoin is currently trading at $87,743...
-
-⚠️ DYOR - Not financial advice.
+👉 Try it now for FREE!
 
 🔗 https://crypto-dashboard-secure.pages.dev/
 
-#Bitcoin #BTC #Crypto #AIAnalysis
+#Crypto #Bitcoin #Dashboard #FreeTool
 ```
 
-### 프랑스어/독일어/스페인어 (유로)
-```
-🪙 Bitcoin(BTC) Analyse IA du jour
+## 🎯 홍보 전략
 
-💰 €74,520 (↑0.91%)
-📊 24h Vol: €21.16B
+### 주요 기능 (6가지)
+1. ✨ 10,000개 이상 암호화폐 실시간 추적
+2. 🤖 AI 기반 코인 전망 분석 (GPT-5.2)
+3. 💰 김치 프리미엄 계산기 (한국어만)
+4. 📊 포트폴리오 관리 & 수익률 계산
+5. 📰 실시간 뉴스 + 자동 번역
+6. 🌍 5개 언어 완벽 지원
 
-🤖 Le Bitcoin se négocie actuellement à €74,520...
+### 랜덤 선택
+- 매 트윗마다 6개 중 랜덤으로 3개 선택
+- 다양성 확보 → 지루하지 않음
+- 모든 기능 골고루 홍보
 
-⚠️ DYOR - Pas un conseil financier.
+## 🚀 로컬 테스트
 
-🔗 https://crypto-dashboard-secure.pages.dev/
-
-#Bitcoin #BTC #Crypto #AnalyseIA
-```
-
-## 🔧 Cron 시간 변경
-
-`wrangler.jsonc` 파일에서 수정:
-
-```jsonc
-"triggers": {
-  "crons": [
-    "0 0 * * *",   // 첫 번째 실행 시간
-    "0 12 * * *"   // 두 번째 실행 시간
-  ]
-}
-```
-
-**시간 예시:**
-- `"0 0 * * *"` → UTC 00:00 (한국 오전 9시)
-- `"0 9 * * *"` → UTC 09:00 (한국 오후 6시)
-- `"0 12 * * *"` → UTC 12:00 (한국 오후 9시)
-
-## 📊 모니터링
-
-### Cloudflare Dashboard에서 확인
-1. https://dash.cloudflare.com 접속
-2. Pages 프로젝트 선택
-3. "Functions" 탭 → "Cron Triggers" 확인
-
-### 로그 확인
 ```bash
-npx wrangler pages deployment tail --project-name webapp
+cd /home/user/webapp
+node crypto-tweet-bot.js
 ```
 
-## 🐛 문제 해결
-
-### 트윗이 발행되지 않아요
-- X Developer Portal에서 앱 권한이 "Read and Write"인지 확인
-- Access Token을 권한 변경 후 재생성했는지 확인
-- Cloudflare 환경 변수가 올바르게 설정되었는지 확인
-
-### Cron이 실행되지 않아요
-- Cloudflare Pages에서 Cron Triggers가 활성화되었는지 확인
-- 배포가 완료되었는지 확인
-- 환경 변수가 프로덕션에 설정되었는지 확인
-
-### 환경 변수 확인
-```bash
-npx wrangler pages secret list --project-name webapp
-```
+**주의**: 실제 트윗이 발행됩니다! 테스트는 신중하게.
 
 ## 📞 문의
 
-문제가 있으시면 언제든지 연락주세요:
+문제가 있으시면:
 - Email: coin.darugi@gmail.com
 - Twitter: @coin_darugi
 
 ## 🎉 완료!
 
-이제 매일 자동으로 5개 언어로 비트코인 분석 트윗이 발행됩니다! 🚀
+이제 매일 자동으로 5개 언어로 웹사이트 홍보 트윗이 발행됩니다! 🚀
