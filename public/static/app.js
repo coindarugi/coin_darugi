@@ -1775,7 +1775,8 @@ async function loadPrices() {
       </button>
     `;
     
-    appDiv.innerHTML = searchHTML + statsHTML + portfolioSummaryHTML + coinsHTML + adMiddleHTML + aiForecastHTML + newsHTML + refreshButton;
+    // 순서: 검색 → 통계 → 포트폴리오 요약 → 코인 목록 → AI 전망 → 뉴스 → 새로고침 → 중간 광고
+    appDiv.innerHTML = searchHTML + statsHTML + portfolioSummaryHTML + coinsHTML + aiForecastHTML + newsHTML + refreshButton + adMiddleHTML;
     
     // 🌍 각 코인별로 해당 국가 거래소 가격 로드
     loadExchangePrices(coinsArray);
