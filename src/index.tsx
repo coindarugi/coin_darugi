@@ -1210,6 +1210,9 @@ app.get('/', (c) => {
         <div class="loading">데이터 로딩 중...</div>
       </div>
       
+      {/* 🖼️ 중단 광고 Placeholder (app.js에서 동적 삽입) */}
+      <div id="ad-middle-placeholder"></div>
+      
       {/* 코인 브라우저 모달 */}
       <div id="coinBrowserModal" class="modal">
         <div class="modal-content">

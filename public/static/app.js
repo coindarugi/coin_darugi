@@ -1775,7 +1775,13 @@ async function loadPrices() {
       </button>
     `;
     
-    appDiv.innerHTML = searchHTML + statsHTML + portfolioSummaryHTML + coinsHTML + adMiddleHTML + aiForecastHTML + newsHTML + refreshButton;
+    appDiv.innerHTML = searchHTML + statsHTML + portfolioSummaryHTML + coinsHTML + aiForecastHTML + newsHTML + refreshButton;
+    
+    // 🖼️ 중단 광고를 별도 placeholder에 삽입
+    const adMiddlePlaceholder = document.getElementById('ad-middle-placeholder');
+    if (adMiddlePlaceholder) {
+      adMiddlePlaceholder.innerHTML = adMiddleHTML;
+    }
     
     // 🌍 각 코인별로 해당 국가 거래소 가격 로드
     loadExchangePrices(coinsArray);
