@@ -267,7 +267,16 @@ function toggleCoin(coinId, coinName, coinSymbol) {
     selectedCoins.push(coinId);
   }
   saveSelectedCoins();
-  loadPrices();
+  
+  // Top 100 브라우저가 열려있으면 모달만 다시 로드 (페이지 전체 리로드 없이)
+  const coinBrowserModal = document.getElementById('coinBrowserModal');
+  if (coinBrowserModal && coinBrowserModal.style.display === 'flex') {
+    // 모달이 열려있으면 모달만 업데이트
+    showCoinBrowser();
+  } else {
+    // 모달이 닫혀있으면 페이지 전체 리로드
+    loadPrices();
+  }
 }
 
 // 코인 검색
