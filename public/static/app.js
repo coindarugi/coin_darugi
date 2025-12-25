@@ -88,6 +88,14 @@ window.addEventListener('DOMContentLoaded', () => {
   loadCryptoNews();
   // AI 전망은 사용자가 버튼 클릭 시에만 로드 (API 비용 절약)
   // setupAIForecastLazyLoading(); // 제거됨
+  
+  // AI 전망이 이미 로드되었으면 페이지 로드 시 자동으로 다시 로드 (언어 변경 시 유지)
+  if (aiForecastLoaded) {
+    setTimeout(() => {
+      loadAIForecastOnDemand();
+    }, 500); // DOM 로딩 완료 후 실행
+  }
+  
   startAutoRefresh();
 });
 
@@ -985,7 +993,7 @@ async function loadFearGreedIndex() {
 let newsTranslations = {}; // 번역 캐시
 
 // AI 전망 버튼 클릭 로딩
-let aiForecastLoaded = false; // AI 전망 로드 여부
+let aiForecastLoaded = localStorage.getItem('aiForecastLoaded') === 'true'; // AI 전망 로드 여부 (localStorage에서 복원)
 
 // 버튼 클릭 시 AI 전망 로드
 async function loadAIForecastOnDemand() {
@@ -995,6 +1003,9 @@ async function loadAIForecastOnDemand() {
   // 이미 로드했으면 다시 로드하지 않음
   if (aiForecastLoaded) return;
   aiForecastLoaded = true;
+  
+  // localStorage에 저장 (언어 변경 시에도 유지)
+  localStorage.setItem('aiForecastLoaded', 'true');
   
   // 로딩 표시
   container.innerHTML = `
