@@ -1,10 +1,5 @@
-# robots.txt for Crypto Dashboard
 User-agent: *
 Allow: /
-Allow: /static/
 
-# Sitemaps
-Sitemap: https://crypto-darugi.com/sitemap.xml
-
-# Crawl-delay for politeness
-Crawl-delay: 1
+# Block analytics endpoints
+Disallow: /cdn-cgi/
