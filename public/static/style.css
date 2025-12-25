@@ -1481,6 +1481,8 @@ h1 {
   max-height: none; /* 높이 제한 제거 - 모든 뉴스 표시 */
   overflow-y: visible;
   padding-right: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .news-feed::-webkit-scrollbar {
@@ -1511,6 +1513,9 @@ h1 {
   text-decoration: none;
   color: inherit;
   display: block;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .news-item:hover {
