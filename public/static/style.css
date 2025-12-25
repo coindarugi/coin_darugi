@@ -52,6 +52,8 @@ body::before {
   position: relative;
   z-index: 0;
   clear: both;
+  max-height: 250px;
+  overflow: hidden;
 }
 
 .ad-header {
@@ -63,6 +65,19 @@ body::before {
   margin-top: 4rem;
   margin-bottom: 2rem;
   clear: both;
+}
+
+/* A-ADS iframe 제한 */
+.ad-container iframe {
+  max-height: 200px;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* 팝업/오버레이 광고 차단 */
+.ad-container * {
+  position: relative !important;
+  max-width: 100% !important;
 }
 
 .ad-label {
@@ -104,9 +119,18 @@ body::before {
 
 /* 반응형: 모바일에서는 광고 숨기기 또는 작은 사이즈 */
 @media (max-width: 768px) {
+  .ad-container {
+    max-height: 150px;
+  }
+  
   .ad-header iframe {
     width: 320px !important;
     height: 50px !important;
+    max-height: 100px !important;
+  }
+  
+  .ad-footer iframe {
+    max-height: 100px !important;
   }
 }
 
