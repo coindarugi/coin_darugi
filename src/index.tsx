@@ -10,13 +10,13 @@ type Bindings = {
   TWITTER_API_SECRET?: string
   TWITTER_ACCESS_TOKEN?: string
   TWITTER_ACCESS_SECRET?: string
+  COINGECKO_API_KEY?: string
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
 
-// 🔑 CoinGecko API Key (Pro Plan)
-const COINGECKO_API_KEY = 'CG-bEbJV8BdVqdiC9EZWHDhiWBt'
-const COINGECKO_API_URL = 'https://pro-api.coingecko.com/api/v3'
+// 🔑 CoinGecko API (Free endpoint by default)
+const COINGECKO_API_URL = 'https://api.coingecko.com/api/v3'
 
 // 🤖 AI 전망 캐시 (5분 - 베이직 플랜)
 const aiForecastCache = {
@@ -923,13 +923,13 @@ ${lang === 'ko' ? 'JSON 형식으로만 응답해주세요' : lang === 'en' ? 'R
             'Authorization': `Bearer ${apiKey}`
           },
           body: JSON.stringify({
-            model: 'gpt-5.2',
+            model: 'gpt-4o-mini',
             messages: [
               { role: 'system', content: langConfig.systemRole },
               { role: 'user', content: prompt }
             ],
             temperature: 0.3,
-            max_completion_tokens: 1000
+            max_tokens: 700
           })
         })
         
