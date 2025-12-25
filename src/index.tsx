@@ -1114,7 +1114,7 @@ app.get('/', (c) => {
           </button>
           
           <button 
-            onclick="loadAIForecastOnDemand(); setTimeout(() => { const aiSection = document.querySelector('.ai-forecast-section'); if (aiSection) aiSection.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 500)"
+            onclick="const aiBtn = document.getElementById('loadAIForecastBtn'); if (aiBtn) { aiBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => aiBtn.classList.add('pulse-animation'), 500); setTimeout(() => aiBtn.classList.remove('pulse-animation'), 2500); }"
             style={{
               display: 'flex',
               alignItems: 'center',
