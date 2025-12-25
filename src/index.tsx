@@ -1094,6 +1094,25 @@ app.get('/', (c) => {
         <div class="loading">데이터 로딩 중...</div>
       </div>
       
+      {/* 광고 영역 2: 가운데 배너 (A-ads Adaptive) */}
+      <div class="ad-container ad-middle" style={{marginTop: '2rem', marginBottom: '2rem'}}>
+        <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998'}}>
+          <iframe 
+            data-aa='2421975' 
+            src='//acceptable.a-ads.com/2421975/?size=Adaptive'
+            style={{
+              border: '0',
+              padding: '0',
+              width: '70%',
+              height: 'auto',
+              overflow: 'hidden',
+              display: 'block',
+              margin: 'auto'
+            }}
+          />
+        </div>
+      </div>
+      
       {/* 코인 브라우저 모달 */}
       <div id="coinBrowserModal" class="modal">
         <div class="modal-content">
