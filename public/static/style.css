@@ -2735,3 +2735,124 @@ h1 {
 .pulse-animation {
   animation: pulse-glow 0.8s ease-in-out 3;
 }
+
+/* ===========================================
+   광고 배너 스타일 (BC.GAME)
+   =========================================== */
+.ad-banner {
+  width: 100%;
+  max-width: 728px;
+  margin: 2rem auto;
+  padding: 1rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.ad-banner:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(102, 126, 234, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.ad-banner a {
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+  /* 모바일 터치 영역 확보 */
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.ad-banner .ad-image {
+  width: 100%;
+  max-width: 728px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  border-radius: 8px;
+  /* 모바일 터치 최적화 */
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* 상단 광고 (헤더 아래) */
+.ad-banner.ad-top {
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* 중단 광고 (코인 리스트 중간) */
+.ad-banner.ad-middle {
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+}
+
+/* 하단 광고 (페이지 끝) */
+.ad-banner.ad-bottom {
+  margin-top: 3rem;
+  margin-bottom: 2rem;
+}
+
+/* 모바일 최적화 */
+@media (max-width: 768px) {
+  .ad-banner {
+    max-width: 100%;
+    padding: 0.5rem;
+    margin: 1.5rem auto;
+    /* 모바일에서 좌우 여백 추가 */
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+  
+  .ad-banner .ad-image {
+    max-width: 100%;
+    border-radius: 6px;
+  }
+  
+  .ad-banner.ad-top {
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .ad-banner.ad-middle {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .ad-banner.ad-bottom {
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* 작은 모바일 화면 (320px - 480px) */
+@media (max-width: 480px) {
+  .ad-banner {
+    padding: 0.25rem;
+    margin: 1rem 0.5rem;
+  }
+  
+  .ad-banner .ad-image {
+    border-radius: 4px;
+  }
+}
+
+/* 터치 디바이스 최적화 */
+@media (hover: none) and (pointer: coarse) {
+  .ad-banner a {
+    /* 모바일 터치 영역 확보 */
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .ad-banner:active {
+    transform: scale(0.98);
+    background: rgba(255, 255, 255, 0.07);
+  }
+}

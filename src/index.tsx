@@ -1259,23 +1259,16 @@ app.get('/', (c) => {
         </div>
       </nav>
       
-      {/* 광고 영역 1: 헤더 아래 배너 (상단) */}
-      <div class="ad-container ad-header" style={{marginTop: '2rem', marginBottom: '2rem'}}>
-        <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998'}}>
-          <iframe 
-            data-aa='2421971' 
-            src='//acceptable.a-ads.com/2421971/?size=Adaptive'
-            style={{
-              border: '0',
-              padding: '0',
-              width: '70%',
-              height: 'auto',
-              overflow: 'hidden',
-              display: 'block',
-              margin: 'auto'
-            }}
+      {/* 광고 영역 1: 헤더 아래 배너 (상단) - BC.GAME */}
+      <div class="ad-banner ad-top">
+        <a href="https://bc.game/i-1hx0000-n/" target="_blank" rel="noopener noreferrer sponsored">
+          <img 
+            src="https://bc.game/banner/728x90.gif" 
+            alt="BC.GAME - Best Crypto Casino"
+            class="ad-image"
+            loading="lazy"
           />
-        </div>
+        </a>
       </div>
       
       <div id="app">
