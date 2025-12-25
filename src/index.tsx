@@ -1210,8 +1210,16 @@ app.get('/', (c) => {
         <div class="loading">데이터 로딩 중...</div>
       </div>
       
-      {/* 🖼️ 중단 광고 Placeholder (app.js에서 동적 삽입) */}
-      <div id="ad-middle-placeholder"></div>
+      {/* 🖼️ 중단 광고 (SSR - 광고 네트워크 크롤링용) */}
+      <div class="ad-container ad-middle" style="margin-top: 2rem; margin-bottom: 2rem;">
+        <div id="frame" style="width: 100%; margin: auto; position: relative; z-index: 99998;">
+          <iframe 
+            data-aa='2421975' 
+            src='//acceptable.a-ads.com/2421975/?size=Adaptive'
+            style='border:0; padding:0; width:70%; height:auto; overflow:hidden; display: block; margin: auto'>
+          </iframe>
+        </div>
+      </div>
       
       {/* 코인 브라우저 모달 */}
       <div id="coinBrowserModal" class="modal">
