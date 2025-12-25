@@ -1,7 +1,7 @@
 import { jsxRenderer } from 'hono/jsx-renderer'
 
 export const renderer = jsxRenderer(({ children, lang }) => {
-  const version = 'v5.3.6' // ✨ 순서 변경: 뉴스→새로고침→광고
+  const version = `v5.3.7-${Date.now()}` // 🔥 타임스탬프로 강제 캐시 무효화
   
   // 🌍 다국어 이미지 지원
   const currentLang = (lang as string) || 'ko'
