@@ -34,11 +34,11 @@ const SITE_URL = 'https://crypto-dashboard-secure.pages.dev/';
 
 // 언어 설정
 const LANGUAGES = {
-  ko: { name: '한국어', currency: 'krw', symbol: '₩', hashtags: '#비트코인 #BTC #암호화폐 #AI분석' },
-  en: { name: 'English', currency: 'usd', symbol: '$', hashtags: '#Bitcoin #BTC #Crypto #AIAnalysis' },
-  fr: { name: 'Français', currency: 'eur', symbol: '€', hashtags: '#Bitcoin #BTC #Crypto #AnalyseIA' },
-  de: { name: 'Deutsch', currency: 'eur', symbol: '€', hashtags: '#Bitcoin #BTC #Krypto #KIAnalyse' },
-  es: { name: 'Español', currency: 'eur', symbol: '€', hashtags: '#Bitcoin #BTC #Cripto #AnálisisIA' },
+  ko: { name: '한국어', currency: 'krw', symbol: '₩', hashtags: '#암호화폐 #비트코인 #코인추적 #무료대시보드' },
+  en: { name: 'English', currency: 'usd', symbol: '$', hashtags: '#Crypto #Bitcoin #Dashboard #FreeTool' },
+  fr: { name: 'Français', currency: 'eur', symbol: '€', hashtags: '#Crypto #Bitcoin #Dashboard #Gratuit' },
+  de: { name: 'Deutsch', currency: 'eur', symbol: '€', hashtags: '#Krypto #Bitcoin #Dashboard #Kostenlos' },
+  es: { name: 'Español', currency: 'eur', symbol: '€', hashtags: '#Cripto #Bitcoin #Dashboard #Gratis' },
 };
 
 /**
@@ -216,39 +216,82 @@ Requisitos:
 }
 
 /**
- * 트윗 텍스트 생성
+ * 웹사이트 홍보 트윗 텍스트 생성
  */
 function createTweetText(bitcoinData, aiAnalysis, language) {
   const currency = LANGUAGES[language].currency;
   const symbol = LANGUAGES[language].symbol;
-  const priceEmoji = bitcoinData.priceChange24h >= 0 ? '↑' : '↓';
   
-  const price = bitcoinData.prices[currency];
-  const volume = bitcoinData.volumes[currency];
-  const warningTexts = {
-    ko: '⚠️ 투자 판단은 신중히! 본 정보는 투자 조언이 아닙니다.',
-    en: '⚠️ DYOR - Not financial advice.',
-    fr: '⚠️ DYOR - Pas un conseil financier.',
-    de: '⚠️ DYOR - Keine Finanzberatung.',
-    es: '⚠️ DYOR - No es asesoramiento financiero.',
+  // 웹사이트 주요 기능 (언어별)
+  const features = {
+    ko: [
+      '✨ 10,000개 이상 암호화폐 실시간 추적',
+      '🤖 AI 기반 코인 전망 분석 (GPT-5.2)',
+      '💰 김치 프리미엄 계산기 (업비트/빗썸/코인원)',
+      '📊 포트폴리오 관리 & 수익률 계산',
+      '📰 실시간 뉴스 + 자동 번역',
+      '🌍 5개 언어 완벽 지원'
+    ],
+    en: [
+      '✨ Track 10,000+ cryptocurrencies in real-time',
+      '🤖 AI-powered coin forecast (GPT-5.2)',
+      '📊 Portfolio management & profit tracking',
+      '📰 Real-time crypto news + translation',
+      '🌍 5 languages supported',
+      '💯 100% FREE!'
+    ],
+    fr: [
+      '✨ Suivez 10 000+ cryptomonnaies en temps réel',
+      '🤖 Prévisions IA (GPT-5.2)',
+      '📊 Gestion de portefeuille',
+      '📰 Actualités crypto + traduction',
+      '🌍 5 langues supportées',
+      '💯 100% GRATUIT!'
+    ],
+    de: [
+      '✨ 10.000+ Kryptowährungen in Echtzeit',
+      '🤖 KI-Prognosen (GPT-5.2)',
+      '📊 Portfolio-Management',
+      '📰 Krypto-News + Übersetzung',
+      '🌍 5 Sprachen unterstützt',
+      '💯 100% KOSTENLOS!'
+    ],
+    es: [
+      '✨ Sigue 10,000+ criptomonedas en tiempo real',
+      '🤖 Pronósticos IA (GPT-5.2)',
+      '📊 Gestión de cartera',
+      '📰 Noticias crypto + traducción',
+      '🌍 5 idiomas compatibles',
+      '💯 ¡100% GRATIS!'
+    ]
   };
 
   const titles = {
-    ko: '🪙 비트코인(BTC) 오늘의 AI 분석',
-    en: '🪙 Bitcoin(BTC) Daily AI Analysis',
-    fr: '🪙 Bitcoin(BTC) Analyse IA du jour',
-    de: '🪙 Bitcoin(BTC) Tägliche KI-Analyse',
-    es: '🪙 Bitcoin(BTC) Análisis IA diario',
+    ko: '🚀 암호화폐 실시간 대시보드',
+    en: '🚀 Crypto Real-time Dashboard',
+    fr: '🚀 Tableau de bord crypto en temps réel',
+    de: '🚀 Krypto-Echtzeit-Dashboard',
+    es: '🚀 Panel de control cripto en tiempo real',
   };
+
+  const ctas = {
+    ko: '👉 지금 무료로 사용해보세요!',
+    en: '👉 Try it now for FREE!',
+    fr: '👉 Essayez-le gratuitement maintenant!',
+    de: '👉 Jetzt kostenlos testen!',
+    es: '👉 ¡Pruébalo gratis ahora!',
+  };
+
+  // 랜덤으로 3개 기능 선택 (매번 다르게)
+  const selectedFeatures = features[language]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 3);
 
   return `${titles[language]}
 
-💰 ${formatNumber(price, currency, symbol)} (${priceEmoji}${Math.abs(bitcoinData.priceChange24h).toFixed(2)}%)
-📊 24h Vol: ${formatNumber(volume, currency, symbol)}
+${selectedFeatures.join('\n')}
 
-🤖 ${aiAnalysis}
-
-${warningTexts[language]}
+${ctas[language]}
 
 🔗 ${SITE_URL}
 
@@ -275,24 +318,17 @@ async function postTweet(text, language) {
  * 메인 실행 함수
  */
 async function main() {
-  console.log('🚀 5개 언어 자동 트윗 봇 시작...\n');
+  console.log('🚀 웹사이트 홍보 트윗 봇 시작...\n');
   console.log(`⏰ 실행 시간: ${new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}\n`);
 
   try {
-    // 1. 비트코인 데이터 가져오기
-    console.log('1️⃣ 비트코인 데이터 가져오는 중...');
-    const bitcoinData = await getBitcoinData();
-    console.log(`✅ 현재가: ${formatNumber(bitcoinData.prices.usd, 'usd', '$')} (${bitcoinData.priceChange24h >= 0 ? '+' : ''}${bitcoinData.priceChange24h.toFixed(2)}%)\n`);
-
-    // 2. 각 언어별로 트윗 생성 및 발행
+    // 각 언어별로 트윗 생성 및 발행
     for (const [langCode, langInfo] of Object.entries(LANGUAGES)) {
-      console.log(`📝 [${langInfo.name}] AI 분석 생성 중...`);
-      const aiAnalysis = await generateAIAnalysis(bitcoinData, langCode);
-      console.log(`✅ [${langInfo.name}] AI 분석 완료\n`);
+      console.log(`🐦 [${langInfo.name}] 트윗 생성 중...`);
 
-      const tweetText = createTweetText(bitcoinData, aiAnalysis, langCode);
+      // 웹사이트 홍보 트윗 생성 (비트코인 데이터 필요 없음)
+      const tweetText = createTweetText(null, null, langCode);
       
-      console.log(`🐦 [${langInfo.name}] 트윗 발행 중...`);
       console.log('─'.repeat(50));
       console.log(tweetText);
       console.log('─'.repeat(50));
