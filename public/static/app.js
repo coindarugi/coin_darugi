@@ -994,18 +994,20 @@ let newsTranslations = {}; // 번역 캐시
 
 // AI 전망 버튼 클릭 로딩
 let aiForecastLoaded = localStorage.getItem('aiForecastLoaded') === 'true'; // AI 전망 로드 여부 (localStorage에서 복원)
+let aiForecastCurrentlyLoaded = false; // 현재 페이지에서 실제로 로드되었는지 여부
 
 // 버튼 클릭 시 AI 전망 로드
 async function loadAIForecastOnDemand() {
   const container = document.getElementById('ai-forecast-container');
   if (!container) return;
   
-  // 이미 로드했으면 다시 로드하지 않음
-  if (aiForecastLoaded) return;
-  aiForecastLoaded = true;
+  // 현재 페이지에서 이미 로드했으면 다시 로드하지 않음
+  if (aiForecastCurrentlyLoaded) return;
+  aiForecastCurrentlyLoaded = true;
   
   // localStorage에 저장 (언어 변경 시에도 유지)
   localStorage.setItem('aiForecastLoaded', 'true');
+  aiForecastLoaded = true;
   
   // 로딩 표시
   container.innerHTML = `
