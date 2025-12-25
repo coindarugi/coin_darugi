@@ -1137,7 +1137,7 @@ app.get('/', (c) => {
           </button>
           
           <button 
-            onclick="loadCryptoNews(); setTimeout(() => { const newsSection = document.querySelector('.news-section'); if (newsSection) newsSection.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 500)"
+            onclick="loadCryptoNews(); setTimeout(() => { const newsCard = document.querySelector('.news-feed-card'); if (newsCard) newsCard.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 1000)"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -1160,7 +1160,7 @@ app.get('/', (c) => {
           </button>
           
           <button 
-            onclick="const portfolioCards = document.querySelectorAll('.portfolio-section'); if (portfolioCards.length > 0) portfolioCards[0].scrollIntoView({ behavior: 'smooth', block: 'center' })"
+            onclick="setTimeout(() => { const portfolioCards = document.querySelectorAll('.coin-card'); if (portfolioCards.length > 0) portfolioCards[0].scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 300)"
             style={{
               display: 'flex',
               alignItems: 'center',
