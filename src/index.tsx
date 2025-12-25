@@ -1211,8 +1211,8 @@ app.get('/', (c) => {
       <div class="ad-container ad-middle" style={{marginTop: '2rem', marginBottom: '2rem'}}>
         <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998'}}>
           <iframe 
-            data-aa='2421975' 
-            src='//acceptable.a-ads.com/2421975/?size=Adaptive'
+            data-aa='2421980' 
+            src='//acceptable.a-ads.com/2421980/?size=Adaptive'
             style={{
               border: '0',
               padding: '0',
