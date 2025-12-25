@@ -1000,6 +1000,7 @@ let newsTranslations = {}; // 번역 캐시
 
 // AI 전망 버튼 클릭 로딩
 let aiForecastCurrentlyLoaded = false; // 현재 페이지에서 실제로 로드되었는지 여부
+let lastLoadedAIForecastHTML = ''; // 마지막으로 로드된 AI 전망 HTML 캐시
 
 // AI 전망 로드 상태를 localStorage에서 확인
 function isAIForecastLoaded() {
@@ -1047,6 +1048,7 @@ function autoLoadAIForecastIfNeeded() {
       if (container) {
         container.innerHTML = cachedHTML;
         aiForecastCurrentlyLoaded = true;
+        lastLoadedAIForecastHTML = cachedHTML; // ✅ 메모리에도 캐시 (탭 전환 시 사용)
         restoreForecastStates(); // 접기/펼치기 상태 복원
       }
     } else {
@@ -1084,11 +1086,12 @@ async function loadAIForecastOnDemand() {
   container.innerHTML = '';
   container.innerHTML = forecastHTML;
   
-  // HTML을 localStorage에 캐시
+  // HTML을 메모리와 localStorage에 캐시
+  lastLoadedAIForecastHTML = forecastHTML; // ✅ 메모리에 캐시 (탭 전환 시 사용)
   saveAIForecastHTML(forecastHTML);
   setAIForecastLoaded(true);
   
-  console.log('[loadAIForecastOnDemand] AI forecast loaded successfully');
+  console.log('[loadAIForecastOnDemand] AI forecast loaded and cached successfully');
 }
 
 // AI 전망 로드
@@ -1480,40 +1483,48 @@ async function loadPrices() {
     // 공포탐욕지수 가져오기
     const fearGreedHTML = await loadFearGreedIndex();
     
-    // AI 전망 컨테이너 (버튼 클릭 로딩만 허용 - 캐시 사용 안 함)
-    const aiForecastHTML = `
-      <div id="ai-forecast-container" style="min-height: 200px;">
-        <div style="text-align: center; padding: 3rem;">
-          <button 
-            id="loadAIForecastBtn" 
-            onclick="if (!aiForecastCurrentlyLoaded) { loadAIForecastOnDemand(); this.disabled = true; }" 
-            style="
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-              padding: 1rem 2rem;
-              border: none;
-              border-radius: 12px;
-              font-size: 1.1rem;
-              font-weight: 600;
-              cursor: pointer;
-              transition: all 0.3s ease;
-              box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-              display: inline-flex;
-              align-items: center;
-              gap: 0.5rem;
-            "
-            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.6)'"
-            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.4)'"
-          >
-            <i class="fas fa-robot" style="font-size: 1.2rem;"></i>
-            <span>${t('loadAIForecast')}</span>
-          </button>
-          <p style="margin-top: 1rem; color: #94a3b8; font-size: 0.9rem;">
-            <i class="fas fa-info-circle"></i> ${t('aiForecastClickMsg')}
-          </p>
+    // AI 전망 컨테이너 (이미 로드된 경우 유지, 아니면 버튼 표시)
+    let aiForecastHTML = '';
+    if (aiForecastCurrentlyLoaded && lastLoadedAIForecastHTML) {
+      // 이미 로드된 AI 전망이 있으면 그대로 사용
+      console.log('[loadPrices] Restoring previously loaded AI forecast');
+      aiForecastHTML = lastLoadedAIForecastHTML;
+    } else {
+      // 아직 로드 안 됨 - 버튼만 표시
+      aiForecastHTML = `
+        <div id="ai-forecast-container" style="min-height: 200px;">
+          <div style="text-align: center; padding: 3rem;">
+            <button 
+              id="loadAIForecastBtn" 
+              onclick="if (!aiForecastCurrentlyLoaded) { loadAIForecastOnDemand(); this.disabled = true; }" 
+              style="
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 1rem 2rem;
+                border: none;
+                border-radius: 12px;
+                font-size: 1.1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+              "
+              onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.6)'"
+              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.4)'"
+            >
+              <i class="fas fa-robot" style="font-size: 1.2rem;"></i>
+              <span>${t('loadAIForecast')}</span>
+            </button>
+            <p style="margin-top: 1rem; color: #94a3b8; font-size: 0.9rem;">
+              <i class="fas fa-info-circle"></i> ${t('aiForecastClickMsg')}
+            </p>
+          </div>
         </div>
-      </div>
-    `;
+      `;
+    }
     
     // 암호화폐 뉴스 가져오기
     const newsHTML = await loadCryptoNews();
