@@ -1755,9 +1755,10 @@ async function loadPrices() {
     
     coinsHTML += '</div>';
     
-    // 🖼️ 광고 영역 2: 중단 배너 (SSR - 광고 네트워크 크롤링용)
+    // 🖼️ 광고 영역 2: 중단 배너 (모바일/데스크톱 분리)
     const adMiddleHTML = `
-      <div class="ad-container ad-middle" style="margin-top: 2rem; margin-bottom: 2rem;">
+      <!-- 데스크톱 광고 -->
+      <div class="ad-container ad-middle ad-desktop" style="margin-top: 2rem; margin-bottom: 2rem;">
         <div id="frame" style="width: 100%; margin: auto; position: relative; z-index: 99998;">
           <iframe 
             data-aa='2421975' 
@@ -1766,13 +1767,22 @@ async function loadPrices() {
           </iframe>
         </div>
       </div>
+      
+      <!-- 모바일 광고 (작은 배너 또는 숨김) -->
+      <div class="ad-container ad-middle ad-mobile" style="margin-top: 1rem; margin-bottom: 1rem; display: none;">
+        <div style="text-align: center; padding: 1rem; color: #94a3b8; font-size: 0.85rem;">
+          <!-- 모바일에서는 광고 최소화 -->
+        </div>
+      </div>
     `;
     
-    // 새로고침 버튼
+    // 새로고침 버튼 (왼쪽 정렬)
     const refreshButton = `
-      <button class="refresh-btn" onclick="loadPrices()">
-        <i class="fas fa-sync-alt"></i> ${t('refresh')}
-      </button>
+      <div style="text-align: left; padding: 0 1rem;">
+        <button class="refresh-btn" onclick="loadPrices()">
+          <i class="fas fa-sync-alt"></i> ${t('refresh')}
+        </button>
+      </div>
     `;
     
     // 순서: 검색 → 통계 → 포트폴리오 요약 → 코인 목록 → AI 전망 → 뉴스 → 새로고침 → 중간 광고

@@ -140,9 +140,19 @@ body::before {
     pointer-events: none !important; /* iframe 내부 클릭 차단 */
   }
   
-  /* 대안: 모바일에서 광고 완전히 숨기기 */
+  /* 데스크톱 광고 숨김 */
+  .ad-desktop {
+    display: none !important;
+  }
+  
+  /* 모바일 광고 표시 (하지만 비어있음) */
+  .ad-mobile {
+    display: block !important;
+  }
+  
+  /* footer 광고 완전히 숨김 */
   .ad-footer {
-    display: none !important; /* footer 광고 완전히 숨김 */
+    display: none !important;
   }
   
   .ad-header iframe {
@@ -473,7 +483,7 @@ h1 {
   cursor: pointer;
   transition: all 0.3s ease;
   display: inline-block;
-  margin: 2rem auto;
+  margin: 2rem 0;
   position: relative;
   z-index: 100;
 }
