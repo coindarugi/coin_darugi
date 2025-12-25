@@ -139,13 +139,6 @@ app.get('/api/prices', async (c) => {
     // 🔑 환경 변수에서 CoinGecko API 키 가져오기 (선택적)
     const COINGECKO_API_KEY = c.env.COINGECKO_API_KEY
     
-    if (!COINGECKO_API_KEY) {
-      return c.json({ 
-        error: '가격 정보를 가져올 수 없습니다.',
-        message: 'COINGECKO_API_KEY is not defined'
-      }, 500)
-    }
-    
     // URL 쿼리에서 선택한 코인 가져오기 (기본값: 비트코인만)
     const selectedCoins = c.req.query('coins') || 'bitcoin'
     
@@ -166,15 +159,18 @@ app.get('/api/prices', async (c) => {
     // 모든 코인 데이터를 한 번에 가져와서 캐시
     const allCoins = 'bitcoin,ethereum,ripple,cardano,solana,polkadot,dogecoin,shiba-inu,polygon,litecoin,binancecoin,avalanche-2,chainlink,stellar,uniswap'
     
-    console.log('🔄 Fetching from CoinGecko Pro API...')
+    console.log('🔄 Fetching from CoinGecko API...')
+    // API 키가 있으면 Pro API, 없으면 Free API 사용
+    const headers: Record<string, string> = {
+      'Accept': 'application/json'
+    }
+    if (COINGECKO_API_KEY) {
+      headers['x-cg-pro-api-key'] = COINGECKO_API_KEY
+    }
+    
     const response = await fetch(
       `${COINGECKO_API_URL}/simple/price?ids=${allCoins}&vs_currencies=usd,krw&include_24hr_change=true&include_market_cap=true`,
-      {
-        headers: {
-          'Accept': 'application/json',
-          'x-cg-pro-api-key': COINGECKO_API_KEY
-        }
-      }
+      { headers }
     )
     
     if (!response.ok) {
@@ -283,15 +279,13 @@ app.get('/api/coins/list', async (c) => {
       return c.json(coinsListCache.data[cacheKey])
     }
     
-    console.log('Fetching coins list from CoinGecko Pro API...')
+    console.log('Fetching coins list from CoinGecko API...')
+    const headers: Record<string, string> = { 'Accept': 'application/json' }
+    if (COINGECKO_API_KEY) headers['x-cg-pro-api-key'] = COINGECKO_API_KEY
+    
     const response = await fetch(
       `${COINGECKO_API_URL}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${perPage}&page=${page}&sparkline=false`,
-      {
-        headers: {
-          'Accept': 'application/json',
-          'x-cg-pro-api-key': COINGECKO_API_KEY
-        }
-      }
+      { headers }
     )
     
     if (!response.ok) {
@@ -330,14 +324,12 @@ app.get('/api/coins/search', async (c) => {
     }
     
     console.log('Searching coins:', query)
+    const headers: Record<string, string> = { 'Accept': 'application/json' }
+    if (COINGECKO_API_KEY) headers['x-cg-pro-api-key'] = COINGECKO_API_KEY
+    
     const response = await fetch(
       `${COINGECKO_API_URL}/search?query=${encodeURIComponent(query)}`,
-      {
-        headers: {
-          'Accept': 'application/json',
-          'x-cg-pro-api-key': COINGECKO_API_KEY
-        }
-      }
+      { headers }
     )
     
     if (!response.ok) {
@@ -385,14 +377,12 @@ app.get('/api/chart/:coinId', async (c) => {
     }
     
     console.log(`Fetching ${days} days chart data for ${coinId}...`)
+    const headers: Record<string, string> = { 'Accept': 'application/json' }
+    if (COINGECKO_API_KEY) headers['x-cg-pro-api-key'] = COINGECKO_API_KEY
+    
     const response = await fetch(
       `${COINGECKO_API_URL}/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`,
-      {
-        headers: {
-          'Accept': 'application/json',
-          'x-cg-pro-api-key': COINGECKO_API_KEY
-        }
-      }
+      { headers }
     )
     
     if (!response.ok) {
@@ -518,14 +508,12 @@ app.get('/api/kimchi-premium/:coinId', async (c) => {
     } else {
       // 캐시에 없으면 CoinGecko Pro API 호출
       try {
+        const headers: Record<string, string> = { 'Accept': 'application/json' }
+        if (COINGECKO_API_KEY) headers['x-cg-pro-api-key'] = COINGECKO_API_KEY
+        
         const coingeckoResponse = await fetch(
           `${COINGECKO_API_URL}/simple/price?ids=${coinId}&vs_currencies=krw`,
-          {
-            headers: {
-              'Accept': 'application/json',
-              'x-cg-pro-api-key': COINGECKO_API_KEY
-            }
-          }
+          { headers }
         )
         
         if (coingeckoResponse.ok) {
@@ -750,14 +738,12 @@ app.get('/api/ai-forecast', async (c) => {
     }
     
     // 1. 가격 데이터 가져오기
+    const headers: Record<string, string> = { 'Accept': 'application/json' }
+    if (COINGECKO_API_KEY) headers['x-cg-pro-api-key'] = COINGECKO_API_KEY
+    
     const pricesResponse = await fetch(
       `${COINGECKO_API_URL}/simple/price?ids=${coins.join(',')}&vs_currencies=usd&include_24hr_change=true&include_market_cap=true`,
-      {
-        headers: {
-          'Accept': 'application/json',
-          'x-cg-pro-api-key': COINGECKO_API_KEY
-        }
-      }
+      { headers }
     )
     
     if (!pricesResponse.ok) {
