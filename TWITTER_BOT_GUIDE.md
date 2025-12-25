@@ -24,7 +24,7 @@
 
 👉 지금 무료로 사용해보세요!
 
-🔗 https://crypto-dashboard-secure.pages.dev/
+🔗 https://crypto-darugi.com/
 
 #암호화폐 #비트코인 #코인추적 #무료대시보드
 ```
@@ -39,7 +39,7 @@
 
 👉 Try it now for FREE!
 
-🔗 https://crypto-dashboard-secure.pages.dev/
+🔗 https://crypto-darugi.com/
 
 #Crypto #Bitcoin #Dashboard #FreeTool
 ```

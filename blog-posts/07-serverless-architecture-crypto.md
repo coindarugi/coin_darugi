@@ -4,7 +4,7 @@
 
 Building cryptocurrency applications doesn't require expensive servers or complex infrastructure. Serverless architecture offers a cost-effective, scalable solution perfect for crypto dashboards, trading bots, and analytics platforms.
 
-**🔗 [Live Example: https://crypto-dashboard-secure.pages.dev](https://crypto-dashboard-secure.pages.dev)**
+**🔗 [Live Example: https://crypto-darugi.com](https://crypto-darugi.com)**
 
 ## What is Serverless Architecture?
 
@@ -406,7 +406,7 @@ Serverless architecture is perfect for cryptocurrency applications. With platfor
 
 **Start building serverless crypto apps today!**
 
-🔗 **[View Live Example](https://crypto-dashboard-secure.pages.dev)**
+🔗 **[View Live Example](https://crypto-darugi.com)**
 
 ---
 

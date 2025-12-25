@@ -43,8 +43,8 @@ Access Token Secret: xyz...
 2. "Set up" 클릭
 3. App permissions: **"Read and Write"** 선택 (중요!)
 4. Type of App: "Web App, Automated App or Bot" 선택
-5. Callback URI: `https://crypto-dashboard-secure.pages.dev` (아무거나)
-6. Website URL: `https://crypto-dashboard-secure.pages.dev`
+5. Callback URI: `https://crypto-darugi.com` (아무거나)
+6. Website URL: `https://crypto-darugi.com`
 7. "Save" 클릭
 
 ### Step 4: 봇 설정 (1분)
@@ -329,7 +329,7 @@ python3 twitter_bot.py > twitter_log.txt 2>&1 &
 📈 Bitcoin just hit $70k!
 
 Track it in real-time with our dashboard:
-https://crypto-dashboard-secure.pages.dev
+https://crypto-darugi.com
 
 #bitcoin #btc
 ```
@@ -342,7 +342,7 @@ https://crypto-dashboard-secure.pages.dev
 
 Use our dashboard to cry in 5 languages! 😭
 
-https://crypto-dashboard-secure.pages.dev
+https://crypto-darugi.com
 
 #crypto #meme
 ```
@@ -357,7 +357,7 @@ Poll: What's your main crypto struggle?
 🅳️ Language barriers
 
 We solve all 4! ✨
-https://crypto-dashboard-secure.pages.dev
+https://crypto-darugi.com
 ```
 
 ---

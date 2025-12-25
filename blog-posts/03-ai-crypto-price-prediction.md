@@ -4,7 +4,7 @@
 
 Artificial Intelligence is revolutionizing cryptocurrency trading. Our **free AI-powered crypto forecast tool** provides real-time analysis and price predictions for top cryptocurrencies, helping traders make informed decisions.
 
-**🔗 [Try AI Crypto Forecast: https://crypto-dashboard-secure.pages.dev](https://crypto-dashboard-secure.pages.dev)**
+**🔗 [Try AI Crypto Forecast: https://crypto-darugi.com](https://crypto-darugi.com)**
 
 ## How AI Crypto Prediction Works
 
@@ -68,7 +68,7 @@ Every forecast provides:
 ## How to Use AI Crypto Forecasts
 
 ### Step 1: Access the Dashboard
-Visit [crypto-dashboard-secure.pages.dev](https://crypto-dashboard-secure.pages.dev)
+Visit [crypto-darugi.com](https://crypto-darugi.com)
 
 ### Step 2: View AI Forecasts
 Scroll to the "AI Coin Forecast Analysis" section
@@ -199,7 +199,7 @@ Start using immediately without creating an account.
 ## Getting Started
 
 ### Free Trial (Forever)
-1. Visit [crypto-dashboard-secure.pages.dev](https://crypto-dashboard-secure.pages.dev)
+1. Visit [crypto-darugi.com](https://crypto-darugi.com)
 2. Scroll to AI Forecast section
 3. View predictions immediately
 4. No registration required
@@ -226,7 +226,7 @@ AI-powered cryptocurrency forecasts are transforming how traders analyze markets
 
 **Start using AI crypto forecasts today!**
 
-🔗 **[Launch AI Dashboard](https://crypto-dashboard-secure.pages.dev)**
+🔗 **[Launch AI Dashboard](https://crypto-darugi.com)**
 
 ---
 

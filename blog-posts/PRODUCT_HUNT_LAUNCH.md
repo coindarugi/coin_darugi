@@ -57,7 +57,7 @@ Track 10,000+ cryptocurrencies in real-time with AI-powered price forecasts. Fea
 ```
 
 ### Product Links
-- **Website**: https://crypto-dashboard-secure.pages.dev
+- **Website**: https://crypto-darugi.com
 - **GitHub**: https://github.com/username/webapp (optional)
 
 ### Video (Optional but Recommended)
@@ -147,7 +147,7 @@ For Product Hunt hunters:
 
 ### 🙏 How You Can Help
 
-1. **Try it out**: https://crypto-dashboard-secure.pages.dev
+1. **Try it out**: https://crypto-darugi.com
 2. **Upvote** if you find it useful
 3. **Share feedback**: What features do you want?
 4. **Spread the word**: Share with crypto friends
@@ -189,7 +189,7 @@ Thanks for checking it out! 🙏
 
 100% free forever!
 
-👉 https://crypto-dashboard-secure.pages.dev
+👉 https://crypto-darugi.com
 
 #crypto #bitcoin #ethereum #producthunt
 ```
@@ -238,7 +238,7 @@ I was tired of slow dashboards that require login and don't support Korean excha
 
 **Tech nerds:** Built with Hono + Cloudflare Workers for <100ms latency globally with $0 hosting costs.
 
-**Try it:** https://crypto-dashboard-secure.pages.dev
+**Try it:** https://crypto-darugi.com
 
 **Product Hunt:** [Link] (Would appreciate an upvote!)
 
@@ -253,7 +253,7 @@ Just launched my crypto dashboard project on Product Hunt and wanted to share it
 
 It's a free dashboard that tracks 10,000+ cryptocurrencies with some unique features like AI forecasts and Kimchi premium calculations.
 
-🔗 https://crypto-dashboard-secure.pages.dev
+🔗 https://crypto-darugi.com
 
 Would love any feedback or feature suggestions!
 
@@ -312,7 +312,7 @@ I'm a big fan of your crypto content on [Platform]. I recently built a free cryp
 • Multi-language support (5 languages)
 • 100% free, no registration
 
-🔗 https://crypto-dashboard-secure.pages.dev
+🔗 https://crypto-darugi.com
 
 I'm launching on Product Hunt today and would love your feedback. If you think it's useful for your audience, I'd be grateful for a mention!
 

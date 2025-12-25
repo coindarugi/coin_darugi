@@ -21,7 +21,7 @@ The **Kimchi Premium** refers to the price difference between cryptocurrency pri
 
 ## Free Kimchi Premium Calculator
 
-**🔗 [Calculate Now: https://crypto-dashboard-secure.pages.dev](https://crypto-dashboard-secure.pages.dev)**
+**🔗 [Calculate Now: https://crypto-darugi.com](https://crypto-darugi.com)**
 
 ### Features
 
@@ -43,7 +43,7 @@ Premium % = ((Korean Price - International Price) / International Price) × 100
 ## How to Use the Calculator
 
 ### Step 1: Access the Dashboard
-Visit [crypto-dashboard-secure.pages.dev](https://crypto-dashboard-secure.pages.dev)
+Visit [crypto-darugi.com](https://crypto-darugi.com)
 
 ### Step 2: Add Your Coins
 Search for Bitcoin, Ethereum, or any supported cryptocurrency
@@ -195,7 +195,7 @@ The Kimchi Premium calculator is an essential tool for anyone interested in Kore
 
 **Start tracking Kimchi Premium now!**
 
-🔗 **[Launch Calculator](https://crypto-dashboard-secure.pages.dev)**
+🔗 **[Launch Calculator](https://crypto-darugi.com)**
 
 ---
 

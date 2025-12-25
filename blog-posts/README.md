@@ -155,7 +155,7 @@ Recommended frequency:
 
 Add UTM parameters to your dashboard URL:
 ```
-https://crypto-dashboard-secure.pages.dev?utm_source=medium&utm_medium=blog&utm_campaign=seo
+https://crypto-darugi.com?utm_source=medium&utm_medium=blog&utm_campaign=seo
 ```
 
 ### Track These Metrics
@@ -169,7 +169,7 @@ https://crypto-dashboard-secure.pages.dev?utm_source=medium&utm_medium=blog&utm_
 
 ## 🔗 Important Links
 
-- **Dashboard**: https://crypto-dashboard-secure.pages.dev
+- **Dashboard**: https://crypto-darugi.com
 - **GitHub**: https://github.com/username/webapp
 - **Contact**: crypto.darugi@gmail.com
 
@@ -229,7 +229,7 @@ https://crypto-dashboard-secure.pages.dev?utm_source=medium&utm_medium=blog&utm_
 
 Questions or need help?
 - Email: crypto.darugi@gmail.com
-- Dashboard: https://crypto-dashboard-secure.pages.dev
+- Dashboard: https://crypto-darugi.com
 
 ## 📄 License
 

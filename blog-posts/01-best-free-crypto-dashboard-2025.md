@@ -1,6 +1,6 @@
 # Best Free Crypto Dashboard 2025: Track 10,000+ Coins with AI-Powered Insights
 
-![Crypto Dashboard](https://crypto-dashboard-secure.pages.dev/og-image.png)
+![Crypto Dashboard](https://crypto-darugi.com/og-image.png)
 
 ## Why You Need a Crypto Dashboard in 2025
 
@@ -8,7 +8,7 @@ Managing cryptocurrency investments has become increasingly complex. With over 1
 
 ## Introducing the Ultimate Free Crypto Dashboard
 
-**🔗 [Try it now: https://crypto-dashboard-secure.pages.dev](https://crypto-dashboard-secure.pages.dev)**
+**🔗 [Try it now: https://crypto-darugi.com](https://crypto-darugi.com)**
 
 ### Key Features
 
@@ -66,7 +66,7 @@ Automatic price refresh every 30 seconds keeps you updated.
 
 ## How to Get Started
 
-1. **Visit** [crypto-dashboard-secure.pages.dev](https://crypto-dashboard-secure.pages.dev)
+1. **Visit** [crypto-darugi.com](https://crypto-darugi.com)
 2. **Search** for your favorite cryptocurrencies
 3. **Add** coins to your dashboard
 4. **Track** prices and manage your portfolio
@@ -109,7 +109,7 @@ In 2025, managing cryptocurrency investments doesn't have to be expensive or com
 
 **Start tracking your crypto portfolio today!**
 
-🔗 **[Launch Dashboard](https://crypto-dashboard-secure.pages.dev)**
+🔗 **[Launch Dashboard](https://crypto-darugi.com)**
 
 ---
 

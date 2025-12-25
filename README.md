@@ -3,7 +3,7 @@
 **비공개 암호화폐 실시간 가격 추적 도구**입니다.
 
 ## 🌐 라이브 데모
-**🔗 프로덕션: https://crypto-dashboard-secure.pages.dev**  
+**🔗 프로덕션: https://crypto-darugi.com**  
 **✅ 공개 액세스** (비밀번호 제거됨)
 
 **샌드박스: https://3000-irx5wzy3u2q3opady5j5e-2e1b9533.sandbox.novita.ai**
@@ -319,7 +319,7 @@ GET /api/ai-forecast
 ### 🚀 빠른 시작 가이드
 
 #### 1️⃣ 웹사이트 접속
-1. **접속**: https://crypto-dashboard-secure.pages.dev 방문
+1. **접속**: https://crypto-darugi.com 방문
 2. **메인 대시보드**: 자동으로 기본 코인들(비트코인, 이더리움, 리플)의 가격 표시
 
 #### 2️⃣ 코인 검색 및 추가
@@ -592,7 +592,7 @@ npm run deploy:prod
 ## 📦 배포 상태
 - **플랫폼**: Cloudflare Pages
 - **현재 상태**: ✅ 프로덕션 배포 완료!
-- **프로덕션 URL**: https://crypto-dashboard-secure.pages.dev (공개 액세스)
+- **프로덕션 URL**: https://crypto-darugi.com (공개 액세스)
 - **샌드박스 URL**: https://3000-irx5wzy3u2q3opady5j5e-2e1b9533.sandbox.novita.ai
 - **배포 시간**: 2025-12-25
 
@@ -669,7 +669,7 @@ npm run deploy:prod
 
 #### 5. 배포
 - **플랫폼**: Cloudflare Pages
-- **URL**: https://crypto-dashboard-secure.pages.dev
+- **URL**: https://crypto-darugi.com
 - **상태**: ✅ 프로덕션 배포 완료
 - **액세스**: 공개 (비밀번호 제거)
 
@@ -750,7 +750,7 @@ npx wrangler pages secret put OPENAI_API_KEY
 #### 2. 테스트 및 검증
 ```bash
 # AI 전망 API 테스트
-curl https://crypto-dashboard-secure.pages.dev/api/ai-forecast | jq '.forecasts[0].analysis.reasoning'
+curl https://crypto-darugi.com/api/ai-forecast | jq '.forecasts[0].analysis.reasoning'
 
 # 기대 결과: 100자 이상의 상세한 데이터 기반 분석
 ```

@@ -4,7 +4,7 @@
 
 Building a cryptocurrency dashboard doesn't have to be complicated or expensive. In this tutorial, I'll show you how I built a production-ready crypto dashboard using **Cloudflare Pages** and **Hono framework** – completely serverless and free to deploy.
 
-**🔗 [Live Demo: https://crypto-dashboard-secure.pages.dev](https://crypto-dashboard-secure.pages.dev)**
+**🔗 [Live Demo: https://crypto-darugi.com](https://crypto-darugi.com)**
 
 ## Why Cloudflare Pages + Hono?
 
@@ -414,7 +414,7 @@ Building a production-ready cryptocurrency dashboard with Cloudflare Pages and H
 
 **Start building your crypto dashboard today!**
 
-🔗 **[Live Demo](https://crypto-dashboard-secure.pages.dev)**
+🔗 **[Live Demo](https://crypto-darugi.com)**
 📚 **[Source Code](#)** (GitHub)
 
 ---

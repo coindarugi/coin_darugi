@@ -8,7 +8,7 @@ In 2025, cryptocurrency is global. Your users speak different languages, and pro
 - User retention: +90%
 - Global reach: Unlimited
 
-**🔗 [See 5-Language Example: https://crypto-dashboard-secure.pages.dev](https://crypto-dashboard-secure.pages.dev)**
+**🔗 [See 5-Language Example: https://crypto-darugi.com](https://crypto-darugi.com)**
 
 ## Implementation Approaches
 
@@ -538,7 +538,7 @@ function getCachedTranslations(lang) {
 Multi-language support is essential for global web applications. With proper implementation, you can provide native experiences for users worldwide while maintaining clean, maintainable code.
 
 **See it in action:**
-🔗 **[5-Language Crypto Dashboard](https://crypto-dashboard-secure.pages.dev)**
+🔗 **[5-Language Crypto Dashboard](https://crypto-darugi.com)**
 
 ---
 

@@ -2,7 +2,7 @@ import { TwitterApi } from 'twitter-api-v2';
 import OpenAI from 'openai';
 
 // 사이트 URL
-const SITE_URL = 'https://crypto-dashboard-secure.pages.dev/';
+const SITE_URL = 'https://crypto-darugi.com/';
 
 // 언어 설정
 const LANGUAGES = {

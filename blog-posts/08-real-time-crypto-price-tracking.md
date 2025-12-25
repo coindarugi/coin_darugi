@@ -9,7 +9,7 @@ In cryptocurrency markets, prices can change by 10% or more in minutes. Real-tim
 - Risk management
 - Profit-taking
 
-**🔗 [Start Real-Time Tracking Now](https://crypto-dashboard-secure.pages.dev)**
+**🔗 [Start Real-Time Tracking Now](https://crypto-darugi.com)**
 
 ## What is "Real-Time" in Crypto?
 
@@ -358,7 +358,7 @@ Low dominance (<40%): Alt season possible
 ## Getting Started
 
 ### Step 1: Choose Your Dashboard
-[**Recommended: Free Real-Time Dashboard**](https://crypto-dashboard-secure.pages.dev)
+[**Recommended: Free Real-Time Dashboard**](https://crypto-darugi.com)
 
 ### Step 2: Add Your Coins
 Search and add coins you want to track
@@ -378,7 +378,7 @@ Real-time cryptocurrency price tracking is essential for serious traders. With 3
 
 **Start tracking prices in real-time!**
 
-🔗 **[Launch Free Dashboard](https://crypto-dashboard-secure.pages.dev)**
+🔗 **[Launch Free Dashboard](https://crypto-darugi.com)**
 
 ---
 

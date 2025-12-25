@@ -27,30 +27,30 @@ export const renderer = jsxRenderer(({ children }) => {
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://crypto-dashboard-secure.pages.dev/" />
+        <meta property="og:url" content="https://crypto-darugi.com/" />
         <meta property="og:title" content="암호화폐 실시간 대시보드 | AI 전망, 10,000+ 코인 추적" />
         <meta property="og:description" content="AI 기반 코인 전망, 10,000개 이상의 암호화폐 실시간 추적, 김치 프리미엄 계산기, 포트폴리오 관리. 무료!" />
-        <meta property="og:image" content="https://crypto-dashboard-secure.pages.dev/og-image.png" />
+        <meta property="og:image" content="https://crypto-darugi.com/og-image.png" />
         <meta property="og:site_name" content="암호화폐 실시간 대시보드" />
         <meta property="og:locale" content="ko_KR" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:url" content="https://crypto-dashboard-secure.pages.dev/" />
+        <meta name="twitter:url" content="https://crypto-darugi.com/" />
         <meta name="twitter:title" content="암호화폐 실시간 대시보드 | AI 전망, 10,000+ 코인" />
         <meta name="twitter:description" content="AI 기반 코인 전망, 10,000+ 암호화폐 실시간 추적, 김치 프리미엄 계산기" />
-        <meta name="twitter:image" content="https://crypto-dashboard-secure.pages.dev/og-image.png" />
+        <meta name="twitter:image" content="https://crypto-darugi.com/og-image.png" />
         
         {/* Canonical URL */}
-        <link rel="canonical" href="https://crypto-dashboard-secure.pages.dev/" />
+        <link rel="canonical" href="https://crypto-darugi.com/" />
         
         {/* 🌍 다국어 hreflang 태그 */}
-        <link rel="alternate" hreflang="ko" href="https://crypto-dashboard-secure.pages.dev/?lang=ko" />
-        <link rel="alternate" hreflang="en" href="https://crypto-dashboard-secure.pages.dev/?lang=en" />
-        <link rel="alternate" hreflang="fr" href="https://crypto-dashboard-secure.pages.dev/?lang=fr" />
-        <link rel="alternate" hreflang="de" href="https://crypto-dashboard-secure.pages.dev/?lang=de" />
-        <link rel="alternate" hreflang="es" href="https://crypto-dashboard-secure.pages.dev/?lang=es" />
-        <link rel="alternate" hreflang="x-default" href="https://crypto-dashboard-secure.pages.dev/" />
+        <link rel="alternate" hreflang="ko" href="https://crypto-darugi.com/?lang=ko" />
+        <link rel="alternate" hreflang="en" href="https://crypto-darugi.com/?lang=en" />
+        <link rel="alternate" hreflang="fr" href="https://crypto-darugi.com/?lang=fr" />
+        <link rel="alternate" hreflang="de" href="https://crypto-darugi.com/?lang=de" />
+        <link rel="alternate" hreflang="es" href="https://crypto-darugi.com/?lang=es" />
+        <link rel="alternate" hreflang="x-default" href="https://crypto-darugi.com/" />
         
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -76,7 +76,7 @@ export const renderer = jsxRenderer(({ children }) => {
             "@type": "WebApplication",
             "name": "암호화폐 실시간 대시보드",
             "description": "AI 기반 코인 전망과 10,000개 이상의 암호화폐를 실시간으로 추적하는 무료 대시보드. 김치 프리미엄 계산기, 포트폴리오 관리, 실시간 뉴스 번역 제공",
-            "url": "https://crypto-dashboard-secure.pages.dev",
+            "url": "https://crypto-darugi.com",
             "applicationCategory": "FinanceApplication",
             "operatingSystem": "Any",
             "offers": {
@@ -93,7 +93,7 @@ export const renderer = jsxRenderer(({ children }) => {
               "10,000+ 코인 지원",
               "다국어 지원 (한국어, 영어, 프랑스어, 독일어, 스페인어)"
             ],
-            "screenshot": "https://crypto-dashboard-secure.pages.dev/og-image.png",
+            "screenshot": "https://crypto-darugi.com/og-image.png",
             "aggregateRating": {
               "@type": "AggregateRating",
               "ratingValue": "4.8",

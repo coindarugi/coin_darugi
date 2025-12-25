@@ -4,7 +4,7 @@
 
 비트코인 가격은 1분에 수십만 원씩 변동할 수 있습니다. 성공적인 투자를 위해서는 실시간 시세 추적이 필수입니다.
 
-**🔗 [무료 실시간 시세 확인하기](https://crypto-dashboard-secure.pages.dev)**
+**🔗 [무료 실시간 시세 확인하기](https://crypto-darugi.com)**
 
 ## 왜 실시간 시세 추적이 중요한가?
 
@@ -388,7 +388,7 @@ RSI 수치: 0-100
 
 **모두 무료, 회원가입 불필요!**
 
-🔗 **[지금 시작하기](https://crypto-dashboard-secure.pages.dev)**
+🔗 **[지금 시작하기](https://crypto-darugi.com)**
 
 ## 결론
 
@@ -396,7 +396,7 @@ RSI 수치: 0-100
 
 **지금 무료로 시작하세요!**
 
-🔗 **[실시간 시세 확인](https://crypto-dashboard-secure.pages.dev)**
+🔗 **[실시간 시세 확인](https://crypto-darugi.com)**
 
 ---
 

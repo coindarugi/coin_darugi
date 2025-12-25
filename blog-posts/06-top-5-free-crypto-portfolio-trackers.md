@@ -4,13 +4,13 @@
 
 With Bitcoin reaching new all-time highs and altcoins booming, managing multiple cryptocurrency investments has become increasingly complex. A good portfolio tracker is essential for serious crypto investors.
 
-**🔗 [Try the Best Free Tracker](https://crypto-dashboard-secure.pages.dev)**
+**🔗 [Try the Best Free Tracker](https://crypto-darugi.com)**
 
 ## Top 5 Free Crypto Portfolio Trackers
 
 ### #1: Crypto Dashboard Secure ⭐⭐⭐⭐⭐
 
-**Website**: [crypto-dashboard-secure.pages.dev](https://crypto-dashboard-secure.pages.dev)
+**Website**: [crypto-darugi.com](https://crypto-darugi.com)
 
 **Key Features**:
 - ✅ 10,000+ cryptocurrencies supported
@@ -279,7 +279,7 @@ Choose based on your specific needs:
 
 **Start tracking your portfolio today!**
 
-🔗 **[Launch Free Tracker](https://crypto-dashboard-secure.pages.dev)**
+🔗 **[Launch Free Tracker](https://crypto-darugi.com)**
 
 ---
 
