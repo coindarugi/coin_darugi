@@ -593,8 +593,13 @@ npm run deploy:prod
 - **플랫폼**: Cloudflare Pages
 - **현재 상태**: ✅ 프로덕션 배포 완료!
 - **프로덕션 URL**: https://crypto-darugi.com (공개 액세스)
+- **최신 배포 URL**: https://ba32ae78.crypto-dashboard-secure.pages.dev
 - **샌드박스 URL**: https://3000-irx5wzy3u2q3opady5j5e-2e1b9533.sandbox.novita.ai
 - **배포 시간**: 2025-12-25
+- **환경 변수**: 
+  - ✅ COINGECKO_API_KEY (CoinGecko Pro API)
+  - ✅ OPENAI_API_KEY (AI 전망 기능)
+  - ✅ TWITTER API Keys (트위터 봇)
 
 ## 🛠 기술 스택
 - **백엔드**: Hono (경량 웹 프레임워크)
