@@ -1071,6 +1071,119 @@ app.get('/', (c) => {
         </div>
       </header>
       
+      {/* 빠른 네비게이션 바 */}
+      <nav style={{
+        background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+        borderBottom: '1px solid rgba(102, 126, 234, 0.2)',
+        padding: '1rem 0',
+        position: 'sticky',
+        top: '0',
+        zIndex: '999',
+        backdropFilter: 'blur(10px)'
+      }}>
+        <div style={{
+          maxWidth: '1200px',
+          margin: '0 auto',
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '1rem',
+          flexWrap: 'wrap',
+          padding: '0 1rem'
+        }}>
+          <button 
+            onclick="document.getElementById('app').scrollIntoView({ behavior: 'smooth', block: 'start' })"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.8rem 1.5rem',
+              background: 'rgba(102, 126, 234, 0.2)',
+              border: '1px solid rgba(102, 126, 234, 0.3)',
+              borderRadius: '12px',
+              color: '#e2e8f0',
+              fontSize: '0.95rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+            onmouseover="this.style.background='rgba(102, 126, 234, 0.3)'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.background='rgba(102, 126, 234, 0.2)'; this.style.transform='translateY(0)'"
+          >
+            <i class="fas fa-coins" style={{fontSize: '1.1rem'}}></i>
+            <span id="navCoins">코인 목록</span>
+          </button>
+          
+          <button 
+            onclick="loadAIForecastOnDemand(); setTimeout(() => { const aiSection = document.querySelector('.ai-forecast-section'); if (aiSection) aiSection.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 500)"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.8rem 1.5rem',
+              background: 'rgba(139, 92, 246, 0.2)',
+              border: '1px solid rgba(139, 92, 246, 0.3)',
+              borderRadius: '12px',
+              color: '#e2e8f0',
+              fontSize: '0.95rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+            onmouseover="this.style.background='rgba(139, 92, 246, 0.3)'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.background='rgba(139, 92, 246, 0.2)'; this.style.transform='translateY(0)'"
+          >
+            <i class="fas fa-brain" style={{fontSize: '1.1rem'}}></i>
+            <span id="navAI">AI 전망</span>
+          </button>
+          
+          <button 
+            onclick="loadCryptoNews(); setTimeout(() => { const newsSection = document.querySelector('.news-section'); if (newsSection) newsSection.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 500)"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.8rem 1.5rem',
+              background: 'rgba(34, 197, 94, 0.2)',
+              border: '1px solid rgba(34, 197, 94, 0.3)',
+              borderRadius: '12px',
+              color: '#e2e8f0',
+              fontSize: '0.95rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+            onmouseover="this.style.background='rgba(34, 197, 94, 0.3)'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.background='rgba(34, 197, 94, 0.2)'; this.style.transform='translateY(0)'"
+          >
+            <i class="fas fa-newspaper" style={{fontSize: '1.1rem'}}></i>
+            <span id="navNews">최신 뉴스</span>
+          </button>
+          
+          <button 
+            onclick="const portfolioCards = document.querySelectorAll('.portfolio-section'); if (portfolioCards.length > 0) portfolioCards[0].scrollIntoView({ behavior: 'smooth', block: 'center' })"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.8rem 1.5rem',
+              background: 'rgba(251, 146, 60, 0.2)',
+              border: '1px solid rgba(251, 146, 60, 0.3)',
+              borderRadius: '12px',
+              color: '#e2e8f0',
+              fontSize: '0.95rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+            onmouseover="this.style.background='rgba(251, 146, 60, 0.3)'; this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.background='rgba(251, 146, 60, 0.2)'; this.style.transform='translateY(0)'"
+          >
+            <i class="fas fa-briefcase" style={{fontSize: '1.1rem'}}></i>
+            <span id="navPortfolio">포트폴리오</span>
+          </button>
+        </div>
+      </nav>
+      
       {/* 광고 영역 1: 헤더 아래 배너 (A-ads Adaptive) */}
       <div class="ad-container ad-header">
         <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998'}}>

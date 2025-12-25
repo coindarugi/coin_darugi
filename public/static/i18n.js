@@ -4,6 +4,12 @@ const translations = {
     // 헤더
     title: '암호화폐 실시간 대시보드',
     
+    // 네비게이션
+    navCoins: '코인 목록',
+    navAI: 'AI 전망',
+    navNews: '최신 뉴스',
+    navPortfolio: '포트폴리오',
+    
     // 통계 카드
     fearGreedIndex: '공포탐욕지수',
     selectedCoins: '선택한 코인',
@@ -141,6 +147,12 @@ const translations = {
   en: {
     title: 'Crypto Real-time Dashboard',
     
+    // Navigation
+    navCoins: 'Coin List',
+    navAI: 'AI Forecast',
+    navNews: 'Latest News',
+    navPortfolio: 'Portfolio',
+    
     fearGreedIndex: 'Fear & Greed Index',
     selectedCoins: 'Selected Coins',
     realTimeUpdate: 'Real-time Update',
@@ -263,6 +275,12 @@ const translations = {
   
   fr: {
     title: 'Tableau de Bord Crypto en Temps Réel',
+    
+    // Navigation
+    navCoins: 'Liste des Cryptos',
+    navAI: 'Prévision IA',
+    navNews: 'Actualités',
+    navPortfolio: 'Portefeuille',
     
     fearGreedIndex: 'Indice de Peur et de Cupidité',
     selectedCoins: 'Pièces Sélectionnées',
@@ -387,6 +405,12 @@ const translations = {
   de: {
     title: 'Echtzeit-Krypto-Dashboard',
     
+    // Navigation
+    navCoins: 'Kryptoliste',
+    navAI: 'KI-Prognose',
+    navNews: 'Nachrichten',
+    navPortfolio: 'Portfolio',
+    
     fearGreedIndex: 'Angst- und Gier-Index',
     selectedCoins: 'Ausgewählte Münzen',
     realTimeUpdate: 'Echtzeit-Update',
@@ -509,6 +533,12 @@ const translations = {
   
   es: {
     title: 'Panel de Criptomonedas en Tiempo Real',
+    
+    // Navigation
+    navCoins: 'Lista de Criptos',
+    navAI: 'Pronóstico IA',
+    navNews: 'Noticias',
+    navPortfolio: 'Cartera',
     
     fearGreedIndex: 'Índice de Miedo y Codicia',
     selectedCoins: 'Monedas Seleccionadas',

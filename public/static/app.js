@@ -7,6 +7,19 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('pageTitle').textContent = t('title');
   document.title = t('title');
   
+  // 네비게이션 번역
+  const navCoins = document.getElementById('navCoins');
+  if (navCoins) navCoins.textContent = t('navCoins');
+  
+  const navAI = document.getElementById('navAI');
+  if (navAI) navAI.textContent = t('navAI');
+  
+  const navNews = document.getElementById('navNews');
+  if (navNews) navNews.textContent = t('navNews');
+  
+  const navPortfolio = document.getElementById('navPortfolio');
+  if (navPortfolio) navPortfolio.textContent = t('navPortfolio');
+  
   // 광고 레이블 번역
   const adLabel = document.getElementById('adLabel');
   if (adLabel) adLabel.textContent = t('advertisement');
