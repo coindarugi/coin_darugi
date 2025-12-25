@@ -121,15 +121,21 @@ body::before {
 @media (max-width: 768px) {
   .ad-container {
     max-height: 150px;
+    pointer-events: none; /* 모바일에서 광고 클릭 방지 */
+  }
+  
+  .ad-container iframe {
+    pointer-events: none !important; /* iframe 내부 클릭 차단 */
+  }
+  
+  /* 대안: 모바일에서 광고 완전히 숨기기 */
+  .ad-footer {
+    display: none !important; /* footer 광고 완전히 숨김 */
   }
   
   .ad-header iframe {
     width: 320px !important;
     height: 50px !important;
-    max-height: 100px !important;
-  }
-  
-  .ad-footer iframe {
     max-height: 100px !important;
   }
 }

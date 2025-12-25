@@ -1,7 +1,7 @@
 import { jsxRenderer } from 'hono/jsx-renderer'
 
 export const renderer = jsxRenderer(({ children, lang }) => {
-  const version = 'v5.3.4' // 🌍 Hreflang 태그 수정
+  const version = 'v5.3.5' // 🐛 모바일 팝업 광고 차단
   
   // 🌍 다국어 이미지 지원
   const currentLang = (lang as string) || 'ko'
