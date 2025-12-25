@@ -1,7 +1,7 @@
 import { jsxRenderer } from 'hono/jsx-renderer'
 
 export const renderer = jsxRenderer(({ children, lang }) => {
-  const version = 'v5.3.5' // 🐛 모바일 팝업 광고 차단
+  const version = 'v5.3.6' // ✨ 순서 변경: 뉴스→새로고침→광고
   
   // 🌍 다국어 이미지 지원
   const currentLang = (lang as string) || 'ko'
