@@ -1041,6 +1041,9 @@ ${lang === 'ko' ? 'JSON 형식으로만 응답해주세요' : lang === 'en' ? 'R
 app.use(renderer)
 
 app.get('/', (c) => {
+  // 🌍 언어 파라미터 감지 (쿼리 또는 쿠키)
+  const lang = c.req.query('lang') || 'ko'
+  
   return c.render(
     <div class="container">
       <header class="dashboard-header">
@@ -1697,7 +1700,8 @@ app.get('/', (c) => {
           © 2024 Crypto Dashboard. All rights reserved.
         </div>
       </footer>
-    </div>
+    </div>,
+    { lang } // 🌍 언어 파라미터 전달
   )
 })
 

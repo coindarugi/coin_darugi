@@ -1,10 +1,72 @@
 import { jsxRenderer } from 'hono/jsx-renderer'
 
-export const renderer = jsxRenderer(({ children }) => {
+export const renderer = jsxRenderer(({ children, lang }) => {
   const version = 'v5.3.2' // 🖼️ OG 이미지 캐시 버스팅
-  const ogImageUrl = `https://crypto-darugi.com/og-image.png?v=${Date.now()}`
+  
+  // 🌍 다국어 이미지 지원
+  const currentLang = (lang as string) || 'ko'
+  const validLangs = ['ko', 'en', 'fr', 'de', 'es']
+  const imageLang = validLangs.includes(currentLang) ? currentLang : 'ko'
+  const ogImageUrl = `https://crypto-darugi.com/og-image-${imageLang}.png?v=${Date.now()}`
+  
+  // 🌍 다국어 메타 태그
+  const metaData: Record<string, any> = {
+    ko: {
+      htmlLang: 'ko',
+      title: '암호화폐 실시간 대시보드 | AI 전망·김치 프리미엄',
+      description: 'AI 기반 암호화폐 실시간 추적. 10,000+ 코인, 김치 프리미엄 계산기, 포트폴리오 관리. 비트코인·이더리움 등 모든 코인 정보를 한눈에!',
+      ogTitle: '암호화폐 실시간 대시보드 | AI 전망, 10,000+ 코인 추적',
+      ogDescription: 'AI 기반 코인 전망, 10,000개 이상의 암호화폐 실시간 추적, 김치 프리미엄 계산기, 포트폴리오 관리. 무료!',
+      ogImageAlt: '암호화폐 실시간 대시보드 - AI 전망, 김치 프리미엄',
+      siteName: '암호화폐 실시간 대시보드',
+      locale: 'ko_KR'
+    },
+    en: {
+      htmlLang: 'en',
+      title: 'Crypto Dashboard | AI Forecast, 10,000+ Coins',
+      description: 'Real-time crypto tracking with AI. 10,000+ coins, Kimchi premium calculator, portfolio management. All coin info at a glance!',
+      ogTitle: 'Crypto Dashboard | AI Forecast, 10,000+ Coins',
+      ogDescription: 'AI-powered crypto forecast, real-time tracking of 10,000+ cryptocurrencies, Kimchi premium calculator, portfolio management. Free!',
+      ogImageAlt: 'Crypto Real-time Dashboard - AI Forecast, Kimchi Premium',
+      siteName: 'Crypto Real-time Dashboard',
+      locale: 'en_US'
+    },
+    fr: {
+      htmlLang: 'fr',
+      title: 'Tableau de bord Crypto | IA, 10 000+ pièces',
+      description: 'Suivi crypto en temps réel avec IA. 10 000+ pièces, calculateur de prime Kimchi, gestion de portefeuille.',
+      ogTitle: 'Tableau de bord Crypto | Prévisions IA, 10 000+ pièces',
+      ogDescription: 'Prévisions crypto par IA, suivi en temps réel de 10 000+ cryptomonnaies, calculateur de prime Kimchi. Gratuit!',
+      ogImageAlt: 'Tableau de bord crypto en temps réel - Prévisions IA',
+      siteName: 'Tableau de bord Crypto',
+      locale: 'fr_FR'
+    },
+    de: {
+      htmlLang: 'de',
+      title: 'Krypto-Dashboard | KI-Prognose, 10.000+ Coins',
+      description: 'Echtzeit-Krypto-Tracking mit KI. 10.000+ Coins, Kimchi-Premium-Rechner, Portfolio-Management.',
+      ogTitle: 'Krypto-Dashboard | KI-Prognose, 10.000+ Coins',
+      ogDescription: 'KI-gestützte Krypto-Prognose, Echtzeit-Tracking von 10.000+ Kryptowährungen, Kimchi-Premium-Rechner. Kostenlos!',
+      ogImageAlt: 'Krypto-Echtzeit-Dashboard - KI-Prognose',
+      siteName: 'Krypto-Dashboard',
+      locale: 'de_DE'
+    },
+    es: {
+      htmlLang: 'es',
+      title: 'Panel Cripto | Pronóstico IA, 10,000+ monedas',
+      description: 'Seguimiento cripto en tiempo real con IA. 10,000+ monedas, calculadora de prima Kimchi, gestión de cartera.',
+      ogTitle: 'Panel Cripto | Pronóstico IA, 10,000+ monedas',
+      ogDescription: 'Pronóstico cripto con IA, seguimiento en tiempo real de 10,000+ criptomonedas, calculadora de prima Kimchi. ¡Gratis!',
+      ogImageAlt: 'Panel de Cripto en Tiempo Real - Pronóstico IA',
+      siteName: 'Panel de Cripto',
+      locale: 'es_ES'
+    }
+  }
+  
+  const meta = metaData[imageLang]
+  
   return (
-    <html lang="ko">
+    <html lang={meta.htmlLang}>
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,35 +80,35 @@ export const renderer = jsxRenderer(({ children }) => {
         <link rel="apple-touch-icon" href="/favicon.svg" />
         
         {/* SEO Meta Tags */}
-        <title>암호화폐 실시간 대시보드 | AI 전망·김치 프리미엄</title>
-        <meta name="description" content="AI 기반 암호화폐 실시간 추적. 10,000+ 코인, 김치 프리미엄 계산기, 포트폴리오 관리. 비트코인·이더리움 등 모든 코인 정보를 한눈에!" />
+        <title>{meta.title}</title>
+        <meta name="description" content={meta.description} />
         <meta name="keywords" content="암호화폐, 비트코인, 이더리움, AI 전망, 코인 분석, 김치 프리미엄, 업비트, 빗썸, 코인원, 실시간 시세, 포트폴리오, 크립토, Bitcoin, Ethereum, Crypto AI, Crypto Dashboard" />
         <meta name="author" content="Crypto Dashboard" />
         <meta name="robots" content="index, follow" />
-        <meta name="language" content="Korean" />
+        <meta name="language" content={meta.htmlLang} />
         <meta name="revisit-after" content="1 days" />
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://crypto-darugi.com/" />
-        <meta property="og:title" content="암호화폐 실시간 대시보드 | AI 전망, 10,000+ 코인 추적" />
-        <meta property="og:description" content="AI 기반 코인 전망, 10,000개 이상의 암호화폐 실시간 추적, 김치 프리미엄 계산기, 포트폴리오 관리. 무료!" />
+        <meta property="og:title" content={meta.ogTitle} />
+        <meta property="og:description" content={meta.ogDescription} />
         <meta property="og:image" content={ogImageUrl} />
         <meta property="og:image:secure_url" content={ogImageUrl} />
         <meta property="og:image:type" content="image/png" />
         <meta property="og:image:width" content="1376" />
         <meta property="og:image:height" content="768" />
-        <meta property="og:image:alt" content="암호화폐 실시간 대시보드 - AI 전망, 김치 프리미엄" />
-        <meta property="og:site_name" content="암호화폐 실시간 대시보드" />
-        <meta property="og:locale" content="ko_KR" />
+        <meta property="og:image:alt" content={meta.ogImageAlt} />
+        <meta property="og:site_name" content={meta.siteName} />
+        <meta property="og:locale" content={meta.locale} />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:url" content="https://crypto-darugi.com/" />
-        <meta name="twitter:title" content="암호화폐 실시간 대시보드 | AI 전망, 10,000+ 코인" />
-        <meta name="twitter:description" content="AI 기반 코인 전망, 10,000+ 암호화폐 실시간 추적, 김치 프리미엄 계산기" />
+        <meta name="twitter:title" content={meta.ogTitle} />
+        <meta name="twitter:description" content={meta.ogDescription} />
         <meta name="twitter:image" content={ogImageUrl} />
-        <meta name="twitter:image:alt" content="암호화폐 실시간 대시보드" />
+        <meta name="twitter:image:alt" content={meta.siteName} />
         
         {/* Canonical URL */}
         <link rel="canonical" href="https://crypto-darugi.com/" />
