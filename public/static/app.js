@@ -1755,7 +1755,7 @@ async function loadPrices() {
     
     coinsHTML += '</div>';
     
-    // 광고 영역 2: 중단 배너
+    // 🖼️ 광고 영역 2: 중단 배너 (SSR - 광고 네트워크 크롤링용)
     const adMiddleHTML = `
       <div class="ad-container ad-middle" style="margin-top: 2rem; margin-bottom: 2rem;">
         <div id="frame" style="width: 100%; margin: auto; position: relative; z-index: 99998;">
@@ -1775,9 +1775,7 @@ async function loadPrices() {
       </button>
     `;
     
-    appDiv.innerHTML = searchHTML + statsHTML + portfolioSummaryHTML + coinsHTML + aiForecastHTML + newsHTML + refreshButton;
-    
-    // 🖼️ 중단 광고는 이제 HTML(SSR)에 포함되어 있음 (ad-container ad-middle)
+    appDiv.innerHTML = searchHTML + statsHTML + portfolioSummaryHTML + coinsHTML + adMiddleHTML + aiForecastHTML + newsHTML + refreshButton;
     
     // 🌍 각 코인별로 해당 국가 거래소 가격 로드
     loadExchangePrices(coinsArray);
