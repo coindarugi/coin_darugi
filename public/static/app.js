@@ -86,8 +86,8 @@ window.addEventListener('DOMContentLoaded', () => {
   loadSelectedExchange();
   loadPrices();
   loadCryptoNews();
-  // AI 전망은 스크롤 시 로드 (Lazy Loading)
-  setupAIForecastLazyLoading();
+  // AI 전망은 사용자가 버튼 클릭 시에만 로드 (API 비용 절약)
+  // setupAIForecastLazyLoading(); // 제거됨
   startAutoRefresh();
 });
 
@@ -984,47 +984,17 @@ async function loadFearGreedIndex() {
 // 암호화폐 뉴스 로드
 let newsTranslations = {}; // 번역 캐시
 
-// AI 전망 Lazy Loading 설정
+// AI 전망 버튼 클릭 로딩
 let aiForecastLoaded = false; // AI 전망 로드 여부
 
-function setupAIForecastLazyLoading() {
-  // 모바일 여부 체크
-  const isMobile = window.innerWidth <= 768;
-  
-  // Intersection Observer 설정 (모바일은 더 일찍 로드)
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      // AI 전망 영역이 화면에 보이고 아직 로드하지 않았으면 로드
-      if (entry.isIntersecting && !aiForecastLoaded) {
-        console.log('AI 전망 로드 시작... (Mobile:', isMobile, ')');
-        aiForecastLoaded = true;
-        loadAIForecastOnDemand();
-        observer.disconnect(); // 한 번만 로드
-      }
-    });
-  }, {
-    rootMargin: isMobile ? '100px' : '200px', // 모바일: 100px, 데스크톱: 200px 전에 미리 로드
-    threshold: 0.1 // 10%만 보여도 트리거
-  });
-  
-  // AI 전망 컨테이너를 관찰
-  const checkAndObserve = () => {
-    const container = document.getElementById('ai-forecast-container');
-    if (container) {
-      observer.observe(container);
-    } else {
-      // 컨테이너가 아직 없으면 잠시 후 다시 시도
-      setTimeout(checkAndObserve, 500);
-    }
-  };
-  
-  checkAndObserve();
-}
-
-// 사용자가 스크롤해서 볼 때 AI 전망 로드
+// 버튼 클릭 시 AI 전망 로드
 async function loadAIForecastOnDemand() {
   const container = document.getElementById('ai-forecast-container');
   if (!container) return;
+  
+  // 이미 로드했으면 다시 로드하지 않음
+  if (aiForecastLoaded) return;
+  aiForecastLoaded = true;
   
   // 로딩 표시
   container.innerHTML = `
@@ -1411,12 +1381,37 @@ async function loadPrices() {
     // 공포탐욕지수 가져오기
     const fearGreedHTML = await loadFearGreedIndex();
     
-    // AI 전망 컨테이너 (Lazy Loading)
+    // AI 전망 컨테이너 (버튼 클릭 로딩)
     const aiForecastHTML = `
       <div id="ai-forecast-container" style="min-height: 200px;">
-        <div style="text-align: center; padding: 3rem; color: #667eea;">
-          <i class="fas fa-scroll" style="font-size: 2rem;"></i>
-          <p style="margin-top: 1rem; color: #94a3b8;">${t('aiForecastScrollMsg')}</p>
+        <div style="text-align: center; padding: 3rem;">
+          <button 
+            id="loadAIForecastBtn" 
+            onclick="loadAIForecastOnDemand()" 
+            style="
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              padding: 1rem 2rem;
+              border: none;
+              border-radius: 12px;
+              font-size: 1.1rem;
+              font-weight: 600;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+              display: inline-flex;
+              align-items: center;
+              gap: 0.5rem;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.6)'"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.4)'"
+          >
+            <i class="fas fa-robot" style="font-size: 1.2rem;"></i>
+            <span>${t('loadAIForecast')}</span>
+          </button>
+          <p style="margin-top: 1rem; color: #94a3b8; font-size: 0.9rem;">
+            <i class="fas fa-info-circle"></i> ${t('aiForecastClickMsg')}
+          </p>
         </div>
       </div>
     `;
