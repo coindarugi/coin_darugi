@@ -2844,15 +2844,21 @@ h1 {
     max-width: 100%;
     margin: 1.5rem 0;
     padding: 0.5rem 1rem;
+    position: relative;
+    z-index: 1; /* 낮은 z-index로 다른 컨텐츠와 겹치지 않도록 */
   }
   
   .ad-banner-mobile #frame {
     width: 100% !important;
+    position: relative;
+    z-index: 1; /* 기본 레이어 */
   }
   
   .ad-banner-mobile iframe {
     width: 100% !important;
     min-height: 90px;
+    position: relative;
+    z-index: 1; /* 다른 컨텐츠와 같은 레벨 */
   }
   
   /* 상단 광고 */

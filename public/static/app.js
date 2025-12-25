@@ -1876,7 +1876,7 @@ async function loadPrices() {
       
       <!-- 모바일 전용 광고 - 중단 (A-Ads) -->
       <div class="ad-banner-mobile ad-mobile-middle">
-        <div id="frame" style="width: 100%; margin: auto; position: relative; z-index: 99998;">
+        <div id="frame" style="width: 100%; margin: auto; position: relative;">
           <iframe 
             data-aa='2422003' 
             src='//acceptable.a-ads.com/2422003/?size=Adaptive'
@@ -1900,7 +1900,7 @@ async function loadPrices() {
       
       <!-- 모바일 전용 광고 - 하단 (A-Ads) -->
       <div class="ad-banner-mobile ad-mobile-bottom">
-        <div id="frame" style="width: 100%; margin: auto; position: relative; z-index: 99998;">
+        <div id="frame" style="width: 100%; margin: auto; position: relative;">
           <iframe 
             data-aa='2422003' 
             src='//acceptable.a-ads.com/2422003/?size=Adaptive'

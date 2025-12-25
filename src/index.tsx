@@ -1280,7 +1280,7 @@ app.get('/', (c) => {
       
       {/* 모바일 전용 광고 - 상단 (A-Ads) */}
       <div class="ad-banner-mobile ad-mobile-top">
-        <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998'}}>
+        <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative'}}>
           <iframe 
             data-aa='2422003' 
             src='//acceptable.a-ads.com/2422003/?size=Adaptive'
