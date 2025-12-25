@@ -4,7 +4,7 @@ Allow: /
 Allow: /static/
 
 # Sitemaps
-Sitemap: https://crypto-dashboard-secure.pages.dev/sitemap.xml
+Sitemap: https://crypto-darugi.com/sitemap.xml
 
 # Crawl-delay for politeness
 Crawl-delay: 1
