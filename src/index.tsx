@@ -136,6 +136,16 @@ async function fetchFromCoinCap(coinIds: string[]) {
 // API 라우트: 암호화폐 실시간 가격 조회 (선택한 코인만)
 app.get('/api/prices', async (c) => {
   try {
+    // 🔑 환경 변수에서 CoinGecko API 키 가져오기 (선택적)
+    const COINGECKO_API_KEY = c.env.COINGECKO_API_KEY
+    
+    if (!COINGECKO_API_KEY) {
+      return c.json({ 
+        error: '가격 정보를 가져올 수 없습니다.',
+        message: 'COINGECKO_API_KEY is not defined'
+      }, 500)
+    }
+    
     // URL 쿼리에서 선택한 코인 가져오기 (기본값: 비트코인만)
     const selectedCoins = c.req.query('coins') || 'bitcoin'
     
@@ -258,6 +268,9 @@ app.get('/api/prices', async (c) => {
 // API 라우트: 전체 코인 목록 (시가총액 기준 Top 100)
 app.get('/api/coins/list', async (c) => {
   try {
+    // 🔑 환경 변수에서 CoinGecko API 키 가져오기
+    const COINGECKO_API_KEY = c.env.COINGECKO_API_KEY
+    
     const page = parseInt(c.req.query('page') || '1')
     const perPage = 100
     
@@ -307,6 +320,9 @@ app.get('/api/coins/list', async (c) => {
 // API 라우트: 코인 검색
 app.get('/api/coins/search', async (c) => {
   try {
+    // 🔑 환경 변수에서 CoinGecko API 키 가져오기
+    const COINGECKO_API_KEY = c.env.COINGECKO_API_KEY
+    
     const query = c.req.query('q') || ''
     
     if (query.length < 2) {
@@ -352,6 +368,9 @@ app.get('/api/coins/search', async (c) => {
 // API 라우트: 코인 차트 데이터 (7일/30일/90일 지원)
 app.get('/api/chart/:coinId', async (c) => {
   try {
+    // 🔑 환경 변수에서 CoinGecko API 키 가져오기
+    const COINGECKO_API_KEY = c.env.COINGECKO_API_KEY
+    
     const coinId = c.req.param('coinId')
     const days = c.req.query('days') || '7' // 기본값: 7일
     
@@ -430,6 +449,9 @@ const coinSymbolMapping: Record<string, string> = {
 // API 라우트: 김치 프리미엄 계산 (개별 코인 지원)
 app.get('/api/kimchi-premium/:coinId', async (c) => {
   try {
+    // 🔑 환경 변수에서 CoinGecko API 키 가져오기
+    const COINGECKO_API_KEY = c.env.COINGECKO_API_KEY
+    
     const coinId = c.req.param('coinId')
     const exchange = c.req.query('exchange') || 'upbit' // 기본값: 업비트
     
@@ -685,6 +707,9 @@ app.get('/api/news', async (c) => {
 // API 라우트: AI 코인 전망 분석 (다국어 지원)
 app.get('/api/ai-forecast', async (c) => {
   try {
+    // 🔑 환경 변수에서 API 키들 가져오기
+    const COINGECKO_API_KEY = c.env.COINGECKO_API_KEY
+    
     const now = Date.now()
     
     // 언어 파라미터 가져오기 (기본값: ko)
