@@ -1,7 +1,8 @@
 import { jsxRenderer } from 'hono/jsx-renderer'
 
 export const renderer = jsxRenderer(({ children }) => {
-  const version = 'v5.3.1' // 🔥 3-5줄 요약 + 원문 보기 버튼으로 이동
+  const version = 'v5.3.2' // 🖼️ OG 이미지 캐시 버스팅
+  const ogImageUrl = `https://crypto-darugi.com/og-image.png?v=${Date.now()}`
   return (
     <html lang="ko">
       <head>
@@ -30,7 +31,12 @@ export const renderer = jsxRenderer(({ children }) => {
         <meta property="og:url" content="https://crypto-darugi.com/" />
         <meta property="og:title" content="암호화폐 실시간 대시보드 | AI 전망, 10,000+ 코인 추적" />
         <meta property="og:description" content="AI 기반 코인 전망, 10,000개 이상의 암호화폐 실시간 추적, 김치 프리미엄 계산기, 포트폴리오 관리. 무료!" />
-        <meta property="og:image" content="https://crypto-darugi.com/og-image.png" />
+        <meta property="og:image" content={ogImageUrl} />
+        <meta property="og:image:secure_url" content={ogImageUrl} />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1376" />
+        <meta property="og:image:height" content="768" />
+        <meta property="og:image:alt" content="암호화폐 실시간 대시보드 - AI 전망, 김치 프리미엄" />
         <meta property="og:site_name" content="암호화폐 실시간 대시보드" />
         <meta property="og:locale" content="ko_KR" />
         
@@ -39,7 +45,8 @@ export const renderer = jsxRenderer(({ children }) => {
         <meta name="twitter:url" content="https://crypto-darugi.com/" />
         <meta name="twitter:title" content="암호화폐 실시간 대시보드 | AI 전망, 10,000+ 코인" />
         <meta name="twitter:description" content="AI 기반 코인 전망, 10,000+ 암호화폐 실시간 추적, 김치 프리미엄 계산기" />
-        <meta name="twitter:image" content="https://crypto-darugi.com/og-image.png" />
+        <meta name="twitter:image" content={ogImageUrl} />
+        <meta name="twitter:image:alt" content="암호화폐 실시간 대시보드" />
         
         {/* Canonical URL */}
         <link rel="canonical" href="https://crypto-darugi.com/" />
