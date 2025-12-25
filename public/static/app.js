@@ -1778,8 +1778,8 @@ async function loadPrices() {
     
     // 새로고침 버튼 (왼쪽 정렬)
     const refreshButton = `
-      <div style="text-align: left; padding: 0 1rem;">
-        <button class="refresh-btn" onclick="loadPrices()">
+      <div style="text-align: left !important; padding: 0 1rem; margin: 1rem 0;">
+        <button class="refresh-btn" onclick="loadPrices()" style="margin: 0 !important; display: inline-block !important;">
           <i class="fas fa-sync-alt"></i> ${t('refresh')}
         </button>
       </div>
