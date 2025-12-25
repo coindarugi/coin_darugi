@@ -1,7 +1,7 @@
 import { jsxRenderer } from 'hono/jsx-renderer'
 
 export const renderer = jsxRenderer(({ children, lang }) => {
-  const version = 'v5.3.2' // 🖼️ OG 이미지 캐시 버스팅
+  const version = 'v5.3.3' // 🖼️ 중단 광고 캐시 버스팅
   
   // 🌍 다국어 이미지 지원
   const currentLang = (lang as string) || 'ko'
