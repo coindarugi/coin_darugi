@@ -1975,6 +1975,10 @@ function toggleForecastText(forecastId) {
     reasoningText.textContent = reasoningFull.length > MAX_LENGTH ? reasoningFull.substring(0, MAX_LENGTH) + '...' : reasoningFull;
     adviceText.textContent = adviceFull.length > MAX_LENGTH ? adviceFull.substring(0, MAX_LENGTH) + '...' : adviceFull;
     
+    // max-height 복원
+    reasoningDiv.style.maxHeight = '140px';
+    adviceDiv.style.maxHeight = '120px';
+    
     reasoningDiv.dataset.expanded = 'false';
     adviceDiv.dataset.expanded = 'false';
     
@@ -1984,6 +1988,10 @@ function toggleForecastText(forecastId) {
     // 펼치기
     reasoningText.textContent = reasoningDiv.dataset.fullText;
     adviceText.textContent = adviceDiv.dataset.fullText;
+    
+    // max-height 제거하여 전체 내용 표시
+    reasoningDiv.style.maxHeight = 'none';
+    adviceDiv.style.maxHeight = 'none';
     
     reasoningDiv.dataset.expanded = 'true';
     adviceDiv.dataset.expanded = 'true';

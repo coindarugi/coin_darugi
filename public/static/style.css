@@ -2287,7 +2287,7 @@ h1 {
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
-  height: 480px; /* 고정 높이로 변경 */
+  min-height: 480px; /* 최소 높이로 변경 */
   overflow: hidden; /* 넘치는 내용 숨김 */
 }
 
@@ -2426,7 +2426,7 @@ h1 {
   line-height: 1.6;
   color: #cbd5e1;
   flex-grow: 0;
-  max-height: 120px; /* 최대 높이 설정 */
+  max-height: 140px; /* 5줄 정도 표시 */
   overflow-y: auto; /* 세로 스크롤 추가 */
 }
 
@@ -2444,7 +2444,7 @@ h1 {
   color: #cbd5e1;
   margin-bottom: auto;
   flex-grow: 0;
-  max-height: 100px; /* 최대 높이 설정 */
+  max-height: 120px; /* 4-5줄 정도 표시 */
   overflow-y: auto; /* 세로 스크롤 추가 */
 }
 
