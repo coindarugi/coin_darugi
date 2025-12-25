@@ -2426,8 +2426,9 @@ h1 {
   line-height: 1.6;
   color: #cbd5e1;
   flex-grow: 0;
-  max-height: 140px; /* 5줄 정도 표시 */
-  overflow-y: auto; /* 세로 스크롤 추가 */
+  /* 기본 높이는 JavaScript에서 개별적으로 설정 */
+  overflow-y: auto;
+  transition: all 0.3s ease;
 }
 
 .forecast-reasoning i {
@@ -2444,8 +2445,9 @@ h1 {
   color: #cbd5e1;
   margin-bottom: auto;
   flex-grow: 0;
-  max-height: 120px; /* 4-5줄 정도 표시 */
-  overflow-y: auto; /* 세로 스크롤 추가 */
+  /* 기본 높이는 JavaScript에서 개별적으로 설정 */
+  overflow-y: auto;
+  transition: all 0.3s ease;
 }
 
 .forecast-advice i {

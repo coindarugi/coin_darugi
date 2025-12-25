@@ -98,9 +98,6 @@ window.addEventListener('DOMContentLoaded', () => {
   loadFavorites();
   loadSelectedExchange();
   loadPrices();
-  
-  // AI 전망이 이전에 로드되었으면 자동으로 로드
-  setTimeout(() => autoLoadAIForecastIfNeeded(), 1000);
   loadCryptoNews();
   // AI 전망은 사용자가 버튼 클릭 시에만 로드 (API 비용 절약)
   
@@ -1015,9 +1012,10 @@ function setAIForecastLoaded(loaded) {
 
 // 페이지 로드 시 AI 전망이 이전에 로드되었으면 자동으로 로드
 function autoLoadAIForecastIfNeeded() {
-  if (isAIForecastLoaded() && !aiForecastCurrentlyLoaded) {
-    loadAIForecastOnDemand();
-  }
+  // 이 함수는 더 이상 사용하지 않음 - 사용자가 명시적으로 버튼을 클릭해야만 로드
+  // if (isAIForecastLoaded() && !aiForecastCurrentlyLoaded) {
+  //   loadAIForecastOnDemand();
+  // }
 }
 
 // 버튼 클릭 시 AI 전망 로드
@@ -1028,9 +1026,6 @@ async function loadAIForecastOnDemand() {
   // 이미 로드했으면 다시 로드하지 않음
   if (aiForecastCurrentlyLoaded) return;
   aiForecastCurrentlyLoaded = true;
-  
-  // 상태를 localStorage에 저장
-  setAIForecastLoaded(true);
   
   // 로딩 표시
   container.innerHTML = `
@@ -1140,11 +1135,11 @@ async function loadAIForecast() {
               <span class="confidence-percentage"><strong>${forecast.analysis.confidence}%</strong></span>
             </div>
           </div>
-          <div class="forecast-reasoning" id="${forecastId}-reasoning" data-full-text="${reasoning.replace(/"/g, '&quot;')}" data-expanded="false">
+          <div class="forecast-reasoning" id="${forecastId}-reasoning" data-full-text="${reasoning.replace(/"/g, '&quot;')}" data-expanded="false" style="max-height: 140px; overflow-y: auto;">
             <i class="fas fa-lightbulb" style="color: #f59e0b;"></i>
             <span id="${forecastId}-reasoning-text">${reasoningShort}</span>
           </div>
-          <div class="forecast-advice" id="${forecastId}-advice" data-full-text="${advice.replace(/"/g, '&quot;')}" data-expanded="false">
+          <div class="forecast-advice" id="${forecastId}-advice" data-full-text="${advice.replace(/"/g, '&quot;')}" data-expanded="false" style="max-height: 120px; overflow-y: auto;">
             <i class="fas fa-hand-point-right" style="color: #3b82f6;"></i>
             <strong>${t('forecastAdvice')}:</strong> <span id="${forecastId}-advice-text">${adviceShort}</span>
           </div>
@@ -1417,7 +1412,7 @@ async function loadPrices() {
     // 공포탐욕지수 가져오기
     const fearGreedHTML = await loadFearGreedIndex();
     
-    // AI 전망 컨테이너 (버튼 클릭 로딩)
+    // AI 전망 컨테이너 (버튼 클릭 로딩만 허용 - 캐시 사용 안 함)
     const aiForecastHTML = `
       <div id="ai-forecast-container" style="min-height: 200px;">
         <div style="text-align: center; padding: 3rem;">
@@ -1799,6 +1794,18 @@ async function loadPrices() {
       </div>
     `;
     
+    const adBottomHTML = `
+      <div class="ad-container ad-bottom" style="margin-top: 2rem; margin-bottom: 3rem;">
+        <div id="frame" style="width: 100%; margin: auto; position: relative; z-index: 99998;">
+          <iframe 
+            data-aa='2421980' 
+            src='//acceptable.a-ads.com/2421980/?size=Adaptive'
+            style='border:0; padding:0; width:70%; height:auto; overflow:hidden; display: block; margin: auto'>
+          </iframe>
+        </div>
+      </div>
+    `;
+    
     // 새로고침 버튼 (가운데 정렬)
     const refreshButton = `
       <div style="text-align: center !important; padding: 0 1rem; margin: 2rem 0;">
@@ -1808,8 +1815,8 @@ async function loadPrices() {
       </div>
     `;
     
-    // 순서: 검색 → 통계 → 포트폴리오 요약 → 코인 목록 → 중간 광고 → AI 전망 → 뉴스 → 새로고침
-    appDiv.innerHTML = searchHTML + statsHTML + portfolioSummaryHTML + coinsHTML + adMiddleHTML + aiForecastHTML + newsHTML + refreshButton;
+    // 순서: 검색 → 통계 → 포트폴리오 요약 → 코인 목록 → 중간 광고 → AI 전망 → 뉴스 → 새로고침 → 하단 광고
+    appDiv.innerHTML = searchHTML + statsHTML + portfolioSummaryHTML + coinsHTML + adMiddleHTML + aiForecastHTML + newsHTML + refreshButton + adBottomHTML;
     
     // 🌍 각 코인별로 해당 국가 거래소 가격 로드
     loadExchangePrices(coinsArray);
@@ -1957,6 +1964,8 @@ function closeUserGuide() {
 
 // AI 전망 텍스트 펼치기/접기
 function toggleForecastText(forecastId) {
+  console.log('[toggleForecastText] Called with forecastId:', forecastId);
+  
   const reasoningDiv = document.getElementById(`${forecastId}-reasoning`);
   const adviceDiv = document.getElementById(`${forecastId}-advice`);
   const reasoningText = document.getElementById(`${forecastId}-reasoning-text`);
@@ -1964,20 +1973,31 @@ function toggleForecastText(forecastId) {
   const btnText = document.getElementById(`${forecastId}-btn-text`);
   const btnIcon = document.getElementById(`${forecastId}-btn-icon`);
   
+  // null 체크 (탭 전환 후에도 작동하도록)
+  if (!reasoningDiv || !adviceDiv || !reasoningText || !adviceText || !btnText || !btnIcon) {
+    console.error('[toggleForecastText] Forecast elements not found:', forecastId);
+    return;
+  }
+  
   const isExpanded = reasoningDiv.dataset.expanded === 'true';
+  console.log('[toggleForecastText] Current state - isExpanded:', isExpanded);
+  
   const MAX_LENGTH = 150;
   
   if (isExpanded) {
-    // 접기
-    const reasoningFull = reasoningDiv.dataset.fullText;
-    const adviceFull = adviceDiv.dataset.fullText;
+    // 접기 - 인라인 스타일로 이 요소만 제어
+    console.log('[toggleForecastText] Collapsing:', forecastId);
+    const reasoningFull = reasoningDiv.dataset.fullText || '';
+    const adviceFull = adviceDiv.dataset.fullText || '';
     
     reasoningText.textContent = reasoningFull.length > MAX_LENGTH ? reasoningFull.substring(0, MAX_LENGTH) + '...' : reasoningFull;
     adviceText.textContent = adviceFull.length > MAX_LENGTH ? adviceFull.substring(0, MAX_LENGTH) + '...' : adviceFull;
     
-    // max-height 복원
+    // CRITICAL: 인라인 스타일로 이 항목만 제어
     reasoningDiv.style.maxHeight = '140px';
+    reasoningDiv.style.overflowY = 'auto';
     adviceDiv.style.maxHeight = '120px';
+    adviceDiv.style.overflowY = 'auto';
     
     reasoningDiv.dataset.expanded = 'false';
     adviceDiv.dataset.expanded = 'false';
@@ -1985,13 +2005,19 @@ function toggleForecastText(forecastId) {
     btnText.textContent = currentLang === 'ko' ? '더보기' : currentLang === 'fr' ? 'Lire la suite' : currentLang === 'de' ? 'Mehr lesen' : currentLang === 'es' ? 'Leer más' : 'Read more';
     btnIcon.className = 'fas fa-chevron-down';
   } else {
-    // 펼치기
-    reasoningText.textContent = reasoningDiv.dataset.fullText;
-    adviceText.textContent = adviceDiv.dataset.fullText;
+    // 펼치기 - 인라인 스타일로 이 요소만 제어
+    console.log('[toggleForecastText] Expanding:', forecastId);
+    const reasoningFull = reasoningDiv.dataset.fullText || '';
+    const adviceFull = adviceDiv.dataset.fullText || '';
     
-    // max-height 제거하여 전체 내용 표시
+    reasoningText.textContent = reasoningFull;
+    adviceText.textContent = adviceFull;
+    
+    // CRITICAL: 인라인 스타일로 이 항목만 제어
     reasoningDiv.style.maxHeight = 'none';
+    reasoningDiv.style.overflowY = 'visible';
     adviceDiv.style.maxHeight = 'none';
+    adviceDiv.style.overflowY = 'visible';
     
     reasoningDiv.dataset.expanded = 'true';
     adviceDiv.dataset.expanded = 'true';
@@ -1999,4 +2025,6 @@ function toggleForecastText(forecastId) {
     btnText.textContent = currentLang === 'ko' ? '접기' : currentLang === 'fr' ? 'Réduire' : currentLang === 'de' ? 'Einklappen' : currentLang === 'es' ? 'Ocultar' : 'Show less';
     btnIcon.className = 'fas fa-chevron-up';
   }
+  
+  console.log('[toggleForecastText] New state - expanded:', reasoningDiv.dataset.expanded);
 }

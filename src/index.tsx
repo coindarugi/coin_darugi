@@ -1728,25 +1728,6 @@ app.get('/', (c) => {
         </div>
       </div>
       
-      {/* 광고 영역 2: 하단 배너 */}
-      <div class="ad-container ad-footer" style={{marginTop: '3rem', marginBottom: '2rem'}}>
-        <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998'}}>
-          <iframe 
-            data-aa='2421980' 
-            src='//acceptable.a-ads.com/2421980/?size=Adaptive'
-            style={{
-              border: '0',
-              padding: '0',
-              width: '70%',
-              height: 'auto',
-              overflow: 'hidden',
-              display: 'block',
-              margin: 'auto'
-            }}
-          />
-        </div>
-      </div>
-      
       {/* 푸터 */}
       <footer style={{
         textAlign: 'center',
