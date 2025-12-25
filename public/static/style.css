@@ -80,6 +80,18 @@ body::before {
   max-width: 100% !important;
 }
 
+/* iframe 내부 팝업 차단 */
+.ad-container iframe::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99999;
+  pointer-events: none;
+}
+
 .ad-label {
   font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.4);
@@ -460,8 +472,10 @@ h1 {
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
-  display: block;
+  display: inline-block;
   margin: 2rem auto;
+  position: relative;
+  z-index: 100;
 }
 
 .refresh-btn:hover {
