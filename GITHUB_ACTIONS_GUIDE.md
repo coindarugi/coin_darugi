@@ -165,7 +165,7 @@ Twitter 계정 `@coin_darugi`에서 발행된 트윗 확인
 ## 📞 문의
 
 문제가 있으시면:
-- Email: coin.darugi@gmail.com
+- Email: crypto.darugi@gmail.com
 - Twitter: @coin_darugi
 
 ## 🎉 완료!

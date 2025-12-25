@@ -322,7 +322,7 @@ Thanks for your time!
 
 Best regards,
 [Your Name]
-coin.darugi@gmail.com
+crypto.darugi@gmail.com
 
 ---
 

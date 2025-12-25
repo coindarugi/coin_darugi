@@ -171,7 +171,7 @@ https://crypto-dashboard-secure.pages.dev?utm_source=medium&utm_medium=blog&utm_
 
 - **Dashboard**: https://crypto-dashboard-secure.pages.dev
 - **GitHub**: https://github.com/username/webapp
-- **Contact**: coin.darugi@gmail.com
+- **Contact**: crypto.darugi@gmail.com
 
 ## 💡 Tips for Success
 
@@ -228,7 +228,7 @@ https://crypto-dashboard-secure.pages.dev?utm_source=medium&utm_medium=blog&utm_
 ## 📞 Support
 
 Questions or need help?
-- Email: coin.darugi@gmail.com
+- Email: crypto.darugi@gmail.com
 - Dashboard: https://crypto-dashboard-secure.pages.dev
 
 ## 📄 License

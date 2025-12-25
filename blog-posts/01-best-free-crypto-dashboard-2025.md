@@ -100,7 +100,7 @@ crypto dashboard, free cryptocurrency tracker, bitcoin price tracker, ethereum d
 ## Community & Support
 
 Found a bug or have a feature request? Contact us:
-- **Email**: coin.darugi@gmail.com
+- **Email**: crypto.darugi@gmail.com
 - **GitHub**: [Contribute to the project](#)
 
 ## Conclusion

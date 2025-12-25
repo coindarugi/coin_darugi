@@ -71,7 +71,7 @@ node crypto-tweet-bot.js
 ## 📞 문의
 
 문제가 있으시면:
-- Email: coin.darugi@gmail.com
+- Email: crypto.darugi@gmail.com
 - Twitter: @coin_darugi
 
 ## 🎉 완료!

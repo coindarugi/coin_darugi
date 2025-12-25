@@ -1078,7 +1078,7 @@ app.get('/', (c) => {
             <i class="fas fa-ad" style={{fontSize: '2rem', color: '#667eea', marginBottom: '0.5rem'}}></i>
             <p id="adInquiryTitle" style={{fontSize: '1.1rem', fontWeight: '600', marginBottom: '0.5rem', color: '#e2e8f0'}}>광고 문의</p>
             <p id="adInquiryDesc" style={{fontSize: '0.9rem', color: '#94a3b8', marginBottom: '0.8rem'}}>이 공간에 귀하의 광고를 게재하세요</p>
-            <a href="mailto:coin.darugi@gmail.com" style={{
+            <a href="mailto:crypto.darugi@gmail.com" style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.5rem',
@@ -1093,7 +1093,7 @@ app.get('/', (c) => {
               border: '1px solid rgba(255, 255, 255, 0.2)'
             }}>
               <i class="fas fa-envelope"></i>
-              coin.darugi@gmail.com
+              crypto.darugi@gmail.com
             </a>
           </div>
         </div>
@@ -1452,14 +1452,14 @@ app.get('/', (c) => {
                   <i class="fas fa-envelope" style={{fontSize: '2rem', color: '#667eea', marginBottom: '0.5rem'}}></i>
                   <p style={{margin: '0', fontSize: '1.1rem', color: '#cbd5e1'}}>
                     <a 
-                      href="mailto:coin.darugi@gmail.com" 
+                      href="mailto:crypto.darugi@gmail.com" 
                       style={{
                         color: '#3b82f6',
                         textDecoration: 'none',
                         fontWeight: '600'
                       }}
                     >
-                      coin.darugi@gmail.com
+                      crypto.darugi@gmail.com
                     </a>
                   </p>
                 </div>
@@ -1532,14 +1532,14 @@ app.get('/', (c) => {
                   <i class="fas fa-envelope" style={{fontSize: '2rem', color: '#667eea', marginBottom: '0.5rem'}}></i>
                   <p style={{margin: '0', fontSize: '1.1rem', color: '#cbd5e1'}}>
                     <a 
-                      href="mailto:coin.darugi@gmail.com" 
+                      href="mailto:crypto.darugi@gmail.com" 
                       style={{
                         color: '#3b82f6',
                         textDecoration: 'none',
                         fontWeight: '600'
                       }}
                     >
-                      coin.darugi@gmail.com
+                      crypto.darugi@gmail.com
                     </a>
                   </p>
                 </div>
@@ -1561,13 +1561,13 @@ app.get('/', (c) => {
         <div style={{marginBottom: '1rem'}}>
           <i class="fas fa-envelope" style={{marginRight: '0.5rem', color: '#667eea'}}></i>
           <span id="contactLabel">문의</span>: 
-          <a href="mailto:coin.darugi@gmail.com" style={{
+          <a href="mailto:crypto.darugi@gmail.com" style={{
             color: '#3b82f6',
             textDecoration: 'none',
             marginLeft: '0.5rem',
             fontWeight: '600'
           }}>
-            coin.darugi@gmail.com
+            crypto.darugi@gmail.com
           </a>
         </div>
         <div style={{fontSize: '0.85rem', color: '#64748b'}}>
