@@ -2735,3 +2735,94 @@ h1 {
 .pulse-animation {
   animation: pulse-glow 0.8s ease-in-out 3;
 }
+
+/* ===========================================
+   모바일 전용 광고 배너 (BC.GAME)
+   =========================================== */
+
+/* 데스크톱: iframe 광고만 표시 */
+.ad-desktop-only {
+  display: block;
+}
+
+.ad-banner-mobile {
+  display: none;
+}
+
+/* 모바일: BC.GAME 배너만 표시 */
+@media (max-width: 768px) {
+  /* 데스크톱 광고 숨김 */
+  .ad-desktop-only {
+    display: none !important;
+  }
+  
+  /* 모바일 광고 표시 */
+  .ad-banner-mobile {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin: 1.5rem 0;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .ad-banner-mobile a {
+    display: block;
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    /* 터치 영역 확보 */
+    min-height: 60px;
+    padding: 0.5rem;
+  }
+  
+  .ad-banner-mobile img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+  }
+  
+  /* 상단 광고 */
+  .ad-mobile-top {
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* 중단 광고 */
+  .ad-mobile-middle {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  /* 하단 광고 */
+  .ad-mobile-bottom {
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* 터치 피드백 */
+  .ad-banner-mobile:active {
+    transform: scale(0.98);
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* 작은 모바일 화면 (480px 이하) */
+@media (max-width: 480px) {
+  .ad-banner-mobile {
+    padding: 0.25rem 0.5rem;
+    margin: 1rem 0;
+  }
+  
+  .ad-banner-mobile a {
+    padding: 0.25rem;
+  }
+  
+  .ad-banner-mobile img {
+    border-radius: 6px;
+  }
+}

@@ -1259,8 +1259,8 @@ app.get('/', (c) => {
         </div>
       </nav>
       
-      {/* 광고 영역 1: 헤더 아래 배너 (상단) */}
-      <div class="ad-container ad-header" style={{marginTop: '2rem', marginBottom: '2rem'}}>
+      {/* 광고 영역 1: 헤더 아래 배너 (상단) - 데스크톱용 */}
+      <div class="ad-container ad-header ad-desktop-only" style={{marginTop: '2rem', marginBottom: '2rem'}}>
         <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998'}}>
           <iframe 
             data-aa='2421971' 
@@ -1276,6 +1276,17 @@ app.get('/', (c) => {
             }}
           />
         </div>
+      </div>
+      
+      {/* 모바일 전용 광고 - 상단 */}
+      <div class="ad-banner-mobile ad-mobile-top">
+        <a href="https://bc.game/i-1hx0000-n/" target="_blank" rel="noopener noreferrer sponsored">
+          <img 
+            src="https://bc.game/banner/728x90.gif" 
+            alt="BC.GAME - Best Crypto Casino"
+            style={{width: '100%', height: 'auto', borderRadius: '8px'}}
+          />
+        </a>
       </div>
       
       <div id="app">

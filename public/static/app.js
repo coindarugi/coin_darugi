@@ -1864,7 +1864,7 @@ async function loadPrices() {
     // 🖼️ 광고 영역 2: 중단 배너 (모바일/데스크톱 분리)
     const adMiddleHTML = `
       <!-- 데스크톱 광고 -->
-      <div class="ad-container ad-middle ad-desktop" style="margin-top: 2rem; margin-bottom: 2rem;">
+      <div class="ad-container ad-middle ad-desktop-only" style="margin-top: 2rem; margin-bottom: 2rem;">
         <div id="frame" style="width: 100%; margin: auto; position: relative; z-index: 99998;">
           <iframe 
             data-aa='2421975' 
@@ -1874,16 +1874,21 @@ async function loadPrices() {
         </div>
       </div>
       
-      <!-- 모바일 광고 (작은 배너 또는 숨김) -->
-      <div class="ad-container ad-middle ad-mobile" style="margin-top: 1rem; margin-bottom: 1rem; display: none;">
-        <div style="text-align: center; padding: 1rem; color: #94a3b8; font-size: 0.85rem;">
-          <!-- 모바일에서는 광고 최소화 -->
-        </div>
+      <!-- 모바일 전용 광고 - 중단 -->
+      <div class="ad-banner-mobile ad-mobile-middle">
+        <a href="https://bc.game/i-1hx0000-n/" target="_blank" rel="noopener noreferrer sponsored">
+          <img 
+            src="https://bc.game/banner/728x90.gif" 
+            alt="BC.GAME - Best Crypto Casino"
+            style="width: 100%; height: auto; border-radius: 8px;"
+          />
+        </a>
       </div>
     `;
     
     const adBottomHTML = `
-      <div class="ad-container ad-bottom" style="margin-top: 2rem; margin-bottom: 3rem;">
+      <!-- 데스크톱 광고 -->
+      <div class="ad-container ad-bottom ad-desktop-only" style="margin-top: 2rem; margin-bottom: 3rem;">
         <div id="frame" style="width: 100%; margin: auto; position: relative; z-index: 99998;">
           <iframe 
             data-aa='2421980' 
@@ -1891,6 +1896,17 @@ async function loadPrices() {
             style='border:0; padding:0; width:70%; height:auto; overflow:hidden; display: block; margin: auto'>
           </iframe>
         </div>
+      </div>
+      
+      <!-- 모바일 전용 광고 - 하단 -->
+      <div class="ad-banner-mobile ad-mobile-bottom">
+        <a href="https://bc.game/i-1hx0000-n/" target="_blank" rel="noopener noreferrer sponsored">
+          <img 
+            src="https://bc.game/banner/728x90.gif" 
+            alt="BC.GAME - Best Crypto Casino"
+            style="width: 100%; height: auto; border-radius: 8px;"
+          />
+        </a>
       </div>
     `;
     
