@@ -1,7 +1,7 @@
 import { jsxRenderer } from 'hono/jsx-renderer'
 
 export const renderer = jsxRenderer(({ children, lang }) => {
-  const version = 'v5.3.3' // 🖼️ 중단 광고 캐시 버스팅
+  const version = 'v5.3.4' // 🌍 Hreflang 태그 수정
   
   // 🌍 다국어 이미지 지원
   const currentLang = (lang as string) || 'ko'
@@ -114,12 +114,12 @@ export const renderer = jsxRenderer(({ children, lang }) => {
         <link rel="canonical" href="https://crypto-darugi.com/" />
         
         {/* 🌍 다국어 hreflang 태그 */}
-        <link rel="alternate" hreflang="ko" href="https://crypto-darugi.com/" />
-        <link rel="alternate" hreflang="en" href="https://crypto-darugi.com/" />
-        <link rel="alternate" hreflang="fr" href="https://crypto-darugi.com/" />
-        <link rel="alternate" hreflang="de" href="https://crypto-darugi.com/" />
-        <link rel="alternate" hreflang="es" href="https://crypto-darugi.com/" />
-        <link rel="alternate" hreflang="x-default" href="https://crypto-darugi.com/" />
+        <link rel="alternate" hrefLang="ko" href="https://crypto-darugi.com/" />
+        <link rel="alternate" hrefLang="en" href="https://crypto-darugi.com/" />
+        <link rel="alternate" hrefLang="fr" href="https://crypto-darugi.com/" />
+        <link rel="alternate" hrefLang="de" href="https://crypto-darugi.com/" />
+        <link rel="alternate" hrefLang="es" href="https://crypto-darugi.com/" />
+        <link rel="alternate" hrefLang="x-default" href="https://crypto-darugi.com/" />
         
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
