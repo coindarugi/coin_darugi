@@ -1349,7 +1349,7 @@ app.get('/', (c) => {
                   <li><strong>즐겨찾기</strong>: ⭐ 별 아이콘 클릭으로 즐겨찾기 추가</li>
                   <li><strong>포트폴리오</strong>: 코인 카드의 `포트폴리오` 버튼으로 수익률 추적</li>
                   <li><strong>차트 보기</strong>: `차트` 버튼으로 7/30/90일 가격 추이 확인</li>
-                  <li><strong>AI 전망 분석</strong>: 🤖 AI 기반 주요 코인 1주일 단기 전망 + 신뢰도 + 투자 조언</li>
+                  <li><strong>AI 전망 분석</strong>: 🤖 AI 버튼 클릭하면 주요 코인 1주일 단기 전망 + 신뢰도 + 투자 조언 표시</li>
                   <li><strong>뉴스 읽기</strong>: 하단 뉴스 섹션에서 최신 암호화폐 뉴스 + 한글 번역</li>
                 </ol>
               </section>
@@ -1365,8 +1365,8 @@ app.get('/', (c) => {
                   💡 고급 팁
                 </h3>
                 <ul style={{lineHeight: '1.8', paddingLeft: '1.5rem'}}>
-                  <li><strong>AI 전망 활용</strong>: 상승/하락/중립 전망 + 신뢰도(%) + 근거 + 투자 조언 제공 (참고용, 투자 책임은 본인)</li>
-                  <li><strong>더보기 버튼</strong>: AI 전망 카드에서 긴 분석 내용은 `더보기` 버튼으로 전체 확인</li>
+                  <li><strong>AI 전망 활용</strong>: 🤖 AI 버튼 클릭 → 상승/하락/중립 전망 + 신뢰도(%) + 근거 + 투자 조언 (참고용, 투자 책임은 본인)</li>
+                  <li><strong>더보기 버튼</strong>: AI 전망 분석이 길 경우 `더보기` 버튼으로 전체 내용 확인</li>
                   <li><strong>김치 프리미엄 활용</strong>: 한국어로 변경하면 업비트/빗썸/코인원 가격 비교 가능</li>
                   <li><strong>공포탐욕지수</strong>: 상단 통계에서 시장 심리 확인하여 투자 타이밍 판단</li>
                   <li><strong>수익률 정렬</strong>: `수익률순` 정렬로 가장 수익 높은 코인 확인</li>
@@ -1486,7 +1486,7 @@ app.get('/', (c) => {
                   <li><strong>Favorites</strong>: Click ⭐ star icon to add to favorites</li>
                   <li><strong>Portfolio</strong>: Track profits with `Portfolio` button on coin cards</li>
                   <li><strong>Charts</strong>: View 7/30/90-day price trends with `Chart` button</li>
-                  <li><strong>AI Forecast</strong>: 🤖 AI-powered 1-week forecast + confidence + reasoning + advice</li>
+                  <li><strong>AI Forecast</strong>: 🤖 Click AI button to see 1-week forecast + confidence + reasoning + advice</li>
                   <li><strong>News</strong>: Read latest crypto news with translation in news section</li>
                 </ol>
               </section>
@@ -1502,8 +1502,8 @@ app.get('/', (c) => {
                   💡 Pro Tips
                 </h3>
                 <ul style={{lineHeight: '1.8', paddingLeft: '1.5rem'}}>
-                  <li><strong>AI Forecast Tips</strong>: Bullish/Bearish/Neutral outlook + confidence(%) + reasoning + advice (for reference only)</li>
-                  <li><strong>Read More Button</strong>: Click `Read more` on AI forecast cards to see full analysis</li>
+                  <li><strong>AI Forecast Tips</strong>: Click 🤖 AI button → Bullish/Bearish/Neutral outlook + confidence(%) + reasoning + advice (for reference only)</li>
+                  <li><strong>Read More Button</strong>: Click `Read more` button if AI analysis is long to see full content</li>
                   <li><strong>Fear & Greed Index</strong>: Check market sentiment for timing</li>
                   <li><strong>Profit Sorting</strong>: Sort by profit to see best performers</li>
                   <li><strong>Auto Refresh</strong>: Prices update every 30 seconds automatically</li>
