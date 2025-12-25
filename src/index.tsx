@@ -1278,15 +1278,23 @@ app.get('/', (c) => {
         </div>
       </div>
       
-      {/* 모바일 전용 광고 - 상단 */}
+      {/* 모바일 전용 광고 - 상단 (A-Ads) */}
       <div class="ad-banner-mobile ad-mobile-top">
-        <a href="https://bc.game/i-1hx0000-n/" target="_blank" rel="noopener noreferrer sponsored">
-          <img 
-            src="https://bc.game/banner/728x90.gif" 
-            alt="BC.GAME - Best Crypto Casino"
-            style={{width: '100%', height: 'auto', borderRadius: '8px'}}
+        <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998'}}>
+          <iframe 
+            data-aa='2422003' 
+            src='//acceptable.a-ads.com/2422003/?size=Adaptive'
+            style={{
+              border: '0',
+              padding: '0',
+              width: '100%',
+              height: 'auto',
+              overflow: 'hidden',
+              display: 'block',
+              margin: 'auto'
+            }}
           />
-        </a>
+        </div>
       </div>
       
       <div id="app">

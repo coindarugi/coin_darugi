@@ -2816,13 +2816,68 @@ h1 {
   .ad-banner-mobile {
     padding: 0.25rem 0.5rem;
     margin: 1rem 0;
+
+/* ===========================================
+   모바일 전용 광고 배너 (A-Ads)
+   =========================================== */
+
+/* 데스크톱: iframe 광고만 표시 */
+.ad-desktop-only {
+  display: block;
+}
+
+.ad-banner-mobile {
+  display: none;
+}
+
+/* 모바일: A-Ads iframe 표시 */
+@media (max-width: 768px) {
+  /* 데스크톱 광고 숨김 */
+  .ad-desktop-only {
+    display: none !important;
   }
   
-  .ad-banner-mobile a {
-    padding: 0.25rem;
+  /* 모바일 광고 표시 */
+  .ad-banner-mobile {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin: 1.5rem 0;
+    padding: 0.5rem 1rem;
   }
   
-  .ad-banner-mobile img {
-    border-radius: 6px;
+  .ad-banner-mobile #frame {
+    width: 100% !important;
+  }
+  
+  .ad-banner-mobile iframe {
+    width: 100% !important;
+    min-height: 90px;
+  }
+  
+  /* 상단 광고 */
+  .ad-mobile-top {
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* 중단 광고 */
+  .ad-mobile-middle {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  /* 하단 광고 */
+  .ad-mobile-bottom {
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* 작은 모바일 화면 (480px 이하) */
+@media (max-width: 480px) {
+  .ad-banner-mobile {
+    padding: 0.25rem 0.5rem;
+    margin: 1rem 0;
   }
 }
