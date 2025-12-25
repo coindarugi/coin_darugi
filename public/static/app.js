@@ -1170,8 +1170,8 @@ async function loadAIForecast() {
       const adviceShort = advice.length > MAX_LENGTH ? advice.substring(0, MAX_LENGTH) + '...' : advice;
       
       const needsReadMore = reasoning.length > MAX_LENGTH || advice.length > MAX_LENGTH;
-      // CRITICAL: Use only coinId to avoid duplicate IDs on reload
-      const forecastId = `forecast-${forecast.coinId}`;
+      // CRITICAL: Use coinId + index to ensure unique IDs even after tab switches
+      const forecastId = `forecast-${forecast.coinId}-${index}`;
       
       forecastHTML += `
         <div class="forecast-item">
