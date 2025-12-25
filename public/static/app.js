@@ -1061,8 +1061,13 @@ async function loadAIForecastOnDemand() {
   const container = document.getElementById('ai-forecast-container');
   if (!container) return;
   
-  // 이미 로드했으면 다시 로드하지 않음
-  if (aiForecastCurrentlyLoaded) return;
+  // 이미 로드했으면 다시 로드하지 않음 (CRITICAL: 중복 호출 방지)
+  if (aiForecastCurrentlyLoaded) {
+    console.log('[loadAIForecastOnDemand] Already loaded, skipping');
+    return;
+  }
+  
+  console.log('[loadAIForecastOnDemand] Loading AI forecast...');
   aiForecastCurrentlyLoaded = true;
   
   // 로딩 표시
@@ -1074,11 +1079,16 @@ async function loadAIForecastOnDemand() {
   `;
   
   const forecastHTML = await loadAIForecast();
+  
+  // CRITICAL: innerHTML 할당 전에 기존 HTML 완전히 제거
+  container.innerHTML = '';
   container.innerHTML = forecastHTML;
   
   // HTML을 localStorage에 캐시
   saveAIForecastHTML(forecastHTML);
   setAIForecastLoaded(true);
+  
+  console.log('[loadAIForecastOnDemand] AI forecast loaded successfully');
 }
 
 // AI 전망 로드
@@ -1476,7 +1486,7 @@ async function loadPrices() {
         <div style="text-align: center; padding: 3rem;">
           <button 
             id="loadAIForecastBtn" 
-            onclick="loadAIForecastOnDemand()" 
+            onclick="if (!aiForecastCurrentlyLoaded) { loadAIForecastOnDemand(); this.disabled = true; }" 
             style="
               background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
               color: white;
