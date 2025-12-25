@@ -1071,31 +1071,22 @@ app.get('/', (c) => {
         </div>
       </header>
       
-      {/* 광고 영역 1: 헤더 아래 배너 (Adaptive) */}
+      {/* 광고 영역 1: 헤더 아래 배너 (A-ads Adaptive) */}
       <div class="ad-container ad-header">
-        <div class="ad-placeholder-custom">
-          <div class="ad-inquiry">
-            <i class="fas fa-ad" style={{fontSize: '2rem', color: '#667eea', marginBottom: '0.5rem'}}></i>
-            <p id="adInquiryTitle" style={{fontSize: '1.1rem', fontWeight: '600', marginBottom: '0.5rem', color: '#e2e8f0'}}>광고 문의</p>
-            <p id="adInquiryDesc" style={{fontSize: '0.9rem', color: '#94a3b8', marginBottom: '0.8rem'}}>이 공간에 귀하의 광고를 게재하세요</p>
-            <a href="mailto:crypto.darugi@gmail.com" style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.8rem 1.5rem',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white',
-              textDecoration: 'none',
-              borderRadius: '0.5rem',
-              fontSize: '0.95rem',
-              fontWeight: '600',
-              transition: 'all 0.3s ease',
-              border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
-              <i class="fas fa-envelope"></i>
-              crypto.darugi@gmail.com
-            </a>
-          </div>
+        <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998'}}>
+          <iframe 
+            data-aa='2421971' 
+            src='//acceptable.a-ads.com/2421971/?size=Adaptive'
+            style={{
+              border: '0',
+              padding: '0',
+              width: '70%',
+              height: 'auto',
+              overflow: 'hidden',
+              display: 'block',
+              margin: 'auto'
+            }}
+          />
         </div>
       </div>
       
