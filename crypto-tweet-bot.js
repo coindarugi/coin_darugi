@@ -226,42 +226,47 @@ function createTweetText(bitcoinData, aiAnalysis, language) {
   const features = {
     ko: [
       '✨ 10,000개 이상 암호화폐 실시간 추적',
-      '🤖 AI 기반 코인 전망 분석 (GPT-5.2)',
-      '💰 김치 프리미엄 계산기 (업비트/빗썸/코인원)',
+      '🤖 AI 기반 코인 전망 분석',
+      '💰 3개 거래소 가격 비교 + 김치 프리미엄 (업비트/빗썸/코인원)',
       '📊 포트폴리오 관리 & 수익률 계산',
       '📰 실시간 뉴스 + 자동 번역',
-      '🌍 5개 언어 완벽 지원'
+      '🏆 Top 100 코인 브라우저 (시총/거래량/등락률순)',
+      '💯 100% 무료!'
     ],
     en: [
       '✨ Track 10,000+ cryptocurrencies in real-time',
-      '🤖 AI-powered coin forecast (GPT-5.2)',
+      '🤖 AI-powered coin forecast analysis',
+      '💰 Compare 3 US exchange prices (Coinbase/Kraken/Gemini)',
       '📊 Portfolio management & profit tracking',
-      '📰 Real-time crypto news + translation',
-      '🌍 5 languages supported',
+      '📰 Real-time crypto news',
+      '🏆 Top 100 coins browser (by market cap/volume/change)',
       '💯 100% FREE!'
     ],
     fr: [
       '✨ Suivez 10 000+ cryptomonnaies en temps réel',
-      '🤖 Prévisions IA (GPT-5.2)',
+      '🤖 Analyse de prévisions IA',
+      '💰 Comparez les prix de 3 bourses européennes',
       '📊 Gestion de portefeuille',
       '📰 Actualités crypto + traduction',
-      '🌍 5 langues supportées',
+      '🏆 Navigateur Top 100 (cap./volume/variation)',
       '💯 100% GRATUIT!'
     ],
     de: [
       '✨ 10.000+ Kryptowährungen in Echtzeit',
-      '🤖 KI-Prognosen (GPT-5.2)',
+      '🤖 KI-gestützte Prognoseanalyse',
+      '💰 Vergleichen Sie 3 EU-Börsenpreise',
       '📊 Portfolio-Management',
       '📰 Krypto-News + Übersetzung',
-      '🌍 5 Sprachen unterstützt',
+      '🏆 Top 100 Coin-Browser (Kap./Volumen/Änderung)',
       '💯 100% KOSTENLOS!'
     ],
     es: [
       '✨ Sigue 10,000+ criptomonedas en tiempo real',
-      '🤖 Pronósticos IA (GPT-5.2)',
+      '🤖 Análisis de pronósticos IA',
+      '💰 Compara precios de 3 exchanges europeos',
       '📊 Gestión de cartera',
       '📰 Noticias crypto + traducción',
-      '🌍 5 idiomas compatibles',
+      '🏆 Navegador Top 100 (cap./volumen/cambio)',
       '💯 ¡100% GRATIS!'
     ]
   };
