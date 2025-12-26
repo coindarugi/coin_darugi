@@ -1230,6 +1230,10 @@ function closeAdModal() {
   loadAIForecastOnDemand();
 }
 
+// 🌍 전역 함수로 노출 (HTML onclick에서 사용)
+window.closeAdModal = closeAdModal;
+window.showBinanceAdModal = showBinanceAdModal;
+
 // AI 전망 로드
 async function loadAIForecast() {
   try {
