@@ -689,7 +689,3 @@ function changeLanguage(lang) {
   // 페이지 새로고침하여 모든 텍스트 업데이트
   location.reload();
 }
-;
-}
-;
-}
