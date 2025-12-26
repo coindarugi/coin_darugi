@@ -122,6 +122,7 @@ const translations = {
     // 거래소
     exchangePrice: '거래소 가격',
     localExchange: '한국 거래소',
+    priceSpread: '가격 차이',
     
     // 푸터
     contact: '문의',
@@ -253,6 +254,7 @@ const translations = {
     
     exchangePrice: 'Exchange Price',
     localExchange: 'US Exchange',
+    priceSpread: 'Price Spread',
     
     contact: 'Contact',
     
@@ -382,6 +384,7 @@ const translations = {
     
     exchangePrice: 'Prix de l\'Échange',
     localExchange: 'Échange Européen',
+    priceSpread: 'Écart de Prix',
     
     contact: 'Contact',
     
@@ -511,6 +514,7 @@ const translations = {
     
     exchangePrice: 'Börsenpreis',
     localExchange: 'Deutsche Börse',
+    priceSpread: 'Preisunterschied',
     
     contact: 'Kontakt',
     
@@ -640,6 +644,7 @@ const translations = {
     
     exchangePrice: 'Precio de Intercambio',
     localExchange: 'Intercambio Español',
+    priceSpread: 'Diferencia de Precio',
     
     contact: 'Contacto',
     
@@ -683,4 +688,8 @@ function changeLanguage(lang) {
   
   // 페이지 새로고침하여 모든 텍스트 업데이트
   location.reload();
+}
+;
+}
+;
 }

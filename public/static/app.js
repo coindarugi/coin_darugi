@@ -1949,17 +1949,45 @@ async function loadExchangePrices(coinsData) {
       const response = await axios.get(`/api/exchange-prices/${coinSymbol}?country=${country}`);
       const data = response.data;
       
-      if (data.price) {
-        let formattedPrice = '';
-        if (data.currency === 'USD') {
-          formattedPrice = `$${data.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        } else if (data.currency === 'EUR') {
-          formattedPrice = `€${data.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        } else if (data.currency === 'KRW') {
-          formattedPrice = `₩${data.price.toLocaleString('ko-KR', { minimumFractionDigits: 0 })}`;
+      if (data.exchanges && data.exchanges.length > 0) {
+        // 여러 거래소 가격 표시
+        let exchangesHTML = '<div style="margin-top: 0.5rem;">';
+        exchangesHTML += `<div style="font-weight: 600; color: #64748b; margin-bottom: 0.25rem;"><i class="fas fa-building"></i> ${t('localExchange')}:</div>`;
+        
+        data.exchanges.forEach((exchange, index) => {
+          let formattedPrice = '';
+          if (data.currency === 'USD') {
+            formattedPrice = `$${exchange.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+          } else if (data.currency === 'EUR') {
+            formattedPrice = `€${exchange.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+          } else if (data.currency === 'KRW') {
+            formattedPrice = `₩${exchange.price.toLocaleString('ko-KR', { minimumFractionDigits: 0 })}`;
+          }
+          
+          // 변동률 표시 (있는 경우)
+          let changeHTML = '';
+          if (exchange.change24h !== undefined) {
+            const changeColor = exchange.change24h >= 0 ? '#10b981' : '#ef4444';
+            const changeIcon = exchange.change24h >= 0 ? '▲' : '▼';
+            changeHTML = `<span style="color: ${changeColor}; font-size: 0.75rem; margin-left: 0.25rem;">${changeIcon} ${Math.abs(exchange.change24h).toFixed(2)}%</span>`;
+          }
+          
+          exchangesHTML += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 0.25rem 0; font-size: 0.85rem;">`;
+          exchangesHTML += `<span style="color: #94a3b8;">${exchange.name}:</span>`;
+          exchangesHTML += `<span style="color: #3b82f6; font-weight: 600;">${formattedPrice}${changeHTML}</span>`;
+          exchangesHTML += `</div>`;
+        });
+        
+        // 가격 차이 요약
+        if (data.summary && data.summary.spreadPercent > 0) {
+          let spreadColor = data.summary.spreadPercent > 1 ? '#ef4444' : '#64748b';
+          exchangesHTML += `<div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #e2e8f0; font-size: 0.8rem; color: ${spreadColor};">`;
+          exchangesHTML += `<i class="fas fa-chart-line"></i> ${t('priceSpread')}: ${data.summary.spreadPercent}%`;
+          exchangesHTML += `</div>`;
         }
         
-        exchangeEl.innerHTML = `<i class="fas fa-building"></i> ${t('localExchange')}: <span style="color: #3b82f6;">${formattedPrice}</span> <small style="color: #64748b;">(${data.exchangeName})</small>`;
+        exchangesHTML += '</div>';
+        exchangeEl.innerHTML = exchangesHTML;
       } else {
         exchangeEl.innerHTML = `<i class="fas fa-building"></i> ${t('localExchange')}: <span style="color: #9ca3af;">N/A</span>`;
       }
