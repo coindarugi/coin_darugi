@@ -588,6 +588,23 @@ h1 {
   .coin-grid {
     grid-template-columns: 1fr;
   }
+  
+  /* 모바일에서 네비게이션을 2x2 그리드로 */
+  .nav-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+  
+  /* 모바일에서 네비게이션 버튼 크기 조정 */
+  .nav-btn {
+    padding: 0.9rem 0.8rem !important;
+    font-size: 0.875rem !important;
+    gap: 0.4rem !important;
+  }
+  
+  .nav-btn i {
+    font-size: 1rem !important;
+  }
 }
 
 /* 코인 선택 UI */

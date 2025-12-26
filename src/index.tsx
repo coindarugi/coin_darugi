@@ -1159,21 +1159,23 @@ app.get('/', (c) => {
         <div style={{
           maxWidth: '1200px',
           margin: '0 auto',
-          display: 'flex',
-          justifyContent: 'center',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
           gap: '1rem',
-          flexWrap: 'wrap',
           padding: '0 1rem'
-        }}>
+        }} 
+        class="nav-grid">
           <button 
             onclick="document.getElementById('app').scrollIntoView({ behavior: 'smooth', block: 'start' })"
+            class="nav-btn"
             style={{
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '0.5rem',
-              padding: '0.8rem 1.5rem',
+              padding: '1rem 1.2rem',
               background: 'rgba(102, 126, 234, 0.2)',
-              border: '1px solid rgba(102, 126, 234, 0.3)',
+              border: '2px solid rgba(102, 126, 234, 0.3)',
               borderRadius: '12px',
               color: '#e2e8f0',
               fontSize: '0.95rem',
@@ -1190,13 +1192,15 @@ app.get('/', (c) => {
           
           <button 
             onclick="const aiBtn = document.getElementById('loadAIForecastBtn'); if (aiBtn) { aiBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => aiBtn.classList.add('pulse-animation'), 500); setTimeout(() => aiBtn.classList.remove('pulse-animation'), 2500); }"
+            class="nav-btn"
             style={{
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '0.5rem',
-              padding: '0.8rem 1.5rem',
+              padding: '1rem 1.2rem',
               background: 'rgba(139, 92, 246, 0.2)',
-              border: '1px solid rgba(139, 92, 246, 0.3)',
+              border: '2px solid rgba(139, 92, 246, 0.3)',
               borderRadius: '12px',
               color: '#e2e8f0',
               fontSize: '0.95rem',
@@ -1213,13 +1217,15 @@ app.get('/', (c) => {
           
           <button 
             onclick="loadCryptoNews(); setTimeout(() => { const newsCard = document.querySelector('.news-feed-card'); if (newsCard) newsCard.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100)"
+            class="nav-btn"
             style={{
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '0.5rem',
-              padding: '0.8rem 1.5rem',
+              padding: '1rem 1.2rem',
               background: 'rgba(34, 197, 94, 0.2)',
-              border: '1px solid rgba(34, 197, 94, 0.3)',
+              border: '2px solid rgba(34, 197, 94, 0.3)',
               borderRadius: '12px',
               color: '#e2e8f0',
               fontSize: '0.95rem',
@@ -1236,13 +1242,15 @@ app.get('/', (c) => {
           
           <button 
             onclick="setTimeout(() => { const portfolioCards = document.querySelectorAll('.coin-card'); if (portfolioCards.length > 0) portfolioCards[0].scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50)"
+            class="nav-btn"
             style={{
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '0.5rem',
-              padding: '0.8rem 1.5rem',
+              padding: '1rem 1.2rem',
               background: 'rgba(251, 146, 60, 0.2)',
-              border: '1px solid rgba(251, 146, 60, 0.3)',
+              border: '2px solid rgba(251, 146, 60, 0.3)',
               borderRadius: '12px',
               color: '#e2e8f0',
               fontSize: '0.95rem',
