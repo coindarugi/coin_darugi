@@ -1631,6 +1631,55 @@ app.get('/', (c) => {
                   borderLeft: '4px solid #667eea',
                   paddingLeft: '1rem'
                 }}>
+                  📊 거래소별 등락 표시
+                </h3>
+                <p style={{lineHeight: '1.8', color: '#cbd5e1', marginBottom: '1rem'}}>
+                  각 거래소의 API 특성에 따라 24시간 등락률 표시가 다릅니다:
+                </p>
+                <div style={{paddingLeft: '1rem'}}>
+                  <div style={{
+                    background: 'rgba(34, 197, 94, 0.1)',
+                    border: '1px solid rgba(34, 197, 94, 0.3)',
+                    borderRadius: '8px',
+                    padding: '1rem',
+                    marginBottom: '0.75rem'
+                  }}>
+                    <p style={{margin: '0', color: '#22c55e', fontWeight: '600'}}>
+                      ✅ 등락 표시 지원 (정확한 24시간 등락률)
+                    </p>
+                    <p style={{margin: '0.5rem 0 0 0', color: '#cbd5e1', fontSize: '0.95rem'}}>
+                      <strong>한국</strong>: 업비트, 빗썸<br/>
+                      <strong>미국/유럽</strong>: Kraken, Bitstamp
+                    </p>
+                  </div>
+                  <div style={{
+                    background: 'rgba(156, 163, 175, 0.1)',
+                    border: '1px solid rgba(156, 163, 175, 0.3)',
+                    borderRadius: '8px',
+                    padding: '1rem'
+                  }}>
+                    <p style={{margin: '0', color: '#9ca3af', fontWeight: '600'}}>
+                      ❌ 등락 표시 미지원 (가격만 표시)
+                    </p>
+                    <p style={{margin: '0.5rem 0 0 0', color: '#cbd5e1', fontSize: '0.95rem'}}>
+                      <strong>한국</strong>: 코인원 (API 제한)<br/>
+                      <strong>미국/유럽</strong>: Coinbase, Gemini (실시간 가격만 제공)
+                    </p>
+                    <p style={{margin: '0.5rem 0 0 0', color: '#94a3b8', fontSize: '0.85rem', fontStyle: 'italic'}}>
+                      💡 이 거래소들은 24시간 등락률 데이터를 API로 제공하지 않습니다.
+                    </p>
+                  </div>
+                </div>
+              </section>
+              
+              <section style={{marginBottom: '2rem'}}>
+                <h3 style={{
+                  color: '#667eea',
+                  fontSize: '1.4rem',
+                  marginBottom: '1rem',
+                  borderLeft: '4px solid #667eea',
+                  paddingLeft: '1rem'
+                }}>
                   🆘 문제 해결
                 </h3>
                 <div style={{
@@ -1756,8 +1805,57 @@ app.get('/', (c) => {
                   <li><strong>Profit Sorting</strong>: Sort by profit to see best performers</li>
                   <li><strong>Auto Refresh</strong>: Prices update every 30 seconds automatically</li>
                   <li><strong>Multi-language</strong>: 5 languages supported</li>
-                  <li><strong>Coinbase Prices</strong>: Switch to English for US exchange prices</li>
+                  <li><strong>Exchange Prices</strong>: Switch language to see local exchange prices (US/EU exchanges)</li>
                 </ul>
+              </section>
+              
+              <section style={{marginBottom: '2rem'}}>
+                <h3 style={{
+                  color: '#667eea',
+                  fontSize: '1.4rem',
+                  marginBottom: '1rem',
+                  borderLeft: '4px solid #667eea',
+                  paddingLeft: '1rem'
+                }}>
+                  📊 Exchange Price Changes
+                </h3>
+                <p style={{lineHeight: '1.8', color: '#cbd5e1', marginBottom: '1rem'}}>
+                  24-hour price change display varies by exchange API capabilities:
+                </p>
+                <div style={{paddingLeft: '1rem'}}>
+                  <div style={{
+                    background: 'rgba(34, 197, 94, 0.1)',
+                    border: '1px solid rgba(34, 197, 94, 0.3)',
+                    borderRadius: '8px',
+                    padding: '1rem',
+                    marginBottom: '0.75rem'
+                  }}>
+                    <p style={{margin: '0', color: '#22c55e', fontWeight: '600'}}>
+                      ✅ Price Change Supported (accurate 24h %)
+                    </p>
+                    <p style={{margin: '0.5rem 0 0 0', color: '#cbd5e1', fontSize: '0.95rem'}}>
+                      <strong>Korea</strong>: Upbit, Bithumb<br/>
+                      <strong>US/EU</strong>: Kraken, Bitstamp
+                    </p>
+                  </div>
+                  <div style={{
+                    background: 'rgba(156, 163, 175, 0.1)',
+                    border: '1px solid rgba(156, 163, 175, 0.3)',
+                    borderRadius: '8px',
+                    padding: '1rem'
+                  }}>
+                    <p style={{margin: '0', color: '#9ca3af', fontWeight: '600'}}>
+                      ❌ Price Change Not Shown (price only)
+                    </p>
+                    <p style={{margin: '0.5rem 0 0 0', color: '#cbd5e1', fontSize: '0.95rem'}}>
+                      <strong>Korea</strong>: Coinone (API limitations)<br/>
+                      <strong>US/EU</strong>: Coinbase, Gemini (spot price only)
+                    </p>
+                    <p style={{margin: '0.5rem 0 0 0', color: '#94a3b8', fontSize: '0.85rem', fontStyle: 'italic'}}>
+                      💡 These exchanges don't provide 24h change data via API.
+                    </p>
+                  </div>
+                </div>
               </section>
               
               <section>
