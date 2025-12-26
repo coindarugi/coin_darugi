@@ -102,8 +102,8 @@ window.addEventListener('DOMContentLoaded', () => {
   // AI 전망 자동 복원 (이전에 로드했던 경우)
   autoLoadAIForecastIfNeeded();
   
-  // 자동 새로고침 비활성화 (사용자가 수동으로 새로고침)
-  // startAutoRefresh();
+  // 자동 새로고침 활성화 (30초마다 가격 갱신)
+  startAutoRefresh();
 });
 
 // 🌍 언어별 SEO 메타 태그 업데이트
@@ -1994,8 +1994,8 @@ function startAutoRefresh() {
     clearInterval(autoRefreshInterval);
   }
   autoRefreshInterval = setInterval(() => {
-    loadPrices();
-  }, 30000); // 30초 (10초 → 30초)
+    loadPrices(); // 메인 가격 갱신
+  }, 30000); // 30초
 }
 
 // 정렬 순서 변경
