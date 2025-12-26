@@ -2,7 +2,7 @@ import { jsxRenderer } from 'hono/jsx-renderer'
 
 export const renderer = jsxRenderer(({ children, lang }) => {
   // 고정 버전 번호 (배포 시에만 변경)
-  const version = `v5.3.8`
+  const version = `v5.3.9`
   
   // 🌍 모든 언어에서 동일한 OG 이미지 사용
   const currentLang = (lang as string) || 'ko'
