@@ -1961,8 +1961,8 @@ async function loadExchangePrices(coinsData) {
           }
           
           exchangesHTML += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 0.25rem 0; font-size: 0.85rem;">`;
-          exchangesHTML += `<span style="color: #94a3b8;">${exchange.name}:</span>`;
-          exchangesHTML += `<span style="color: #3b82f6; font-weight: 600;">${formattedPrice}${changeHTML}</span>`;
+          exchangesHTML += `<span style="color: #94a3b8; min-width: 80px;">${exchange.name}:</span>`;
+          exchangesHTML += `<span style="color: #3b82f6; font-weight: 600; text-align: right; flex: 1;">${formattedPrice}${changeHTML}</span>`;
           exchangesHTML += `</div>`;
         });
         

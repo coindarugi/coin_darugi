@@ -1843,7 +1843,7 @@ app.get('/api/exchange-prices/:coinSymbol', async (c) => {
           const upbitData = await upbitResponse.json()
           if (upbitData.length > 0 && !upbitData[0].error) {
             exchanges.push({
-              name: 'Upbit',
+              name: '업비트',
               price: upbitData[0].trade_price,
               change24h: upbitData[0].signed_change_rate * 100,
               volume24h: upbitData[0].acc_trade_price_24h
@@ -1859,7 +1859,7 @@ app.get('/api/exchange-prices/:coinSymbol', async (c) => {
           const bithumbData = await bithumbResponse.json()
           if (bithumbData.status === '0000' && bithumbData.data) {
             exchanges.push({
-              name: 'Bithumb',
+              name: '빗썸',
               price: parseFloat(bithumbData.data.closing_price),
               change24h: parseFloat(bithumbData.data.fluctate_rate_24H),
               volume24h: parseFloat(bithumbData.data.acc_trade_value_24H)
@@ -1879,7 +1879,7 @@ app.get('/api/exchange-prices/:coinSymbol', async (c) => {
             const change24h = yesterdayPrice > 0 ? ((currentPrice - yesterdayPrice) / yesterdayPrice) * 100 : 0
             
             exchanges.push({
-              name: 'Coinone',
+              name: '코인원',
               price: currentPrice,
               change24h: change24h,
               volume24h: parseFloat(coinoneData.volume) * currentPrice
