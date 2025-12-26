@@ -102,7 +102,8 @@ window.addEventListener('DOMContentLoaded', () => {
   // AI 전망 자동 복원 (이전에 로드했던 경우)
   autoLoadAIForecastIfNeeded();
   
-  startAutoRefresh();
+  // 자동 새로고침 비활성화 (사용자가 수동으로 새로고침)
+  // startAutoRefresh();
 });
 
 // 🌍 언어별 SEO 메타 태그 업데이트
@@ -1861,59 +1862,37 @@ async function loadPrices() {
     
     coinsHTML += '</div>';
     
-    // 🖼️ 광고 영역 2: 중단 배너 (모바일/데스크톱 분리)
+    // 중단 광고 (AI 전망 버튼 위)
     const adMiddleHTML = `
-      <!-- 데스크톱 광고 -->
+      <!-- 데스크톱 광고 - 중단 -->
       <div class="ad-container ad-middle ad-desktop-only" style="margin-top: 2rem; margin-bottom: 2rem;">
-        <div id="frame" style="width: 100%; margin: auto; position: relative; z-index: 99998;">
+        <div id="frame" style="width: 100%; margin: auto; position: relative; z-index: 99998; pointer-events: auto;">
           <iframe 
-            data-aa='2421975' 
-            src='//acceptable.a-ads.com/2421975/?size=Adaptive'
-            style='border:0; padding:0; width:70%; height:auto; overflow:hidden; display: block; margin: auto'>
+            data-aa='2421971' 
+            src='//acceptable.a-ads.com/2421971/?size=Adaptive'
+            style='border:0; padding:0; width:70%; height:auto; overflow:hidden; display: block; margin: auto; pointer-events: auto;'>
           </iframe>
         </div>
       </div>
       
-      <!-- 모바일 전용 광고 - 중단 (A-Ads) -->
+      <!-- 모바일 광고 - 중단 -->
       <div class="ad-banner-mobile ad-mobile-middle">
-        <div id="frame" style="width: 100%; margin: auto; position: relative;">
+        <div id="frame" style="width: 100%; margin: auto; position: relative; z-index: 99998; pointer-events: auto;">
           <iframe 
-            data-aa='2422003' 
-            src='//acceptable.a-ads.com/2422003/?size=Adaptive'
-            style='border:0; padding:0; width:100%; height:auto; overflow:hidden; display: block; margin: auto'>
+            data-aa='2422071' 
+            src='//acceptable.a-ads.com/2422071/?size=Adaptive'
+            style='border:0; padding:0; width:70%; height:auto; overflow:hidden; display: block; margin: auto; pointer-events: auto;'>
           </iframe>
         </div>
       </div>
     `;
     
-    const adBottomHTML = `
-      <!-- 데스크톱 광고 -->
-      <div class="ad-container ad-bottom ad-desktop-only" style="margin-top: 2rem; margin-bottom: 3rem;">
-        <div id="frame" style="width: 100%; margin: auto; position: relative; z-index: 99998;">
-          <iframe 
-            data-aa='2421980' 
-            src='//acceptable.a-ads.com/2421980/?size=Adaptive'
-            style='border:0; padding:0; width:70%; height:auto; overflow:hidden; display: block; margin: auto'>
-          </iframe>
-        </div>
-      </div>
-      
-      <!-- 모바일 전용 광고 - 하단 (A-Ads) -->
-      <div class="ad-banner-mobile ad-mobile-bottom">
-        <div id="frame" style="width: 100%; margin: auto; position: relative;">
-          <iframe 
-            data-aa='2422003' 
-            src='//acceptable.a-ads.com/2422003/?size=Adaptive'
-            style='border:0; padding:0; width:100%; height:auto; overflow:hidden; display: block; margin: auto'>
-          </iframe>
-        </div>
-      </div>
-    `;
+    const adBottomHTML = '';
     
     // 새로고침 버튼 (가운데 정렬)
     const refreshButton = `
-      <div style="text-align: center !important; padding: 0 1rem; margin: 2rem 0;">
-        <button class="refresh-btn" onclick="loadPrices()" style="margin: 0 auto !important; display: inline-block !important;">
+      <div class="refresh-btn-wrapper">
+        <button class="refresh-btn" onclick="loadPrices()">
           <i class="fas fa-sync-alt"></i> ${t('refresh')}
         </button>
       </div>

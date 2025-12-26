@@ -1261,7 +1261,7 @@ app.get('/', (c) => {
       
       {/* 광고 영역 1: 헤더 아래 배너 (상단) - 데스크톱용 */}
       <div class="ad-container ad-header ad-desktop-only" style={{marginTop: '2rem', marginBottom: '2rem'}}>
-        <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998'}}>
+        <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998', pointerEvents: 'auto'}}>
           <iframe 
             data-aa='2421971' 
             src='//acceptable.a-ads.com/2421971/?size=Adaptive'
@@ -1272,7 +1272,8 @@ app.get('/', (c) => {
               height: 'auto',
               overflow: 'hidden',
               display: 'block',
-              margin: 'auto'
+              margin: 'auto',
+              pointerEvents: 'auto'
             }}
           />
         </div>
@@ -1280,18 +1281,19 @@ app.get('/', (c) => {
       
       {/* 모바일 전용 광고 - 상단 (A-Ads) */}
       <div class="ad-banner-mobile ad-mobile-top">
-        <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative'}}>
+        <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998', pointerEvents: 'auto'}}>
           <iframe 
-            data-aa='2422003' 
-            src='//acceptable.a-ads.com/2422003/?size=Adaptive'
+            data-aa='2422071' 
+            src='//acceptable.a-ads.com/2422071/?size=Adaptive'
             style={{
               border: '0',
               padding: '0',
-              width: '100%',
+              width: '70%',
               height: 'auto',
               overflow: 'hidden',
               display: 'block',
-              margin: 'auto'
+              margin: 'auto',
+              pointerEvents: 'auto'
             }}
           />
         </div>
@@ -1299,6 +1301,46 @@ app.get('/', (c) => {
       
       <div id="app">
         <div class="loading">데이터 로딩 중...</div>
+      </div>
+      
+      {/* 광고 영역 3: 하단 배너 (페이지 맨 아래) - 데스크톱용 */}
+      <div class="ad-container ad-bottom ad-desktop-only" style={{marginTop: '2rem', marginBottom: '3rem'}}>
+        <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998', pointerEvents: 'auto'}}>
+          <iframe 
+            data-aa='2421971' 
+            src='//acceptable.a-ads.com/2421971/?size=Adaptive'
+            style={{
+              border: '0',
+              padding: '0',
+              width: '70%',
+              height: 'auto',
+              overflow: 'hidden',
+              display: 'block',
+              margin: 'auto',
+              pointerEvents: 'auto'
+            }}
+          />
+        </div>
+      </div>
+      
+      {/* 모바일 전용 광고 - 하단 (A-Ads) */}
+      <div class="ad-banner-mobile ad-mobile-bottom">
+        <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998', pointerEvents: 'auto'}}>
+          <iframe 
+            data-aa='2422071' 
+            src='//acceptable.a-ads.com/2422071/?size=Adaptive'
+            style={{
+              border: '0',
+              padding: '0',
+              width: '70%',
+              height: 'auto',
+              overflow: 'hidden',
+              display: 'block',
+              margin: 'auto',
+              pointerEvents: 'auto'
+            }}
+          />
+        </div>
       </div>
       
       {/* 코인 브라우저 모달 */}
@@ -1754,7 +1796,10 @@ app.get('/', (c) => {
         marginTop: '3rem',
         borderTop: '1px solid rgba(255, 255, 255, 0.1)',
         color: '#94a3b8',
-        fontSize: '0.9rem'
+        fontSize: '0.9rem',
+        position: 'relative',
+        zIndex: '1',
+        clear: 'both'
       }}>
         <div style={{marginBottom: '1rem'}}>
           <i class="fas fa-envelope" style={{marginRight: '0.5rem', color: '#667eea'}}></i>
@@ -1853,17 +1898,17 @@ app.get('/api/exchange-prices/:coinSymbol', async (c) => {
         break
         
       case 'es':
-        // 스페인: Binance (글로벌 거래소, 스페인어 지원)
+        // 스페인: Bitstamp (유럽 최대 거래소, 스페인어 지원)
         try {
-          const binanceResponse = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${coinSymbol}EUR`)
-          const binanceData = await binanceResponse.json()
-          if (binanceData.price) {
-            exchangePrice = parseFloat(binanceData.price)
-            exchangeName = 'Binance'
+          const bitstampResponse = await fetch(`https://www.bitstamp.net/api/v2/ticker/${coinSymbol.toLowerCase()}eur/`)
+          const bitstampData = await bitstampResponse.json()
+          if (bitstampData.last) {
+            exchangePrice = parseFloat(bitstampData.last)
+            exchangeName = 'Bitstamp'
             currency = 'EUR'
           }
         } catch (error) {
-          console.error('Binance API error:', error)
+          console.error('Bitstamp API error:', error)
         }
         break
     }
