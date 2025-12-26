@@ -1954,15 +1954,16 @@ async function loadExchangePrices(coinsData) {
           
           // 변동률 표시 (있는 경우)
           let changeHTML = '';
-          if (exchange.change24h !== undefined) {
+          if (exchange.change24h !== undefined && exchange.change24h !== null) {
             const changeColor = exchange.change24h >= 0 ? '#10b981' : '#ef4444';
             const changeIcon = exchange.change24h >= 0 ? '▲' : '▼';
-            changeHTML = `<span style="color: ${changeColor}; font-size: 0.75rem; margin-left: 0.25rem;">${changeIcon} ${Math.abs(exchange.change24h).toFixed(2)}%</span>`;
+            changeHTML = `<span style="color: ${changeColor}; font-size: 0.75rem;">${changeIcon} ${Math.abs(exchange.change24h).toFixed(2)}%</span>`;
           }
           
-          exchangesHTML += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 0.25rem 0; font-size: 0.85rem;">`;
-          exchangesHTML += `<span style="color: #94a3b8; min-width: 80px;">${exchange.name}:</span>`;
-          exchangesHTML += `<span style="color: #3b82f6; font-weight: 600; text-align: right; flex: 1;">${formattedPrice}${changeHTML}</span>`;
+          exchangesHTML += `<div style="display: flex; align-items: center; padding: 0.25rem 0; font-size: 0.85rem; gap: 0.5rem;">`;
+          exchangesHTML += `<span style="color: #94a3b8; min-width: 70px;">${exchange.name}</span>`;
+          exchangesHTML += `<span style="color: #3b82f6; font-weight: 600; min-width: 110px; text-align: right;">${formattedPrice}</span>`;
+          exchangesHTML += `<span style="min-width: 70px; text-align: right;">${changeHTML}</span>`;
           exchangesHTML += `</div>`;
         });
         
