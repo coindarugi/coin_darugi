@@ -1118,36 +1118,36 @@ app.get('/', (c) => {
   
   return c.render(
     <div class="container">
-      <header class="dashboard-header">
+      <header class="dashboard-header" role="banner">
         <div class="header-content">
           <div class="header-main">
-            <div class="header-icon">💰</div>
+            <div class="header-icon" role="img" aria-label="돈 아이콘">💰</div>
             <h1 id="pageTitle">암호화폐 실시간 대시보드</h1>
           </div>
           
           {/* 언어 선택 */}
-          <div class="language-selector">
-            <button onclick="changeLanguage('ko')" class="lang-btn" data-lang="ko" title="한국어">
-              <span class="fi fi-kr"></span>
+          <div class="language-selector" role="navigation" aria-label="언어 선택">
+            <button onclick="changeLanguage('ko')" class="lang-btn" data-lang="ko" title="한국어" aria-label="한국어로 변경">
+              <span class="fi fi-kr" role="img" aria-label="한국 국기"></span>
             </button>
-            <button onclick="changeLanguage('en')" class="lang-btn" data-lang="en" title="English">
-              <span class="fi fi-us"></span>
+            <button onclick="changeLanguage('en')" class="lang-btn" data-lang="en" title="English" aria-label="Change to English">
+              <span class="fi fi-us" role="img" aria-label="US flag"></span>
             </button>
-            <button onclick="changeLanguage('fr')" class="lang-btn" data-lang="fr" title="Français">
-              <span class="fi fi-fr"></span>
+            <button onclick="changeLanguage('fr')" class="lang-btn" data-lang="fr" title="Français" aria-label="Changer en français">
+              <span class="fi fi-fr" role="img" aria-label="Drapeau français"></span>
             </button>
-            <button onclick="changeLanguage('de')" class="lang-btn" data-lang="de" title="Deutsch">
-              <span class="fi fi-de"></span>
+            <button onclick="changeLanguage('de')" class="lang-btn" data-lang="de" title="Deutsch" aria-label="Auf Deutsch ändern">
+              <span class="fi fi-de" role="img" aria-label="Deutsche Flagge"></span>
             </button>
-            <button onclick="changeLanguage('es')" class="lang-btn" data-lang="es" title="Español">
-              <span class="fi fi-es"></span>
+            <button onclick="changeLanguage('es')" class="lang-btn" data-lang="es" title="Español" aria-label="Cambiar a español">
+              <span class="fi fi-es" role="img" aria-label="Bandera española"></span>
             </button>
           </div>
         </div>
       </header>
       
       {/* 빠른 네비게이션 바 */}
-      <nav style={{
+      <nav role="navigation" aria-label="주요 메뉴" style={{
         background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
         borderBottom: '1px solid rgba(102, 126, 234, 0.2)',
         padding: '1rem 0',
@@ -1299,9 +1299,9 @@ app.get('/', (c) => {
         </div>
       </div>
       
-      <div id="app">
+      <main id="app" role="main" aria-label="암호화폐 대시보드 메인 콘텐츠">
         <div class="loading">데이터 로딩 중...</div>
-      </div>
+      </main>
       
       {/* 광고 영역 3: 하단 배너 (페이지 맨 아래) - 데스크톱용 */}
       <div class="ad-container ad-bottom ad-desktop-only" style={{marginTop: '2rem', marginBottom: '3rem'}}>

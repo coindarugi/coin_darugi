@@ -686,6 +686,11 @@ function changeLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('language', lang);
   
+  // Google Analytics 트래킹
+  if (typeof gtag !== 'undefined') {
+    gtag('event', 'language_change', { language: lang });
+  }
+  
   // 페이지 새로고침하여 모든 텍스트 업데이트
   location.reload();
 }

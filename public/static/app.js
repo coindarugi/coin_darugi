@@ -248,6 +248,55 @@ function savePortfolio() {
   localStorage.setItem('portfolio', JSON.stringify(portfolio));
 }
 
+// 🔍 Google Analytics 이벤트 트래킹
+function trackEvent(eventName, eventParams = {}) {
+  if (typeof gtag !== 'undefined') {
+    gtag('event', eventName, eventParams);
+  }
+}
+
+// 코인 검색 추적
+function trackSearch(searchTerm) {
+  trackEvent('search', {
+    search_term: searchTerm
+  });
+}
+
+// 코인 추가 추적
+function trackCoinAdd(coinId, coinName) {
+  trackEvent('coin_add', {
+    coin_id: coinId,
+    coin_name: coinName
+  });
+}
+
+// 차트 보기 추적
+function trackChartView(coinId, days) {
+  trackEvent('chart_view', {
+    coin_id: coinId,
+    time_period: days + '_days'
+  });
+}
+
+// AI 전망 로드 추적
+function trackAIForecast() {
+  trackEvent('ai_forecast_load');
+}
+
+// 포트폴리오 저장 추적
+function trackPortfolioSave(coinId) {
+  trackEvent('portfolio_save', {
+    coin_id: coinId
+  });
+}
+
+// 언어 변경 추적
+function trackLanguageChange(language) {
+  trackEvent('language_change', {
+    language: language
+  });
+}
+
 // 선택한 코인 저장
 function saveSelectedCoins() {
   localStorage.setItem('selectedCoins', JSON.stringify(selectedCoins));
@@ -539,6 +588,10 @@ function closeChartModal() {
 // 차트 로드
 async function loadChart(coinId, days = 7) {
   console.log('[Chart] Loading chart for:', coinId, 'days:', days);
+  
+  // Google Analytics 트래킹
+  trackChartView(coinId, days);
+  
   const ctx = document.getElementById('priceChart');
   if (!ctx) {
     console.error('[Chart] Canvas element not found');

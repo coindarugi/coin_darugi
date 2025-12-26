@@ -89,11 +89,16 @@ export const renderer = jsxRenderer(({ children, lang }) => {
         {/* SEO Meta Tags */}
         <title>{meta.title}</title>
         <meta name="description" content={meta.description} />
-        <meta name="keywords" content="암호화폐, 비트코인, 이더리움, AI 전망, 코인 분석, 김치 프리미엄, 업비트, 빗썸, 코인원, 실시간 시세, 포트폴리오, 크립토, Bitcoin, Ethereum, Crypto AI, Crypto Dashboard" />
+        <meta name="keywords" content="암호화폐, 비트코인, 이더리움, AI 전망, 코인 분석, 김치 프리미엄, 업비트, 빗썸, 코인원, 실시간 시세, 포트폴리오, 크립토, Bitcoin, Ethereum, Crypto AI, Crypto Dashboard, 가상화폐, 디지털 자산, 블록체인, cryptocurrency, blockchain, digital assets, crypto trading, price tracker" />
         <meta name="author" content="Crypto Dashboard" />
-        <meta name="robots" content="index, follow" />
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
         <meta name="language" content={meta.htmlLang} />
         <meta name="revisit-after" content="1 days" />
+        <meta name="rating" content="general" />
+        <meta name="distribution" content="global" />
+        <meta name="geo.region" content="KR" />
+        <meta name="geo.placename" content="South Korea" />
+        <meta name="format-detection" content="telephone=no" />
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />

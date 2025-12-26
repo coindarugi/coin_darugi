@@ -1,5 +1,33 @@
+# crypto-darugi.com robots.txt
+
 User-agent: *
 Allow: /
+Allow: /static/
 
-# Block analytics endpoints
-Disallow: /cdn-cgi/
+# Sitemap
+Sitemap: https://crypto-darugi.com/sitemap.xml
+
+# 크롤링 속도 제한 (선택사항)
+Crawl-delay: 1
+
+# Disallow admin pages (없음)
+# Disallow: /admin/
+
+# Allow all search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
