@@ -4,11 +4,11 @@ export const renderer = jsxRenderer(({ children, lang }) => {
   // 고정 버전 번호 (배포 시에만 변경)
   const version = `v5.3.8`
   
-  // 🌍 다국어 이미지 지원
+  // 🌍 모든 언어에서 동일한 OG 이미지 사용
   const currentLang = (lang as string) || 'ko'
   const validLangs = ['ko', 'en', 'fr', 'de', 'es']
   const imageLang = validLangs.includes(currentLang) ? currentLang : 'ko'
-  const ogImageUrl = `https://crypto-darugi.com/og-image-${imageLang}.png?v=${version}`
+  const ogImageUrl = `https://crypto-darugi.com/og-image.png?v=${version}`
   
   // 🌍 다국어 메타 태그
   const metaData: Record<string, any> = {

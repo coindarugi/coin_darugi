@@ -44,7 +44,7 @@ function createTweetText(language) {
     ko: [
       '✨ 10,000개 이상 암호화폐 실시간 추적',
       '🤖 AI 기반 코인 전망 분석',
-      '💰 3개 거래소 가격 비교 + 김치 프리미엄 (업비트/빗썸/코인원)',
+      '💰 3개 한국 거래소 가격 비교 + 김치 프리미엄',
       '📊 포트폴리오 관리 & 수익률 계산',
       '📰 실시간 뉴스 + 자동 번역',
       '🏆 Top 100 코인 브라우저 (시총/거래량/등락률순)',
@@ -53,7 +53,7 @@ function createTweetText(language) {
     en: [
       '✨ Track 10,000+ cryptocurrencies in real-time',
       '🤖 AI-powered coin forecast analysis',
-      '💰 Compare 3 US exchange prices (Coinbase/Kraken/Gemini)',
+      '💰 Compare 3 US exchange prices',
       '📊 Portfolio management & profit tracking',
       '📰 Real-time crypto news',
       '🏆 Top 100 coins browser (by market cap/volume/change)',
