@@ -1509,6 +1509,148 @@ app.get('/', (c) => {
         <i class="fas fa-question"></i>
       </button>
       
+      {/* 🎯 바이낸스 광고 모달 (AI 전망 보기 전) */}
+      <div 
+        id="binanceAdModal" 
+        class="modal" 
+        style={{display: 'none', zIndex: '10001'}}
+      >
+        <div 
+          class="modal-content" 
+          style={{
+            maxWidth: '600px',
+            background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+            border: '2px solid #f0b90b',
+            boxShadow: '0 0 40px rgba(240, 185, 11, 0.3)'
+          }}
+        >
+          {/* 헤더 */}
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '2rem',
+            paddingBottom: '1.5rem',
+            borderBottom: '2px solid rgba(240, 185, 11, 0.3)'
+          }}>
+            <div style={{
+              fontSize: '3rem',
+              marginBottom: '1rem'
+            }}>💎</div>
+            <h2 style={{
+              margin: '0',
+              fontSize: '1.75rem',
+              background: 'linear-gradient(135deg, #f0b90b 0%, #ffd700 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              fontWeight: '700'
+            }} id="adModalTitle">
+              AI 전망은 바이낸스가 후원합니다
+            </h2>
+            <p style={{
+              margin: '0.5rem 0 0 0',
+              color: '#94a3b8',
+              fontSize: '0.95rem'
+            }} id="adModalSubtitle">
+              잠시만 기다려주세요...
+            </p>
+          </div>
+          
+          {/* 바이낸스 배너 */}
+          <div style={{
+            background: 'linear-gradient(135deg, #f0b90b 0%, #ffd700 100%)',
+            borderRadius: '16px',
+            padding: '2rem',
+            textAlign: 'center',
+            marginBottom: '1.5rem',
+            cursor: 'pointer',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+          }}
+          onclick="window.open('https://www.binance.com/en/register?ref=YOUR_REF_ID', '_blank')"
+          onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 32px rgba(240, 185, 11, 0.4)';"
+          onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';"
+          >
+            <div style={{
+              fontSize: '3rem',
+              marginBottom: '1rem'
+            }}>🚀</div>
+            <h3 style={{
+              margin: '0 0 0.5rem 0',
+              fontSize: '1.5rem',
+              color: '#1e293b',
+              fontWeight: '700'
+            }} id="binanceBannerTitle">
+              전세계 1위 암호화폐 거래소
+            </h3>
+            <p style={{
+              margin: '0',
+              fontSize: '1.1rem',
+              color: '#334155',
+              fontWeight: '600'
+            }} id="binanceBannerSubtitle">
+              바이낸스에서 지금 거래하세요!
+            </p>
+            <div style={{
+              marginTop: '1rem',
+              padding: '0.75rem 1.5rem',
+              background: '#1e293b',
+              borderRadius: '8px',
+              display: 'inline-block'
+            }}>
+              <span style={{
+                color: '#f0b90b',
+                fontSize: '1rem',
+                fontWeight: '600'
+              }} id="binanceCTA">
+                지금 가입하고 수수료 20% 할인 받기 →
+              </span>
+            </div>
+          </div>
+          
+          {/* 카운트다운 */}
+          <div style={{
+            textAlign: 'center',
+            padding: '1.5rem',
+            background: 'rgba(240, 185, 11, 0.1)',
+            borderRadius: '12px',
+            marginBottom: '1rem'
+          }}>
+            <div style={{
+              fontSize: '2.5rem',
+              fontWeight: '700',
+              color: '#f0b90b',
+              marginBottom: '0.5rem'
+            }} id="adCountdown">5</div>
+            <p style={{
+              margin: '0',
+              color: '#94a3b8',
+              fontSize: '0.9rem'
+            }} id="adCountdownText">
+              초 후 AI 전망이 표시됩니다
+            </p>
+          </div>
+          
+          {/* 건너뛰기 버튼 (5초 후 활성화) */}
+          <button 
+            id="skipAdBtn"
+            onclick="closeAdModal()" 
+            disabled
+            style={{
+              width: '100%',
+              padding: '1rem',
+              background: 'rgba(102, 126, 234, 0.2)',
+              border: '2px solid rgba(102, 126, 234, 0.3)',
+              borderRadius: '12px',
+              color: '#64748b',
+              fontSize: '1rem',
+              fontWeight: '600',
+              cursor: 'not-allowed',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <span id="skipBtnText">건너뛰기 (5초 대기...)</span>
+          </button>
+        </div>
+      </div>
+      
       {/* 사용설명서 모달 */}
       <div 
         id="userGuideModal" 

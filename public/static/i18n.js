@@ -142,6 +142,17 @@ const translations = {
     outlookNeutral: '중립',
     aiForecastDisclaimer: '⚠️ AI 분석은 참고용이며 투자 조언이 아닙니다.',
     lastUpdate: '마지막 업데이트',
+    
+    // 바이낸스 광고
+    adModalTitle: 'AI 전망은 바이낸스가 후원합니다',
+    adModalSubtitle: '잠시만 기다려주세요...',
+    binanceBannerTitle: '전세계 1위 암호화폐 거래소',
+    binanceBannerSubtitle: '바이낸스에서 지금 거래하세요!',
+    binanceCTA: '지금 가입하고 수수료 20% 할인 받기 →',
+    adCountdownText: '초 후 AI 전망이 표시됩니다',
+    skipAd: '건너뛰기',
+    secondsWait: '초 대기...',
+    skipAdNow: 'AI 전망 보러가기 →',
     change24h: '24시간 변동'
   },
   
@@ -272,7 +283,18 @@ const translations = {
     outlookNeutral: 'Neutral',
     aiForecastDisclaimer: '⚠️ AI analysis is for reference only and not investment advice.',
     lastUpdate: 'Last Update',
-    change24h: '24h Change'
+    change24h: '24h Change',
+    
+    // Binance Ad
+    adModalTitle: 'AI Forecast Sponsored by Binance',
+    adModalSubtitle: 'Please wait a moment...',
+    binanceBannerTitle: 'World\'s #1 Crypto Exchange',
+    binanceBannerSubtitle: 'Trade on Binance now!',
+    binanceCTA: 'Sign up now and get 20% fee discount →',
+    adCountdownText: 'seconds until AI forecast',
+    skipAd: 'Skip',
+    secondsWait: 's wait...',
+    skipAdNow: 'View AI Forecast →',
   },
   
   fr: {

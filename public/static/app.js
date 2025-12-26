@@ -71,6 +71,22 @@ window.addEventListener('DOMContentLoaded', () => {
   const userGuideTitle = document.getElementById('userGuideTitle');
   if (userGuideTitle) userGuideTitle.textContent = t('userGuideTitle');
   
+  // 🎯 바이낸스 광고 모달 번역
+  const adModalTitle = document.getElementById('adModalTitle');
+  const adModalSubtitle = document.getElementById('adModalSubtitle');
+  const binanceBannerTitle = document.getElementById('binanceBannerTitle');
+  const binanceBannerSubtitle = document.getElementById('binanceBannerSubtitle');
+  const binanceCTA = document.getElementById('binanceCTA');
+  const adCountdownText = document.getElementById('adCountdownText');
+  const skipBtnText = document.getElementById('skipBtnText');
+  
+  if (adModalTitle) adModalTitle.textContent = t('adModalTitle');
+  if (adModalSubtitle) adModalSubtitle.textContent = t('adModalSubtitle');
+  if (binanceBannerTitle) binanceBannerTitle.textContent = t('binanceBannerTitle');
+  if (binanceBannerSubtitle) binanceBannerSubtitle.textContent = t('binanceBannerSubtitle');
+  if (binanceCTA) binanceCTA.textContent = t('binanceCTA');
+  if (adCountdownText) adCountdownText.textContent = t('adCountdownText');
+  
   // 사용설명서 언어별 가이드 표시/숨김
   document.querySelectorAll('.guide-lang').forEach(guide => {
     guide.style.display = 'none';
@@ -1122,6 +1138,9 @@ function autoLoadAIForecastIfNeeded() {
 }
 
 // 버튼 클릭 시 AI 전망 로드
+// 🎯 광고 표시 여부 추적
+let adAlreadyShown = false;
+
 async function loadAIForecastOnDemand() {
   const container = document.getElementById('ai-forecast-container');
   if (!container) return;
@@ -1130,6 +1149,13 @@ async function loadAIForecastOnDemand() {
   if (aiForecastCurrentlyLoaded) {
     console.log('[loadAIForecastOnDemand] Already loaded, skipping');
     return;
+  }
+  
+  // 🎯 광고를 아직 안 봤으면 광고 먼저 표시!
+  if (!adAlreadyShown) {
+    console.log('[loadAIForecastOnDemand] Showing Binance ad first...');
+    showBinanceAdModal();
+    return; // 광고 끝나면 자동으로 AI 로드됨
   }
   
   console.log('[loadAIForecastOnDemand] Loading AI forecast...');
@@ -1155,6 +1181,53 @@ async function loadAIForecastOnDemand() {
   setAIForecastLoaded(true);
   
   console.log('[loadAIForecastOnDemand] AI forecast loaded and cached successfully');
+}
+
+// 🎯 바이낸스 광고 모달 표시
+function showBinanceAdModal() {
+  const modal = document.getElementById('binanceAdModal');
+  if (!modal) return;
+  
+  modal.style.display = 'flex';
+  
+  // 카운트다운 시작 (5초)
+  let countdown = 5;
+  const countdownEl = document.getElementById('adCountdown');
+  const skipBtn = document.getElementById('skipAdBtn');
+  const skipBtnText = document.getElementById('skipBtnText');
+  
+  const timer = setInterval(() => {
+    countdown--;
+    if (countdownEl) countdownEl.textContent = countdown;
+    if (skipBtnText) skipBtnText.textContent = `${t('skipAd')} (${countdown}${t('secondsWait')})`;
+    
+    if (countdown <= 0) {
+      clearInterval(timer);
+      // 건너뛰기 버튼 활성화
+      if (skipBtn) {
+        skipBtn.disabled = false;
+        skipBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        skipBtn.style.borderColor = '#667eea';
+        skipBtn.style.color = '#ffffff';
+        skipBtn.style.cursor = 'pointer';
+      }
+      if (skipBtnText) skipBtnText.textContent = t('skipAdNow');
+    }
+  }, 1000);
+}
+
+// 🎯 광고 모달 닫기 및 AI 전망 로드
+function closeAdModal() {
+  const modal = document.getElementById('binanceAdModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+  
+  // 광고 봤다고 표시
+  adAlreadyShown = true;
+  
+  // 이제 진짜 AI 전망 로드
+  loadAIForecastOnDemand();
 }
 
 // AI 전망 로드
