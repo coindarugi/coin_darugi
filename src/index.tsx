@@ -1874,10 +1874,15 @@ app.get('/api/exchange-prices/:coinSymbol', async (c) => {
           const coinoneResponse = await fetch(`https://api.coinone.co.kr/ticker/?currency=${coinSymbol.toLowerCase()}`)
           const coinoneData = await coinoneResponse.json()
           if (coinoneData.result === 'success') {
+            const currentPrice = parseFloat(coinoneData.last)
+            const yesterdayPrice = parseFloat(coinoneData.yesterday_last)
+            const change24h = yesterdayPrice > 0 ? ((currentPrice - yesterdayPrice) / yesterdayPrice) * 100 : 0
+            
             exchanges.push({
               name: 'Coinone',
-              price: parseFloat(coinoneData.last),
-              volume24h: parseFloat(coinoneData.volume) * parseFloat(coinoneData.last)
+              price: currentPrice,
+              change24h: change24h,
+              volume24h: parseFloat(coinoneData.volume) * currentPrice
             })
           }
         } catch (error) {
