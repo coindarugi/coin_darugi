@@ -271,17 +271,18 @@ body::before {
   max-width: 1400px;
   margin: 0 auto;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 3rem;
+  gap: 2rem;
   position: relative;
-  padding: 0 1rem;
+  padding: 0 2rem;
 }
 
 .header-main {
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   text-align: center;
+  min-width: 250px;
 }
 
 /* 언어 선택기 */
@@ -289,10 +290,7 @@ body::before {
   display: flex;
   gap: 0.5rem;
   align-items: center;
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  flex-shrink: 0;
 }
 
 .lang-btn {
