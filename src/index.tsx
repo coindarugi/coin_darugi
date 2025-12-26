@@ -1823,103 +1823,201 @@ app.get('/', (c) => {
 })
 
 // 🌍 국가별 거래소 가격 API
-// 각 언어별로 해당 국가의 주요 거래소 가격 표시
+// 각 국가별로 여러 거래소의 가격을 모두 보여줌 (거래소마다 가격이 다름)
 app.get('/api/exchange-prices/:coinSymbol', async (c) => {
   try {
     const coinSymbol = c.req.param('coinSymbol').toUpperCase()
     const country = c.req.query('country') || 'kr' // kr, us, fr, de, es
     
-    let exchangePrice = null
-    let exchangeName = ''
+    const exchanges: any[] = []
     let currency = 'USD'
     
     switch (country) {
       case 'kr':
-        // 한국: 업비트 (이미 김치 프리미엄에서 사용 중)
+        // 🇰🇷 한국: 업비트, 빗썸, 코인원
+        currency = 'KRW'
+        
+        // 업비트
         try {
           const upbitResponse = await fetch(`https://api.upbit.com/v1/ticker?markets=KRW-${coinSymbol}`)
           const upbitData = await upbitResponse.json()
           if (upbitData.length > 0 && !upbitData[0].error) {
-            exchangePrice = upbitData[0].trade_price
-            exchangeName = 'Upbit'
-            currency = 'KRW'
+            exchanges.push({
+              name: 'Upbit',
+              price: upbitData[0].trade_price,
+              change24h: upbitData[0].signed_change_rate * 100,
+              volume24h: upbitData[0].acc_trade_price_24h
+            })
           }
         } catch (error) {
           console.error('Upbit API error:', error)
         }
+        
+        // 빗썸
+        try {
+          const bithumbResponse = await fetch(`https://api.bithumb.com/public/ticker/${coinSymbol}_KRW`)
+          const bithumbData = await bithumbResponse.json()
+          if (bithumbData.status === '0000' && bithumbData.data) {
+            exchanges.push({
+              name: 'Bithumb',
+              price: parseFloat(bithumbData.data.closing_price),
+              change24h: parseFloat(bithumbData.data.fluctate_rate_24H),
+              volume24h: parseFloat(bithumbData.data.acc_trade_value_24H)
+            })
+          }
+        } catch (error) {
+          console.error('Bithumb API error:', error)
+        }
+        
+        // 코인원
+        try {
+          const coinoneResponse = await fetch(`https://api.coinone.co.kr/ticker/?currency=${coinSymbol.toLowerCase()}`)
+          const coinoneData = await coinoneResponse.json()
+          if (coinoneData.result === 'success') {
+            exchanges.push({
+              name: 'Coinone',
+              price: parseFloat(coinoneData.last),
+              volume24h: parseFloat(coinoneData.volume) * parseFloat(coinoneData.last)
+            })
+          }
+        } catch (error) {
+          console.error('Coinone API error:', error)
+        }
         break
         
       case 'us':
-        // 미국: Coinbase Pro
+        // 🇺🇸 미국: Coinbase, Kraken, Gemini
+        currency = 'USD'
+        
+        // Coinbase
         try {
           const coinbaseResponse = await fetch(`https://api.coinbase.com/v2/prices/${coinSymbol}-USD/spot`)
           const coinbaseData = await coinbaseResponse.json()
           if (coinbaseData.data) {
-            exchangePrice = parseFloat(coinbaseData.data.amount)
-            exchangeName = 'Coinbase'
-            currency = 'USD'
+            exchanges.push({
+              name: 'Coinbase',
+              price: parseFloat(coinbaseData.data.amount)
+            })
           }
         } catch (error) {
           console.error('Coinbase API error:', error)
         }
+        
+        // Kraken (USD)
+        try {
+          const krakenResponse = await fetch(`https://api.kraken.com/0/public/Ticker?pair=${coinSymbol}USD`)
+          const krakenData = await krakenResponse.json()
+          if (krakenData.result) {
+            const pairKey = Object.keys(krakenData.result)[0]
+            if (pairKey) {
+              const data = krakenData.result[pairKey]
+              exchanges.push({
+                name: 'Kraken',
+                price: parseFloat(data.c[0]),
+                change24h: parseFloat(data.o) > 0 ? ((parseFloat(data.c[0]) - parseFloat(data.o)) / parseFloat(data.o)) * 100 : 0,
+                volume24h: parseFloat(data.v[1]) * parseFloat(data.c[0])
+              })
+            }
+          }
+        } catch (error) {
+          console.error('Kraken API error:', error)
+        }
+        
+        // Gemini
+        try {
+          const geminiResponse = await fetch(`https://api.gemini.com/v1/pubticker/${coinSymbol.toLowerCase()}usd`)
+          const geminiData = await geminiResponse.json()
+          if (geminiData.last) {
+            exchanges.push({
+              name: 'Gemini',
+              price: parseFloat(geminiData.last),
+              volume24h: parseFloat(geminiData.volume?.USD || 0)
+            })
+          }
+        } catch (error) {
+          console.error('Gemini API error:', error)
+        }
         break
         
       case 'fr':
-        // 프랑스: Bitstamp (유럽 최대 거래소)
+      case 'de':
+      case 'es':
+        // 🇪🇺 유럽: Bitstamp, Kraken, Coinbase (EUR)
+        currency = 'EUR'
+        
+        // Bitstamp
         try {
           const bitstampResponse = await fetch(`https://www.bitstamp.net/api/v2/ticker/${coinSymbol.toLowerCase()}eur/`)
           const bitstampData = await bitstampResponse.json()
           if (bitstampData.last) {
-            exchangePrice = parseFloat(bitstampData.last)
-            exchangeName = 'Bitstamp'
-            currency = 'EUR'
+            exchanges.push({
+              name: 'Bitstamp',
+              price: parseFloat(bitstampData.last),
+              change24h: parseFloat(bitstampData.open) > 0 ? ((parseFloat(bitstampData.last) - parseFloat(bitstampData.open)) / parseFloat(bitstampData.open)) * 100 : 0,
+              volume24h: parseFloat(bitstampData.volume) * parseFloat(bitstampData.last)
+            })
           }
         } catch (error) {
           console.error('Bitstamp API error:', error)
         }
-        break
         
-      case 'de':
-        // 독일: Kraken
+        // Kraken (EUR)
         try {
           const krakenResponse = await fetch(`https://api.kraken.com/0/public/Ticker?pair=${coinSymbol}EUR`)
           const krakenData = await krakenResponse.json()
           if (krakenData.result) {
             const pairKey = Object.keys(krakenData.result)[0]
             if (pairKey) {
-              exchangePrice = parseFloat(krakenData.result[pairKey].c[0])
-              exchangeName = 'Kraken'
-              currency = 'EUR'
+              const data = krakenData.result[pairKey]
+              exchanges.push({
+                name: 'Kraken',
+                price: parseFloat(data.c[0]),
+                change24h: parseFloat(data.o) > 0 ? ((parseFloat(data.c[0]) - parseFloat(data.o)) / parseFloat(data.o)) * 100 : 0,
+                volume24h: parseFloat(data.v[1]) * parseFloat(data.c[0])
+              })
             }
           }
         } catch (error) {
           console.error('Kraken API error:', error)
         }
-        break
         
-      case 'es':
-        // 스페인: Bitstamp (유럽 최대 거래소, 스페인어 지원)
+        // Coinbase (EUR)
         try {
-          const bitstampResponse = await fetch(`https://www.bitstamp.net/api/v2/ticker/${coinSymbol.toLowerCase()}eur/`)
-          const bitstampData = await bitstampResponse.json()
-          if (bitstampData.last) {
-            exchangePrice = parseFloat(bitstampData.last)
-            exchangeName = 'Bitstamp'
-            currency = 'EUR'
+          const coinbaseResponse = await fetch(`https://api.coinbase.com/v2/prices/${coinSymbol}-EUR/spot`)
+          const coinbaseData = await coinbaseResponse.json()
+          if (coinbaseData.data) {
+            exchanges.push({
+              name: 'Coinbase',
+              price: parseFloat(coinbaseData.data.amount)
+            })
           }
         } catch (error) {
-          console.error('Bitstamp API error:', error)
+          console.error('Coinbase API error:', error)
         }
         break
     }
     
-    if (exchangePrice) {
+    if (exchanges.length > 0) {
+      // 가격 차이 계산
+      const prices = exchanges.map(e => e.price).filter(p => p > 0)
+      const minPrice = Math.min(...prices)
+      const maxPrice = Math.max(...prices)
+      const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length
+      const priceSpread = maxPrice - minPrice
+      const spreadPercent = (priceSpread / avgPrice) * 100
+      
       return c.json({
         coinSymbol,
-        exchangeName,
-        price: exchangePrice,
+        country,
         currency,
-        country
+        exchanges,
+        summary: {
+          minPrice,
+          maxPrice,
+          avgPrice,
+          priceSpread,
+          spreadPercent: parseFloat(spreadPercent.toFixed(2))
+        }
       })
     } else {
       return c.json({ 
