@@ -274,30 +274,33 @@ body::before {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 2rem;
+  gap: 3rem;
   position: relative;
-  padding: 0 2rem;
+  padding: 1.5rem 3rem;
 }
 
 .header-main {
   flex: 1 1 auto;
-  text-align: center;
-  min-width: 250px;
+  text-align: left;
+  min-width: 280px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 /* 언어 선택기 */
 .language-selector {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
   align-items: center;
   flex-shrink: 0;
 }
 
 .lang-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.75rem;
+  padding: 0.6rem 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
   line-height: 1;
@@ -305,12 +308,14 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .lang-btn .fi {
-  font-size: 1.8rem;
+  font-size: 2rem;
   display: inline-block;
-  border-radius: 4px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .lang-btn:hover {
@@ -363,10 +368,11 @@ body::before {
 }
 
 .header-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+  font-size: 3.5rem;
+  margin-right: 1rem;
   animation: float 3s ease-in-out infinite;
   filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.5));
+  display: inline-block;
 }
 
 @keyframes float {
@@ -375,15 +381,16 @@ body::before {
 }
 
 h1 {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 800;
   margin: 0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   text-shadow: 0 0 40px rgba(102, 126, 234, 0.3);
+  line-height: 1.2;
 }
 
 .stats-grid {
