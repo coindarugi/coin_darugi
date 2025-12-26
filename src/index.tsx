@@ -1564,7 +1564,7 @@ app.get('/', (c) => {
             cursor: 'pointer',
             transition: 'transform 0.2s ease, box-shadow 0.2s ease'
           }}
-          onclick="window.open('https://www.binance.com/en/register?ref=YOUR_REF_ID', '_blank')"
+          onclick="window.open('https://www.binance.com/activity/referral-entry/CPA?ref=CPA_00HN6U5C77', '_blank')"
           onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 32px rgba(240, 185, 11, 0.4)';"
           onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';"
           >
