@@ -1924,18 +1924,6 @@ async function loadPrices() {
 async function loadExchangePrices(coinsData) {
   const country = countryMapping[currentLang] || 'us';
   
-  // 한국어는 이미 김치 프리미엄으로 표시하므로 스킵
-  if (country === 'kr') {
-    for (const coinData of coinsData) {
-      const { coinId } = coinData;
-      const exchangeEl = document.getElementById(`exchange-${coinId}`);
-      if (exchangeEl) {
-        exchangeEl.style.display = 'none'; // 한국은 김치 프리미엄으로 대체
-      }
-    }
-    return;
-  }
-  
   for (const coinData of coinsData) {
     const { coinId } = coinData;
     const coinSymbol = coinSymbolMap[coinId];
