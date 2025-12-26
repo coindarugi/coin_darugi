@@ -52,8 +52,8 @@ body::before {
   position: relative;
   z-index: 1;
   clear: both;
-  max-height: 250px;
-  overflow: hidden;
+  min-height: 100px;
+  overflow: visible;
 }
 
 .ad-header {
@@ -67,9 +67,9 @@ body::before {
   clear: both;
 }
 
-/* A-ADS iframe 제한 */
+/* A-ADS iframe 설정 */
 .ad-container iframe {
-  max-height: 200px;
+  min-height: 100px;
   position: relative !important;
   z-index: 1 !important;
 }
@@ -136,8 +136,8 @@ body::before {
   width: 100%;
   margin: 1rem 0;
   clear: both;
-  max-height: 250px !important;
-  overflow: hidden !important;
+  min-height: 100px;
+  overflow: visible !important;
 }
 
 .ad-mobile-bottom {
@@ -149,14 +149,14 @@ body::before {
 .ad-banner-mobile #frame {
   position: relative !important;
   z-index: 1 !important;
-  max-height: 250px !important;
-  overflow: hidden !important;
+  min-height: 100px;
+  overflow: visible !important;
 }
 
 .ad-banner-mobile iframe {
   position: relative !important;
   z-index: 1 !important;
-  max-height: 200px !important;
+  min-height: 100px;
 }
 
 /* 광고 내부 모든 요소 제한 */
