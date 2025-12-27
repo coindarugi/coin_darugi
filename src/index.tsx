@@ -2881,7 +2881,7 @@ app.get('/blog', async (c) => {
     html = html.replace(
       /<h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg">\s*📝 암호화폐 투자 블로그\s*<\/h1>/,
       `<h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg text-center" style="line-height: 1.3;">
-            📝 암호화폐<br/>투자 블로그
+            📝<br/>암호화폐<br/>투자 블로그
           </h1>`
     )
     
