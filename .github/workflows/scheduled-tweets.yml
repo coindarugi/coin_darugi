@@ -1,10 +1,12 @@
 name: 🤖 Crypto Tweet Bot
 
 on:
-  # 하루 2회 자동 실행
-  schedule:
-    - cron: '0 0 * * *'   # UTC 00:00 = 한국 오전 9시
-    - cron: '0 12 * * *'  # UTC 12:00 = 한국 오후 9시
+  # 하루 3회 자동 실행 (8시간 주기) - Free API 17개 제한 고려
+schedule:
+  - cron: '0 0 * * *'   # UTC 00:00 = 한국 오전 9시
+  - cron: '0 8 * * *'   # UTC 08:00 = 한국 오후 5시
+  - cron: '0 16 * * *'  # UTC 16:00 = 한국 새벽 1시
+
   
   # 수동 실행 허용
   workflow_dispatch:
