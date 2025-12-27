@@ -8,7 +8,7 @@ const translations = {
     navCoins: '코인 목록',
     navAI: 'AI 전망',
     navNews: '최신 뉴스',
-    navPortfolio: '포트폴리오',
+    navPortfolio: '블로그',
     
     // 통계 카드
     fearGreedIndex: '공포탐욕지수',
@@ -163,7 +163,7 @@ const translations = {
     navCoins: 'Coin List',
     navAI: 'AI Forecast',
     navNews: 'Latest News',
-    navPortfolio: 'Portfolio',
+    navPortfolio: 'Blog',
     
     fearGreedIndex: 'Fear & Greed Index',
     selectedCoins: 'Selected Coins',
@@ -304,7 +304,7 @@ const translations = {
     navCoins: 'Liste des Cryptos',
     navAI: 'Prévision IA',
     navNews: 'Actualités',
-    navPortfolio: 'Portefeuille',
+    navPortfolio: 'Blog',
     
     fearGreedIndex: 'Indice de Peur et de Cupidité',
     selectedCoins: 'Pièces Sélectionnées',
@@ -434,7 +434,7 @@ const translations = {
     navCoins: 'Kryptoliste',
     navAI: 'KI-Prognose',
     navNews: 'Nachrichten',
-    navPortfolio: 'Portfolio',
+    navPortfolio: 'Blog',
     
     fearGreedIndex: 'Angst- und Gier-Index',
     selectedCoins: 'Ausgewählte Münzen',
@@ -564,7 +564,7 @@ const translations = {
     navCoins: 'Lista de Criptos',
     navAI: 'Pronóstico IA',
     navNews: 'Noticias',
-    navPortfolio: 'Cartera',
+    navPortfolio: 'Blog',
     
     fearGreedIndex: 'Índice de Miedo y Codicia',
     selectedCoins: 'Monedas Seleccionadas',
