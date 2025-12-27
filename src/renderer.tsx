@@ -2,13 +2,16 @@ import { jsxRenderer } from 'hono/jsx-renderer'
 
 export const renderer = jsxRenderer(({ children, lang }) => {
   // 고정 버전 번호 (배포 시에만 변경)
-  const version = `v5.3.9`
+  const version = `v5.4.0`
   
-  // 🌍 모든 언어에서 동일한 OG 이미지 사용
+  // 🌍 언어별 OG 이미지 사용
   const currentLang = (lang as string) || 'ko'
   const validLangs = ['ko', 'en', 'fr', 'de', 'es']
-  const imageLang = validLangs.includes(currentLang) ? currentLang : 'ko'
-  const ogImageUrl = `https://crypto-darugi.com/og-image.png?v=${version}`
+  
+  // 언어별 이미지가 있으면 사용, 없으면 기본값(ko) 또는 공용
+  // public 폴더에 og-image-ko.png, og-image-en.png 등이 존재함
+  const ogImageName = validLangs.includes(currentLang) ? `og-image-${currentLang}.png` : 'og-image.png'
+  const ogImageUrl = `https://crypto-darugi.com/${ogImageName}?v=${version}`
   
   // 🌍 다국어 메타 태그
   const metaData: Record<string, any> = {
@@ -159,7 +162,8 @@ export const renderer = jsxRenderer(({ children, lang }) => {
         }}></script>
         
         {/* Structured Data (JSON-LD) */}
-        <script type="application/ld+json">{`
+        <script type="application/ld+json" dangerouslySetInnerHTML={{
+          __html: `
           {
             "@context": "https://schema.org",
             "@type": "WebApplication",
@@ -190,7 +194,8 @@ export const renderer = jsxRenderer(({ children, lang }) => {
             },
             "inLanguage": ["ko", "en", "fr", "de", "es"]
           }
-        `}</script>
+          `
+        }}></script>
       </head>
       <body class="bg-gray-900 text-white">
         {children}

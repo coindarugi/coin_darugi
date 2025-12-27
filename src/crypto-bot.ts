@@ -1,264 +1,179 @@
 import { TwitterApi } from 'twitter-api-v2';
-import OpenAI from 'openai';
 
 // 사이트 URL
 const SITE_URL = 'https://crypto-darugi.com/';
 
-// 언어 설정
+// 언어 설정 및 홍보 문구 (매력적인 문구로 개선)
 const LANGUAGES = {
-  ko: { name: '한국어', currency: 'krw', symbol: '₩', hashtags: '#비트코인 #BTC #암호화폐 #AI분석' },
-  en: { name: 'English', currency: 'usd', symbol: '$', hashtags: '#Bitcoin #BTC #Crypto #AIAnalysis' },
-  fr: { name: 'Français', currency: 'eur', symbol: '€', hashtags: '#Bitcoin #BTC #Crypto #AnalyseIA' },
-  de: { name: 'Deutsch', currency: 'eur', symbol: '€', hashtags: '#Bitcoin #BTC #Krypto #KIAnalyse' },
-  es: { name: 'Español', currency: 'eur', symbol: '€', hashtags: '#Bitcoin #BTC #Cripto #AnálisisIA' },
+  ko: { 
+    name: '한국어', 
+    currency: 'krw', 
+    symbol: '₩', 
+    hashtags: '#비트코인 #김치프리미엄 #업비트 #투자 #재테크',
+    promotion: '🔥 남들보다 먼저 확인하세요!\n✅ 실시간 김치 프리미엄 & AI 가격 전망\n✅ 10,000+ 코인 시세 및 차트 분석\n\n👉 100% 무료 대시보드 바로가기'
+  },
+  en: { 
+    name: 'English', 
+    currency: 'usd', 
+    symbol: '$', 
+    hashtags: '#Bitcoin #Crypto #Trading #AI #Investment',
+    promotion: '🚀 Don\'t miss the market trends!\n✅ Real-time Prices for 10,000+ Coins\n✅ AI-Powered Price Forecasts\n✅ Professional Portfolio Management\n\n👉 Free Crypto Dashboard Here'
+  },
+  fr: { 
+    name: 'Français', 
+    currency: 'eur', 
+    symbol: '€', 
+    hashtags: '#Bitcoin #Crypto #Finance #Investissement #IA',
+    promotion: '🚀 Suivez le marché en temps réel !\n✅ Cours de 10 000+ Cryptos\n✅ Prévisions de Prix par IA\n✅ Gestion de Portefeuille Pro\n\n👉 Tableau de bord Gratuit'
+  },
+  de: { 
+    name: 'Deutsch', 
+    currency: 'eur', 
+    symbol: '€', 
+    hashtags: '#Bitcoin #Krypto #Finanzen #Investieren #KI',
+    promotion: '🚀 Verpassen Sie keinen Trend!\n✅ Echtzeit-Kurse für 10.000+ Coins\n✅ KI-gestützte Preisprognosen\n✅ Professionelles Portfolio-Management\n\n👉 Kostenloses Krypto-Dashboard'
+  },
+  es: { 
+    name: 'Español', 
+    currency: 'eur', 
+    symbol: '€', 
+    hashtags: '#Bitcoin #Cripto #Finanzas #Inversión #IA',
+    promotion: '🚀 ¡Domina el mercado cripto!\n✅ Precios de 10,000+ Monedas\n✅ Pronósticos de Precios con IA\n✅ Gestión de Cartera Profesional\n\n👉 Panel de Control Gratuito'
+  },
 };
 
 /**
- * CoinGecko에서 비트코인 데이터 가져오기
+ * CoinGecko에서 비트코인 글로벌 데이터 가져오기
  */
-async function getBitcoinData() {
-  const response = await fetch(
-    'https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&community_data=false&developer_data=false'
-  );
-  
-  if (!response.ok) {
-    throw new Error(`CoinGecko API 오류: ${response.status}`);
+async function getGlobalData() {
+  try {
+    const response = await fetch(
+      'https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&community_data=false&developer_data=false'
+    );
+    
+    if (!response.ok) throw new Error(`CoinGecko API Error: ${response.status}`);
+    const data = await response.json();
+    
+    return {
+      prices: {
+        usd: data.market_data.current_price.usd,
+        krw: data.market_data.current_price.krw,
+        eur: data.market_data.current_price.eur,
+      },
+      change24h: data.market_data.price_change_percentage_24h,
+    };
+  } catch (error) {
+    console.error('글로벌 데이터 조회 실패:', error);
+    return null;
   }
-  
-  const data = await response.json();
-  
-  // 데이터 검증
-  if (!data?.market_data?.current_price) {
-    throw new Error('CoinGecko API 응답에 market_data가 없습니다');
-  }
-  
-  return {
-    prices: {
-      usd: data.market_data.current_price.usd || 0,
-      krw: data.market_data.current_price.krw || 0,
-      eur: data.market_data.current_price.eur || 0,
-    },
-    priceChange24h: data.market_data.price_change_percentage_24h || 0,
-    volumes: {
-      usd: data.market_data.total_volume.usd || 0,
-      krw: data.market_data.total_volume.krw || 0,
-      eur: data.market_data.total_volume.eur || 0,
-    },
-    highs: {
-      usd: data.market_data.high_24h.usd || 0,
-      krw: data.market_data.high_24h.krw || 0,
-      eur: data.market_data.high_24h.eur || 0,
-    },
-    lows: {
-      usd: data.market_data.low_24h.usd || 0,
-      krw: data.market_data.low_24h.krw || 0,
-      eur: data.market_data.low_24h.eur || 0,
-    },
-  };
 }
 
 /**
- * 숫자 포맷팅 (천 단위 콤마, 화폐별)
+ * 업비트에서 비트코인 가격 가져오기 (김치 프리미엄 계산용)
+ */
+async function getUpbitPrice() {
+  try {
+    const response = await fetch('https://api.upbit.com/v1/ticker?markets=KRW-BTC');
+    if (!response.ok) throw new Error(`Upbit API Error: ${response.status}`);
+    const data = await response.json();
+    return data[0].trade_price;
+  } catch (error) {
+    console.error('업비트 시세 조회 실패:', error);
+    return null;
+  }
+}
+
+/**
+ * 숫자 포맷팅
  */
 function formatNumber(num: number, currency = 'usd', symbol = '$') {
-  // 한국 원화는 소수점 없음
   if (currency === 'krw') {
-    if (num >= 1_000_000_000_000) {
-      return `${symbol}${(num / 1_000_000_000_000).toFixed(2)}조`;
-    } else if (num >= 100_000_000) {
-      return `${symbol}${(num / 100_000_000).toFixed(2)}억`;
-    } else if (num >= 10_000) {
-      return `${symbol}${(num / 10_000).toFixed(0)}만`;
-    } else {
-      return `${symbol}${Math.round(num).toLocaleString('ko-KR')}`;
-    }
+    return `${symbol}${Math.round(num).toLocaleString('ko-KR')}`;
   }
-  
-  // USD, EUR은 소수점 포함
-  if (num >= 1_000_000_000) {
-    return `${symbol}${(num / 1_000_000_000).toFixed(2)}B`;
-  } else if (num >= 1_000_000) {
-    return `${symbol}${(num / 1_000_000).toFixed(2)}M`;
-  } else {
-    const locale = currency === 'eur' ? 'de-DE' : 'en-US';
-    return `${symbol}${num.toLocaleString(locale, { maximumFractionDigits: 2 })}`;
-  }
-}
-
-/**
- * OpenAI로 다국어 AI 분석 생성
- */
-async function generateAIAnalysis(bitcoinData: any, language: string, openaiApiKey: string) {
-  const currency = LANGUAGES[language as keyof typeof LANGUAGES].currency;
-  const symbol = LANGUAGES[language as keyof typeof LANGUAGES].symbol;
-  
-  const price = bitcoinData.prices[currency];
-  const high = bitcoinData.highs[currency];
-  const low = bitcoinData.lows[currency];
-  
-  const prompts: Record<string, string> = {
-    ko: `당신은 암호화폐 전문 분석가입니다. 다음 비트코인 데이터를 바탕으로 간결하고 전문적인 분석을 작성하세요.
-
-데이터:
-- 현재가: ${formatNumber(price, currency, symbol)}
-- 24시간 변동: ${bitcoinData.priceChange24h.toFixed(2)}%
-- 24시간 최고가: ${formatNumber(high, currency, symbol)}
-- 24시간 최저가: ${formatNumber(low, currency, symbol)}
-
-요구사항:
-- 2-3문장으로 간결하게
-- 기술적 분석 포함
-- 투자 조언 아님, 정보 제공만
-- 이모지 사용 금지`,
-
-    en: `You are a cryptocurrency expert analyst. Write a concise and professional analysis based on the following Bitcoin data.
-
-Data:
-- Current Price: ${formatNumber(price, currency, symbol)}
-- 24h Change: ${bitcoinData.priceChange24h.toFixed(2)}%
-- 24h High: ${formatNumber(high, currency, symbol)}
-- 24h Low: ${formatNumber(low, currency, symbol)}
-
-Requirements:
-- 2-3 sentences, concise
-- Include technical analysis
-- Not investment advice, information only
-- No emojis`,
-
-    fr: `Vous êtes un analyste expert en cryptomonnaies. Rédigez une analyse concise et professionnelle basée sur les données Bitcoin suivantes.
-
-Données:
-- Prix actuel: ${formatNumber(price, currency, symbol)}
-- Variation 24h: ${bitcoinData.priceChange24h.toFixed(2)}%
-- Plus haut 24h: ${formatNumber(high, currency, symbol)}
-- Plus bas 24h: ${formatNumber(low, currency, symbol)}
-
-Exigences:
-- 2-3 phrases, concis
-- Inclure une analyse technique
-- Pas de conseil d'investissement, information uniquement
-- Pas d'émojis`,
-
-    de: `Sie sind ein Kryptowährungs-Experte. Schreiben Sie eine prägnante und professionelle Analyse basierend auf den folgenden Bitcoin-Daten.
-
-Daten:
-- Aktueller Preis: ${formatNumber(price, currency, symbol)}
-- 24h Änderung: ${bitcoinData.priceChange24h.toFixed(2)}%
-- 24h Hoch: ${formatNumber(high, currency, symbol)}
-- 24h Tief: ${formatNumber(low, currency, symbol)}
-
-Anforderungen:
-- 2-3 Sätze, prägnant
-- Technische Analyse einbeziehen
-- Keine Anlageberatung, nur Informationen
-- Keine Emojis`,
-
-    es: `Eres un analista experto en criptomonedas. Escribe un análisis conciso y profesional basado en los siguientes datos de Bitcoin.
-
-Datos:
-- Precio actual: ${formatNumber(price, currency, symbol)}
-- Cambio 24h: ${bitcoinData.priceChange24h.toFixed(2)}%
-- Máximo 24h: ${formatNumber(high, currency, symbol)}
-- Mínimo 24h: ${formatNumber(low, currency, symbol)}
-
-Requisitos:
-- 2-3 oraciones, conciso
-- Incluir análisis técnico
-- No es asesoramiento de inversión, solo información
-- Sin emojis`,
-  };
-
-  const openai = new OpenAI({ apiKey: openaiApiKey });
-
-  const completion = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    messages: [
-      {
-        role: 'system',
-        content: 'You are a professional cryptocurrency analyst providing factual market analysis.',
-      },
-      {
-        role: 'user',
-        content: prompts[language],
-      },
-    ],
-    temperature: 0.7,
-    max_tokens: 200,
-  });
-
-  return completion.choices[0].message.content?.trim() || '';
+  return `${symbol}${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 /**
  * 트윗 텍스트 생성
  */
-function createTweetText(bitcoinData: any, aiAnalysis: string, language: string) {
-  const currency = LANGUAGES[language as keyof typeof LANGUAGES].currency;
-  const symbol = LANGUAGES[language as keyof typeof LANGUAGES].symbol;
-  const priceEmoji = bitcoinData.priceChange24h >= 0 ? '↑' : '↓';
+function createTweetText(globalData: any, upbitPrice: number | null, language: string) {
+  const langConfig = LANGUAGES[language as keyof typeof LANGUAGES];
+  const currency = langConfig.currency;
+  const symbol = langConfig.symbol;
   
-  const price = bitcoinData.prices[currency];
-  const volume = bitcoinData.volumes[currency];
+  const globalPrice = globalData.prices[currency];
+  const changeEmoji = globalData.change24h >= 0 ? '📈' : '📉';
+  const changeSign = globalData.change24h >= 0 ? '+' : '';
   
-  const warningTexts: Record<string, string> = {
-    ko: '⚠️ 투자 판단은 신중히! 본 정보는 투자 조언이 아닙니다.',
-    en: '⚠️ DYOR - Not financial advice.',
-    fr: '⚠️ DYOR - Pas un conseil financier.',
-    de: '⚠️ DYOR - Keine Finanzberatung.',
-    es: '⚠️ DYOR - No es asesoramiento financiero.',
-  };
-
-  const titles: Record<string, string> = {
-    ko: '🪙 비트코인(BTC) 오늘의 AI 분석',
-    en: '🪙 Bitcoin(BTC) Daily AI Analysis',
-    fr: '🪙 Bitcoin(BTC) Analyse IA du jour',
-    de: '🪙 Bitcoin(BTC) Tägliche KI-Analyse',
-    es: '🪙 Bitcoin(BTC) Análisis IA diario',
-  };
-
-  return `${titles[language]}
-
-💰 ${formatNumber(price, currency, symbol)} (${priceEmoji}${Math.abs(bitcoinData.priceChange24h).toFixed(2)}%)
-📊 24h Vol: ${formatNumber(volume, currency, symbol)}
-
-🤖 ${aiAnalysis}
-
-${warningTexts[language]}
-
-🔗 ${SITE_URL}
-
-${LANGUAGES[language as keyof typeof LANGUAGES].hashtags}`;
+  let content = '';
+  
+  // 1. 헤더 (비트코인 현재가)
+  content += `💎 Bitcoin (BTC) ${changeEmoji}\n\n`;
+  
+  // 2. 가격 정보
+  if (language === 'ko' && upbitPrice) {
+    // 한국어: 김치 프리미엄 포함
+    const kimchiPremium = ((upbitPrice - globalData.prices.krw) / globalData.prices.krw) * 100;
+    const premiumEmoji = kimchiPremium >= 0 ? '🔴' : '🔵'; // 양수면 김프(빨강), 음수면 역프
+    const premiumText = kimchiPremium >= 0 ? '김치 프리미엄' : '역프리미엄';
+    
+    content += `🇰🇷 업비트: ${formatNumber(upbitPrice, 'krw', '₩')}\n`;
+    content += `🌶️ ${premiumText}: ${premiumEmoji} ${changeSign}${kimchiPremium.toFixed(2)}%\n\n`;
+  } else {
+    // 글로벌: 해당 통화 가격만 표시
+    content += `💰 Price: ${formatNumber(globalPrice, currency, symbol)}\n`;
+    content += `📊 24h Change: ${changeSign}${globalData.change24h.toFixed(2)}%\n\n`;
+  }
+  
+  // 3. 홍보 문구 (핵심)
+  content += `${langConfig.promotion}\n\n`;
+  
+  // 4. 링크 및 해시태그 (강조)
+  const ctaText = language === 'ko' ? '👉 무료 대시보드 확인하기:' : '👉 Visit Free Dashboard:';
+  
+  // 언어별 URL 생성 (한국어는 기본, 나머지는 파라미터 추가)
+  const targetUrl = language === 'ko' ? SITE_URL : `${SITE_URL}?lang=${language}`;
+  
+  content += `${ctaText} ${targetUrl}\n\n`;
+  content += langConfig.hashtags;
+  
+  return content;
 }
 
 /**
- * 트윗 발행
+ * 트윗 발행 함수
  */
 async function postTweet(text: string, language: string, twitterClient: TwitterApi) {
-  const rwClient = twitterClient.readWrite;
-  const tweet = await rwClient.v2.tweet(text);
-  
-  console.log(`✅ [${LANGUAGES[language as keyof typeof LANGUAGES].name}] 트윗 성공!`);
-  console.log(`   트윗 ID: ${tweet.data.id}`);
-  console.log(`   링크: https://twitter.com/i/web/status/${tweet.data.id}\n`);
-  
-  return tweet;
+  try {
+    const tweet = await twitterClient.v2.tweet(text);
+    console.log(`✅ [${language}] 트윗 성공! ID: ${tweet.data.id}`);
+    return true;
+  } catch (error) {
+    console.error(`❌ [${language}] 트윗 실패:`, error);
+    return false;
+  }
 }
 
 /**
- * 메인 봇 실행 함수 (환경 변수로부터 API 키 받음)
+ * 메인 봇 실행 함수
  */
 export async function runCryptoBot(env: {
   TWITTER_API_KEY: string;
   TWITTER_API_SECRET: string;
   TWITTER_ACCESS_TOKEN: string;
   TWITTER_ACCESS_SECRET: string;
-  OPENAI_API_KEY: string;
+  OPENAI_API_KEY?: string; // 사용 안 함
 }) {
-  console.log('🚀 5개 언어 자동 트윗 봇 시작...\n');
-  console.log(`⏰ 실행 시간: ${new Date().toISOString()}\n`);
+  console.log('🚀 암호화폐 홍보 봇 시작...\n');
 
   try {
-    // X API 클라이언트 생성
+    // 1. 데이터 수집
+    const globalData = await getGlobalData();
+    if (!globalData) throw new Error('글로벌 데이터 조회 실패');
+    
+    const upbitPrice = await getUpbitPrice(); // 한국어 트윗용
+
+    // 2. 트위터 클라이언트
     const twitterClient = new TwitterApi({
       appKey: env.TWITTER_API_KEY,
       appSecret: env.TWITTER_API_SECRET,
@@ -266,39 +181,24 @@ export async function runCryptoBot(env: {
       accessSecret: env.TWITTER_ACCESS_SECRET,
     });
 
-    // 1. 비트코인 데이터 가져오기
-    console.log('1️⃣ 비트코인 데이터 가져오는 중...');
-    const bitcoinData = await getBitcoinData();
-    console.log(`✅ 현재가: ${formatNumber(bitcoinData.prices.usd, 'usd', '$')} (${bitcoinData.priceChange24h >= 0 ? '+' : ''}${bitcoinData.priceChange24h.toFixed(2)}%)\n`);
-
-    // 2. 각 언어별로 트윗 생성 및 발행
-    for (const [langCode, langInfo] of Object.entries(LANGUAGES)) {
-      console.log(`📝 [${langInfo.name}] AI 분석 생성 중...`);
-      const aiAnalysis = await generateAIAnalysis(bitcoinData, langCode, env.OPENAI_API_KEY);
-      console.log(`✅ [${langInfo.name}] AI 분석 완료\n`);
-
-      const tweetText = createTweetText(bitcoinData, aiAnalysis, langCode);
+    // 3. 언어별 트윗 발행
+    for (const lang of Object.keys(LANGUAGES)) {
+      const text = createTweetText(globalData, upbitPrice, lang);
       
-      console.log(`🐦 [${langInfo.name}] 트윗 발행 중...`);
-      console.log('─'.repeat(50));
-      console.log(tweetText);
-      console.log('─'.repeat(50));
+      console.log(`\n📄 [${lang}] 트윗 미리보기:`);
+      console.log('-----------------------------------');
+      console.log(text);
+      console.log('-----------------------------------');
       
-      await postTweet(tweetText, langCode, twitterClient);
-
-      // 다음 트윗까지 2초 대기 (API 제한 방지)
-      if (langCode !== 'es') {
-        console.log('⏳ 2초 대기...\n');
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
+      await postTweet(text, lang, twitterClient);
+      
+      // API 제한 방지 딜레이
+      await new Promise(resolve => setTimeout(resolve, 2000));
     }
 
-    console.log('\n🎉 모든 트윗 발행 완료!');
-    console.log(`📊 총 ${Object.keys(LANGUAGES).length}개 언어로 트윗 발행됨`);
-    
-    return { success: true, message: '모든 트윗 발행 완료' };
+    return { success: true };
   } catch (error) {
-    console.error('\n❌ 오류 발생:', error);
+    console.error('봇 실행 중 치명적 오류:', error);
     throw error;
   }
 }

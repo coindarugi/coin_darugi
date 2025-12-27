@@ -3032,3 +3032,22 @@ h1 {
     flex-shrink: 0 !important;
   }
 }
+
+/* AI 전망 카드 높이 통일 */
+.forecast-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+  align-items: stretch !important;
+}
+
+.forecast-item {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.forecast-advice {
+  margin-top: auto;
+}

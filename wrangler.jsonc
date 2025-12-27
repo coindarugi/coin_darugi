@@ -1,10 +1,16 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "webapp",
+  "name": "crypto-dashboard-secure",
   "compatibility_date": "2025-12-24",
   "pages_build_output_dir": "./dist",
   "compatibility_flags": [
     "nodejs_compat"
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "BLOG_KV",
+      "id": "53b9ad60b82e4dc692394442f43d6893"
+    }
   ],
   "analytics_engine_datasets": []
 }

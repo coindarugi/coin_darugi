@@ -1,5 +1,9 @@
 // 페이지 로드 시 대시보드 초기화
 window.addEventListener('DOMContentLoaded', () => {
+  // 현재 언어 설정 (URL 파라미터 또는 HTML lang 속성에서 가져오기)
+  const urlParams = new URLSearchParams(window.location.search);
+  const currentLang = urlParams.get('lang') || document.documentElement.lang || 'ko';
+
   // 언어별 SEO 메타 태그 업데이트
   updateSEOMetaTags();
   
@@ -17,8 +21,8 @@ window.addEventListener('DOMContentLoaded', () => {
   const navNews = document.getElementById('navNews');
   if (navNews) navNews.textContent = t('navNews');
   
-  const navPortfolio = document.getElementById('navPortfolio');
-  if (navPortfolio) navPortfolio.textContent = t('navPortfolio');
+  const navBlog = document.getElementById('navBlog');
+  if (navBlog) navBlog.textContent = t('navBlog');
   
   // 광고 레이블 번역
   const adLabel = document.getElementById('adLabel');
@@ -215,7 +219,7 @@ const countryMapping = {
   'es': 'es'  // 스페인
 };
 
-// 코인 ID → 심볼 매핑
+// 코인 ID → 심볼 매핑 (확장판)
 const coinSymbolMap = {
   'bitcoin': 'BTC',
   'ethereum': 'ETH',
@@ -231,7 +235,34 @@ const coinSymbolMap = {
   'avalanche-2': 'AVAX',
   'chainlink': 'LINK',
   'stellar': 'XLM',
-  'uniswap': 'UNI'
+  'uniswap': 'UNI',
+  'tron': 'TRX',
+  'the-open-network': 'TON',
+  'monero': 'XMR',
+  'bitcoin-cash': 'BCH',
+  'ethereum-classic': 'ETC',
+  'filecoin': 'FIL',
+  'cosmos': 'ATOM',
+  'eos': 'EOS',
+  'aave': 'AAVE',
+  'maker': 'MKR',
+  'algorand': 'ALGO',
+  'tezos': 'XTZ',
+  'neo': 'NEO',
+  'dash': 'DASH',
+  'zcash': 'ZEC',
+  'compound': 'COMP',
+  'decentraland': 'MANA',
+  'the-sandbox': 'SAND',
+  'axie-infinity': 'AXS',
+  'gala': 'GALA',
+  'chiliz': 'CHZ',
+  'tether': 'USDT',
+  'usd-coin': 'USDC',
+  'binance-usd': 'BUSD',
+  'dai': 'DAI',
+  'true-usd': 'TUSD',
+  'first-digital-usd': 'FDUSD'
 };
 
 // 선택된 코인 (로컬 스토리지에서 불러오기)
@@ -345,11 +376,41 @@ function toggleCoin(coinId, coinName, coinSymbol) {
   
   console.log('업데이트된 selectedCoins:', selectedCoins);
   
-  // Top 100 브라우저가 열려있으면 모달 업데이트
-  const coinBrowserModal = document.getElementById('coinBrowserModal');
-  if (coinBrowserModal && coinBrowserModal.style.display === 'flex') {
-    showCoinBrowser();
-  }
+  // Top 100 모달 UI 즉시 업데이트 (전체 리로드 방지)
+  const coinCards = document.querySelectorAll(`.top-coin-card[onclick*="'${coinId}'"]`);
+  coinCards.forEach(card => {
+    if (wasAdded) {
+      card.classList.add('selected');
+      if (!card.querySelector('.top-coin-selected')) {
+        const checkDiv = document.createElement('div');
+        checkDiv.className = 'top-coin-selected';
+        checkDiv.innerHTML = `<i class="fas fa-check"></i> ${t('selected')}`;
+        card.appendChild(checkDiv);
+      }
+    } else {
+      card.classList.remove('selected');
+      const checkDiv = card.querySelector('.top-coin-selected');
+      if (checkDiv) checkDiv.remove();
+    }
+  });
+  
+  // 검색 결과 UI 업데이트
+  const searchItems = document.querySelectorAll(`.search-result-item[onclick*="'${coinId}'"]`);
+  searchItems.forEach(item => {
+    if (wasAdded) {
+      item.classList.add('selected');
+      const icon = item.querySelector('i');
+      if (icon) {
+        icon.className = 'fas fa-check text-green-400';
+      }
+    } else {
+      item.classList.remove('selected');
+      const icon = item.querySelector('i');
+      if (icon) {
+        icon.className = 'fas fa-plus text-gray-400';
+      }
+    }
+  });
   
   // 대시보드 업데이트
   if (wasAdded) {
@@ -408,28 +469,32 @@ async function addCoinToDashboard(coinId) {
       `;
     }
     
-    // 포트폴리오 정보
-    let portfolioHTML = '';
-    if (portfolio[coinId]) {
-      const { amount, avgPrice } = portfolio[coinId];
-      const currentValue = amount * data.usd;
-      const profit = currentValue - (amount * avgPrice);
-      const profitRate = ((profit / (amount * avgPrice)) * 100).toFixed(2);
-      const isProfitable = profit >= 0;
-      
-      portfolioHTML = `
-        <div class="portfolio-info">
-          <div class="portfolio-row">
-            <span>${t('holdings')}:</span>
-            <span>${amount} ${coinSymbol}</span>
+      // 포트폴리오 정보
+      let portfolioHTML = '';
+      if (portfolio[coinId]) {
+        const { amount, avgPrice } = portfolio[coinId];
+        const safeAmount = Number(amount) || 0;
+        const safeAvgPrice = Number(avgPrice) || 0;
+        const currentValue = safeAmount * data.usd;
+        const profit = currentValue - (safeAmount * safeAvgPrice);
+        const profitRate = safeAvgPrice > 0 ? ((profit / (safeAmount * safeAvgPrice)) * 100).toFixed(2) : '0.00';
+        const isProfitable = profit >= 0;
+        
+        portfolioHTML = `
+          <div class="portfolio-info ${isProfitable ? 'profitable' : 'losing'}">
+            <div class="portfolio-detail">
+              <i class="fas fa-coins"></i> ${t('holding') || '보유'}: ${safeAmount.toFixed(4)} ${coinSymbol}
+            </div>
+            <div class="portfolio-detail">
+              <i class="fas fa-dollar-sign"></i> ${t('avgPrice') || '평단'}: ${formatPrice(safeAvgPrice)}
+            </div>
+            <div class="portfolio-detail ${isProfitable ? 'text-green-400' : 'text-red-400'}">
+              <strong>${profit >= 0 ? '+' : ''}${profitRate}%</strong> (${formatPrice(profit)})
+            </div>
           </div>
-          <div class="portfolio-row portfolio-profit ${isProfitable ? 'text-green-400' : 'text-red-400'}">
-            <span>${t('profitRate')}:</span>
-            <span><strong>${isProfitable ? '+' : ''}${profitRate}%</strong></span>
-          </div>
-        </div>
-      `;
-    }
+        `;
+      }
+
     
     // 코인 카드 HTML
     const coinCardHTML = `
@@ -456,14 +521,14 @@ async function addCoinToDashboard(coinId) {
         </div>
         ${getPriceChangeHTML(change)}
         ${kimchiPremiumHTML}
-        <div class="market-cap">
+        <div class="exchange-price-info" id="exchange-${coinId}" style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem;">
+          <i class="fas fa-building"></i> ${t('localExchange')}: <span style="color: #3b82f6;">Loading...</span>
+        </div>
+        <div class="market-cap" style="margin-top: 0.5rem;">
           <i class="fas fa-chart-pie"></i> ${t('marketCap')}: ${formatMarketCap(currentLang === 'ko' ? marketCapKRW : data.usd_market_cap, currentLang === 'ko' ? 'krw' : 'usd')}
         </div>
         <div class="volume-info">
           <i class="fas fa-exchange-alt"></i> ${t('volume24h')}: ${formatMarketCap(volume24h, 'usd')}
-        </div>
-        <div class="exchange-price-info" id="exchange-${coinId}" style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem;">
-          <i class="fas fa-building"></i> ${t('localExchange')}: <span style="color: #3b82f6;">Loading...</span>
         </div>
         ${portfolioHTML}
         <div class="coin-actions">
@@ -610,8 +675,9 @@ async function showCoinBrowser() {
       const changeClass = change >= 0 ? 'positive' : 'negative';
       const changeArrow = change >= 0 ? '▲' : '▼';
       
+      // 토글 시 대시보드 즉시 업데이트를 위해 onclick 이벤트에 loadSelectedCoins 호출 추가하지 않음 (toggleCoin 내부에서 처리)
       coinsHTML += `
-        <div class="top-coin-card ${isSelected ? 'selected' : ''}" onclick="toggleCoin('${coin.id}')">
+        <div class="top-coin-card ${isSelected ? 'selected' : ''}" onclick="toggleCoin('${coin.id}', '${coin.name}', '${coin.symbol}')">
           <div class="top-coin-rank">#${index + 1}</div>
           <img src="${coin.image}" alt="${coin.name}" class="top-coin-image">
           <div class="top-coin-name">${coin.name}</div>
@@ -819,7 +885,7 @@ async function loadChart(coinId, days = 7) {
       type: 'line',
       data: {
         datasets: [{
-          label: 'Price (USD)',
+          label: `${t('price')} (USD)`,
           data: prices,
           borderColor: 'rgb(59, 130, 246)',
           backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -837,7 +903,7 @@ async function loadChart(coinId, days = 7) {
           tooltip: {
             callbacks: {
               label: function(context) {
-                return 'Price: $' + context.parsed.y.toFixed(2);
+                return `${t('price')}: $` + context.parsed.y.toFixed(2);
               }
             }
           }
@@ -893,6 +959,32 @@ function openPortfolioModal(coinId, coinName, currentPrice) {
   const modal = document.getElementById('portfolioModal');
   const modalTitle = document.getElementById('portfolioModalTitle');
   modalTitle.textContent = `${coinName} ${t('portfolioManagement')}`;
+  
+  // 다국어 라벨 업데이트
+  const amountLabel = document.getElementById('portfolioAmountLabel');
+  if (amountLabel) amountLabel.innerHTML = `<i class="fas fa-coins"></i> ${t('holding') || '보유 수량'}`;
+  
+  const avgPriceLabel = document.getElementById('portfolioAvgPriceLabel');
+  if (avgPriceLabel) avgPriceLabel.innerHTML = `<i class="fas fa-dollar-sign"></i> ${t('avgPrice') || '평균 매수가 (USD)'}`;
+  
+  const currentPriceLabel = document.getElementById('portfolioCurrentPriceLabel');
+  if (currentPriceLabel) currentPriceLabel.innerHTML = `<i class="fas fa-chart-line"></i> ${t('currentPrice') || '현재가'}:`;
+  
+  const placeholder = document.getElementById('portfolioPlaceholder');
+  if (placeholder) placeholder.textContent = t('portfolioInputPlaceholder') || '수량과 평균 매수가를 입력하세요';
+  
+  const saveBtn = document.getElementById('portfolioSaveBtn');
+  if (saveBtn) saveBtn.innerHTML = `<i class="fas fa-save"></i> ${t('save') || '저장'}`;
+  
+  const cancelBtn = document.getElementById('portfolioCancelBtn');
+  if (cancelBtn) cancelBtn.textContent = t('cancel') || '취소';
+  
+  // Placeholder 업데이트
+  const amountInput = document.getElementById('portfolioAmount');
+  if (amountInput) amountInput.placeholder = t('portfolioAmountPlaceholder');
+  
+  const avgPriceInput = document.getElementById('portfolioAvgPrice');
+  if (avgPriceInput) avgPriceInput.placeholder = t('portfolioPricePlaceholder');
   
   // 현재 포트폴리오 정보 불러오기
   const portfolioData = portfolio[coinId] || { amount: 0, avgPrice: 0 };
@@ -1894,7 +1986,6 @@ async function loadPrices() {
       </div>
     `;
     
-    // 통계 섹션
     let statsHTML = `
       <div class="stats-grid">
         ${fearGreedHTML}
@@ -1932,8 +2023,9 @@ async function loadPrices() {
     const totalProfit = totalCurrentValue - totalInvestment;
     const totalProfitRate = totalInvestment > 0 ? ((totalProfit / totalInvestment) * 100).toFixed(2) : '0.00';
     
-    // 포트폴리오 요약 카드 (포트폴리오가 있을 때만 표시)
+    // 포트폴리오 요약 카드 (항상 표시하되, 데이터 없으면 안내 메시지)
     let portfolioSummaryHTML = '';
+    
     if (hasPortfolio) {
       const isProfitable = totalProfit >= 0;
       portfolioSummaryHTML = `
@@ -1961,7 +2053,23 @@ async function loadPrices() {
           </div>
         </div>
       `;
+    } else {
+      // 포트폴리오 데이터가 없을 때 표시할 안내 UI (참고 사이트 스타일)
+      portfolioSummaryHTML = `
+        <div class="portfolio-summary-card empty-state">
+          <h3 class="text-xl font-bold mb-2">
+            <i class="fas fa-wallet text-gray-500"></i> ${t('portfolioManagement')}
+          </h3>
+          <p class="text-gray-400 mb-4">${t('enterAmountAndPrice') || '수량과 평균 매수가를 입력하여 수익률을 관리하세요.'}</p>
+          <div class="text-center">
+            <button class="btn-secondary" onclick="document.querySelector('.coin-card .action-btn:nth-child(2)').click()">
+              <i class="fas fa-plus"></i> ${t('addPortfolio') || '포트폴리오 시작하기'}
+            </button>
+          </div>
+        </div>
+      `;
     }
+
     
     // 코인 카드들
     let coinsHTML = '<div class="coin-grid">';
@@ -1998,7 +2106,7 @@ async function loadPrices() {
       const kimchiResults = coinKimchiMap[coinId];
       
       // 평균 김치 프리미엄 계산
-      let avgKimchi = 0;
+      let avgKimchi = null;
       if (kimchiResults && kimchiResults.length > 0) {
         const validKimchi = kimchiResults.filter(r => r.data && !r.data.error && r.data.premium);
         if (validKimchi.length > 0) {
@@ -2137,15 +2245,16 @@ async function loadPrices() {
           </div>
           ${getPriceChangeHTML(change)}
           ${kimchiPremiumHTML}
+          <div class="exchange-price-info" id="exchange-${coinId}" style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem;">
+            <i class="fas fa-building"></i> ${t('localExchange')}: <span style="color: #3b82f6;">Loading...</span>
+          </div>
           <div class="market-cap">
             <i class="fas fa-chart-pie"></i> ${t('marketCap')}: ${formatMarketCap(currentLang === 'ko' ? marketCapKRW : data.market_cap, currentLang === 'ko' ? 'krw' : 'usd')}
           </div>
           <div class="volume-info">
             <i class="fas fa-exchange-alt"></i> ${t('volume24h')}: ${formatMarketCap(volume24h, 'usd')}
           </div>
-          <div class="exchange-price-info" id="exchange-${coinId}" style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem;">
-            <i class="fas fa-building"></i> ${t('localExchange')}: <span style="color: #3b82f6;">Loading...</span>
-          </div>
+
           ${portfolioHTML}
           <div class="coin-actions">
             <button class="action-btn" onclick="openChartModal('${coinId}', '${coinName}')">
@@ -2161,7 +2270,7 @@ async function loadPrices() {
     
     coinsHTML += '</div>';
     
-    // 중단 광고 (AI 전망 버튼 위)
+    // 중간 광고 (코인 목록 뒤)
     const adMiddleHTML = `
       <!-- 데스크톱 광고 - 중단 -->
       <div class="ad-container ad-middle ad-desktop-only" style="margin-top: 2rem; margin-bottom: 2rem;">
@@ -2186,6 +2295,7 @@ async function loadPrices() {
       </div>
     `;
     
+    // 하단 광고 (중복 방지를 위해 제거 - index.tsx에서 처리)
     const adBottomHTML = '';
     
     // 새로고침 버튼 (가운데 정렬)
@@ -2197,8 +2307,25 @@ async function loadPrices() {
       </div>
     `;
     
-    // 순서: 검색 → 통계 → 포트폴리오 요약 → 코인 목록 → 중간 광고 → AI 전망 → 뉴스 → 새로고침 → 하단 광고
-    appDiv.innerHTML = searchHTML + statsHTML + portfolioSummaryHTML + coinsHTML + adMiddleHTML + aiForecastHTML + newsHTML + refreshButton + adBottomHTML;
+    // TOP 10 시가총액 테이블
+    const top100TableHTML = `<div id="top100-preview-container"></div>`;
+    
+    // 최종 순서: 검색 → 통계 → 코인 목록 → TOP10 테이블 → 광고 → AI 전망 → 뉴스 → 새로고침 → 광고
+    // 1. 광고 (Header - outside main)
+    // 2. searchHTML (검색 + Top 100 Button)
+    // 3. statsHTML (통계 - 공포탐욕지수, 선택한 코인, 실시간 업데이트)
+    // 4. coinsHTML (선택한 코인 카드들 - 포트폴리오 정보 포함)
+    // 5. top100TableHTML (TOP 10 시가총액 테이블)
+    // 6. adMiddleHTML (중간 광고)
+    // 7. aiForecastHTML (AI 전망)
+    // 8. newsHTML (뉴스)
+    // 9. refreshButton (새로고침)
+    // 10. adBottomHTML (하단 광고)
+    
+    appDiv.innerHTML = searchHTML + statsHTML + coinsHTML + top100TableHTML + adMiddleHTML + aiForecastHTML + newsHTML + refreshButton + adBottomHTML;
+    
+    // Top 100 테이블 로드 (비동기)
+    loadTop100Preview();
     
     // 🌍 각 코인별로 해당 국가 거래소 가격 로드
     loadExchangePrices(coinsArray);
@@ -2219,11 +2346,133 @@ async function loadPrices() {
   }
 }
 
+// Top 100 미리보기 테이블 로드
+async function loadTop100Preview() {
+  const container = document.getElementById('top100-preview-container');
+  if (!container) return;
+
+  try {
+    const response = await axios.get('/api/coins/list?limit=10'); // 상위 10개만 미리보기
+    const coins = response.data.coins || [];
+
+    let html = `
+      <div class="top100-preview-card" style="margin-top: 2rem; background: rgba(30, 41, 59, 0.5); border-radius: 16px; padding: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.1);">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold">
+            <i class="fas fa-trophy text-yellow-500"></i> ${t('top10Title') || 'Top 10'}
+          </h3>
+          <button onclick="openCoinBrowser()" class="text-sm text-blue-400 hover:text-blue-300">
+            ${t('viewAll') || 'View All'} <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="text-gray-400 border-b border-gray-700 text-sm">
+                <th class="p-2">${t('rank') || 'Rank'}</th>
+                <th class="p-2">${t('coin') || 'Coin'}</th>
+                <th class="p-2 text-right">${t('price') || 'Price'}</th>
+                <th class="p-2 text-right">24h</th>
+                <th class="p-2 text-right hidden md:table-cell">Mkt Cap</th>
+              </tr>
+            </thead>
+            <tbody>
+    `;
+
+    // 🌍 국가별 거래소 가격 병렬 로드
+    const country = countryMapping[currentLang] || 'us';
+    const exchangePricePromises = coins.slice(0, 10).map(async (coin) => {
+      const coinSymbol = coinSymbolMap[coin.id];
+      if (!coinSymbol) return { coin, exchangePrice: null };
+      
+      try {
+        const response = await axios.get(`/api/exchange-prices/${coinSymbol}?country=${country}`);
+        return { coin, exchangePrice: response.data };
+      } catch (error) {
+        return { coin, exchangePrice: null };
+      }
+    });
+    
+    const coinsWithExchangePrice = await Promise.all(exchangePricePromises);
+    
+    coinsWithExchangePrice.forEach(({ coin, exchangePrice }) => {
+      const change = coin.price_change_percentage_24h || 0;
+      const changeColor = change >= 0 ? 'text-green-400' : 'text-red-400';
+      const changeIcon = change >= 0 ? '▲' : '▼';
+      
+      // 🌍 국가별 거래소 가격 사용 (없으면 글로벌 가격)
+      let priceFormatted = '';
+      let priceSource = 'CoinGecko';
+      
+      if (exchangePrice && exchangePrice.exchanges && exchangePrice.exchanges.length > 0) {
+        // 첫 번째 거래소 가격 사용
+        const firstExchange = exchangePrice.exchanges[0];
+        priceSource = firstExchange.name;
+        
+        if (exchangePrice.currency === 'KRW') {
+          priceFormatted = `₩${firstExchange.price.toLocaleString('ko-KR', { minimumFractionDigits: 0 })}`;
+        } else if (exchangePrice.currency === 'EUR') {
+          priceFormatted = `€${firstExchange.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        } else {
+          priceFormatted = `$${firstExchange.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+      } else {
+        // 글로벌 가격 사용
+        priceFormatted = currentLang === 'ko' 
+          ? new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'USD' }).format(coin.current_price).replace('US$', '$') 
+          : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(coin.current_price);
+      }
+        
+      const marketCapFormatted = currentLang === 'ko'
+        ? formatMarketCap(coin.market_cap, 'krw')
+        : formatMarketCap(coin.market_cap, 'usd');
+      
+      html += `
+        <tr class="border-b border-gray-800 hover:bg-gray-800 transition-colors cursor-pointer" onclick="toggleCoin('${coin.id}')">
+          <td class="p-3 text-gray-500 font-mono text-sm">#${coin.market_cap_rank}</td>
+          <td class="p-3">
+            <div class="flex items-center gap-2">
+              <img src="${coin.image}" class="w-6 h-6 rounded-full" alt="${coin.symbol}">
+              <div>
+                <div class="font-bold text-sm">${coin.symbol.toUpperCase()}</div>
+                <div class="text-xs text-gray-500 md:hidden">${coin.name}</div>
+              </div>
+            </div>
+          </td>
+          <td class="p-3 text-right font-mono text-sm">
+            ${priceFormatted}
+            <div class="text-xs text-gray-500 mt-0.5">${priceSource}</div>
+          </td>
+          <td class="p-3 text-right font-mono text-sm ${changeColor}">
+            ${Math.abs(change).toFixed(2)}%
+          </td>
+          <td class="p-3 text-right font-mono text-sm text-gray-400 hidden md:table-cell">
+            ${marketCapFormatted}
+          </td>
+        </tr>
+      `;
+    });
+
+    html += `
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = html;
+  } catch (error) {
+    console.error('Top 100 preview failed:', error);
+    container.innerHTML = ''; // 실패 시 조용히 숨김
+  }
+}
+
 // 🌍 국가별 거래소 가격 로드
 // 단일 코인 거래소 가격 로드
 async function loadExchangePriceForCoin(coinId, lang) {
   const country = countryMapping[lang] || 'us';
-  const coinSymbol = coinSymbolMap[coinId];
+  // 매핑 확인 후 없으면 ID를 대문자로 변환해서 시도
+  const coinSymbol = coinSymbolMap[coinId] || coinId.toUpperCase();
   
   if (!coinSymbol) return;
   
@@ -2262,7 +2511,7 @@ async function loadExchangePriceForCoin(coinId, lang) {
         exchangesHTML += `</div>`;
       });
       
-      if (data.summary && data.summary.spreadPercent > 0) {
+      if (data.summary && data.summary.spreadPercent !== undefined && data.summary.spreadPercent !== null) {
         let spreadColor = data.summary.spreadPercent > 1 ? '#ef4444' : '#64748b';
         exchangesHTML += `<div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #e2e8f0; font-size: 0.8rem; color: ${spreadColor};">`;
         exchangesHTML += `<i class="fas fa-chart-line"></i> ${t('priceSpread')}: ${data.summary.spreadPercent.toFixed(2)}%</div>`;
@@ -2284,7 +2533,7 @@ async function loadExchangePrices(coinsData) {
   
   for (const coinData of coinsData) {
     const { coinId } = coinData;
-    const coinSymbol = coinSymbolMap[coinId];
+    const coinSymbol = coinSymbolMap[coinId] || coinId.toUpperCase();
     
     if (!coinSymbol) continue;
     
@@ -2326,10 +2575,10 @@ async function loadExchangePrices(coinsData) {
         });
         
         // 가격 차이 요약
-        if (data.summary && data.summary.spreadPercent > 0) {
+        if (data.summary && data.summary.spreadPercent !== undefined && data.summary.spreadPercent !== null) {
           let spreadColor = data.summary.spreadPercent > 1 ? '#ef4444' : '#64748b';
           exchangesHTML += `<div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #e2e8f0; font-size: 0.8rem; color: ${spreadColor};">`;
-          exchangesHTML += `<i class="fas fa-chart-line"></i> ${t('priceSpread')}: ${data.summary.spreadPercent}%`;
+          exchangesHTML += `<i class="fas fa-chart-line"></i> ${t('priceSpread')}: ${data.summary.spreadPercent.toFixed(2)}%`;
           exchangesHTML += `</div>`;
         }
         
@@ -2348,7 +2597,8 @@ async function loadExchangePrices(coinsData) {
 // 단일 코인의 거래소 가격 로드
 async function loadExchangePriceForCoin(coinId, lang) {
   const country = countryMapping[lang] || 'us';
-  const coinSymbol = coinSymbolMap[coinId];
+  // 매핑 확인 후 없으면 ID를 대문자로 변환해서 시도
+  const coinSymbol = coinSymbolMap[coinId] || coinId.toUpperCase();
   
   if (!coinSymbol) return;
   
@@ -2387,10 +2637,10 @@ async function loadExchangePriceForCoin(coinId, lang) {
         exchangesHTML += `</div>`;
       });
       
-      if (data.summary && data.summary.spreadPercent > 0) {
+      if (data.summary && data.summary.spreadPercent !== undefined && data.summary.spreadPercent !== null) {
         let spreadColor = data.summary.spreadPercent > 1 ? '#ef4444' : '#64748b';
         exchangesHTML += `<div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #e2e8f0; font-size: 0.8rem; color: ${spreadColor};">`;
-        exchangesHTML += `<i class="fas fa-chart-line"></i> ${t('priceSpread')}: ${data.summary.spreadPercent}%`;
+        exchangesHTML += `<i class="fas fa-chart-line"></i> ${t('priceSpread')}: ${data.summary.spreadPercent.toFixed(2)}%`;
         exchangesHTML += `</div>`;
       }
       
@@ -2511,9 +2761,6 @@ window.onclick = function(event) {
   }
   if (event.target === chartModal) {
     closeChartModal();
-  }
-  if (event.target === portfolioModal) {
-    closePortfolioModal();
   }
   if (event.target === userGuideModal) {
     closeUserGuide();

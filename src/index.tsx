@@ -13,6 +13,7 @@ type Bindings = {
   TWITTER_ACCESS_TOKEN?: string
   TWITTER_ACCESS_SECRET?: string
   COINGECKO_API_KEY?: string
+  BLOG_KV: KVNamespace // 블로그 데이터 저장용 KV
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -112,6 +113,7 @@ async function fetchFromCoinCap(coinIds: string[]) {
         const usdPrice = parseFloat(coin.priceUsd)
         const change24h = parseFloat(coin.changePercent24Hr)
         const marketCap = parseFloat(coin.marketCapUsd)
+        const volume24h = parseFloat(coin.volumeUsd24Hr)
         
         // KRW 환율 적용 (1400원 고정 - 실시간 환율 API 없음)
         const krwPrice = usdPrice * 1400
@@ -120,6 +122,7 @@ async function fetchFromCoinCap(coinIds: string[]) {
           usd: usdPrice,
           usd_market_cap: marketCap,
           usd_24h_change: change24h,
+          usd_24h_vol: volume24h,
           krw: krwPrice,
           krw_market_cap: marketCap * 1400,
           krw_24h_change: change24h
@@ -143,26 +146,36 @@ app.get('/api/prices', async (c) => {
     
     // URL 쿼리에서 선택한 코인 가져오기 (기본값: 비트코인만)
     const selectedCoins = c.req.query('coins') || 'bitcoin'
+    const requestedCoinsList = selectedCoins.split(',').filter(id => id && id.trim().length > 0)
     
-    // 캐시 체크
+    // 캐시 체크: 요청된 모든 코인이 캐시에 있는지 확인
     const now = Date.now()
     if (priceCache.data && (now - priceCache.timestamp) < priceCache.ttl) {
-      console.log('✅ Returning cached data')
-      // 캐시된 데이터에서 선택한 코인만 필터링
-      const filteredData: any = {}
-      selectedCoins.split(',').forEach(coin => {
-        if (priceCache.data[coin]) {
-          filteredData[coin] = priceCache.data[coin]
-        }
-      })
-      return c.json(filteredData)
+      const allCached = requestedCoinsList.every(coin => priceCache.data[coin])
+      
+      if (allCached) {
+        console.log('✅ Returning cached data (all requested coins found)')
+        const filteredData: any = {}
+        requestedCoinsList.forEach(coin => {
+          if (priceCache.data[coin]) {
+            filteredData[coin] = priceCache.data[coin]
+          }
+        })
+        return c.json(filteredData)
+      }
     }
     
-    // 모든 코인 데이터를 한 번에 가져와서 캐시
-    const allCoins = 'bitcoin,ethereum,ripple,cardano,solana,polkadot,dogecoin,shiba-inu,polygon,litecoin,binancecoin,avalanche-2,chainlink,stellar,uniswap'
+    // 기본 코인 목록 (캐시 유지용)
+    const defaultCoins = 'bitcoin,ethereum,ripple,cardano,solana,polkadot,dogecoin,shiba-inu,polygon,litecoin,binancecoin,avalanche-2,chainlink,stellar,uniswap'
+    const defaultCoinsList = defaultCoins.split(',')
     
-    console.log('🔄 Fetching from CoinGecko Pro API...')
-    // CoinGecko Basic API 키 사용 (Pro API URL에서는 x-cg-pro-api-key 사용)
+    // 요청된 코인과 기본 코인을 합쳐서 중복 제거
+    const coinsToFetch = Array.from(new Set([...defaultCoinsList, ...requestedCoinsList]))
+    const coinsParam = coinsToFetch.join(',')
+    
+    console.log(`🔄 Fetching ${coinsToFetch.length} coins from CoinGecko...`)
+    
+    // CoinGecko Basic API 키 사용
     const headers: Record<string, string> = {
       'Accept': 'application/json'
     }
@@ -170,49 +183,44 @@ app.get('/api/prices', async (c) => {
       headers['x-cg-pro-api-key'] = COINGECKO_API_KEY
     }
     
-    const apiUrl = `${COINGECKO_API_URL}/simple/price?ids=${allCoins}&vs_currencies=usd,krw&include_24hr_change=true&include_market_cap=true`
+    const apiUrl = `${COINGECKO_API_URL}/simple/price?ids=${coinsParam}&vs_currencies=usd,krw&include_24hr_change=true&include_market_cap=true&include_24hr_vol=true`
     console.log('📍 API URL:', apiUrl)
-    console.log('📍 Headers:', headers)
     
     const response = await fetch(apiUrl, { headers })
     
     if (!response.ok) {
       const errorBody = await response.text()
       console.error('❌ CoinGecko API error:', response.status, response.statusText)
-      console.error('❌ Error body:', errorBody)
       
-      // 429 에러인 경우: 1) 캐시 반환 2) CoinCap 백업 시도
+      // 429 에러인 경우: 캐시 반환 시도
       if (response.status === 429) {
         console.warn('⚠️ Rate limit exceeded!')
         
-        // 먼저 캐시된 데이터 확인
         if (priceCache.data) {
-          console.log('✅ Returning cached data (stale)')
+          console.log('✅ Returning cached data (stale, due to 429)')
           const filteredData: any = {}
-          selectedCoins.split(',').forEach(coin => {
+          requestedCoinsList.forEach(coin => {
             if (priceCache.data[coin]) {
               filteredData[coin] = priceCache.data[coin]
             }
           })
+          
+          // 캐시에 없는 코인이 요청되었는데 429가 떴다면, 빈 데이터라도 반환해야 함 (에러 방지)
           return c.json(filteredData)
         }
         
-        // 캐시도 없으면 CoinCap API 시도
+        // 캐시도 없고 429면 CoinCap 백업 시도
         console.log('🔄 Trying CoinCap API as backup...')
-        const coinCapData = await fetchFromCoinCap(allCoins.split(','))
-        
+        const coinCapData = await fetchFromCoinCap(coinsToFetch)
         if (coinCapData && Object.keys(coinCapData).length > 0) {
-          console.log('✅ CoinCap API success!')
-          
-          // 캐시 업데이트
-          priceCache.data = coinCapData
+          // 기존 캐시와 병합
+          priceCache.data = { ...(priceCache.data || {}), ...coinCapData }
           priceCache.timestamp = now
           
-          // 선택한 코인만 필터링
           const filteredData: any = {}
-          selectedCoins.split(',').forEach(coin => {
-            if (coinCapData[coin]) {
-              filteredData[coin] = coinCapData[coin]
+          requestedCoinsList.forEach(coin => {
+            if (priceCache.data[coin]) {
+              filteredData[coin] = priceCache.data[coin]
             }
           })
           return c.json(filteredData)
@@ -222,23 +230,24 @@ app.get('/api/prices', async (c) => {
       throw new Error(`API 요청 실패: ${response.status}`)
     }
     
-    console.log('✅ CoinGecko API success - Cache updated')
     const data = await response.json()
     
     // 빈 응답 체크
     if (Object.keys(data).length === 0) {
-      throw new Error('데이터 없음')
+      // 일부 코인은 ID가 잘못되었을 수 있음. 에러 대신 빈 객체 반환하거나 있는 것만 반환
+      console.warn('⚠️ No data returned for requested coins')
     }
     
-    // 캐시 업데이트
-    priceCache.data = data
+    // 캐시 업데이트 (기존 캐시와 병합)
+    // 이렇게 하면 이전에 fetch한 다른 코인 데이터도 유지됨
+    priceCache.data = { ...(priceCache.data || {}), ...data }
     priceCache.timestamp = now
     
     // 선택한 코인만 필터링해서 반환
     const filteredData: any = {}
-    selectedCoins.split(',').forEach(coin => {
-      if (data[coin]) {
-        filteredData[coin] = data[coin]
+    requestedCoinsList.forEach(coin => {
+      if (priceCache.data[coin]) {
+        filteredData[coin] = priceCache.data[coin]
       }
     })
     
@@ -438,7 +447,9 @@ const coinSymbolMapping: Record<string, string> = {
   'eos': 'EOS',
   'aave': 'AAVE',
   'algorand': 'ALGO',
-  'cosmos': 'ATOM'
+  'cosmos': 'ATOM',
+  'tether': 'USDT',
+  'usd-coin': 'USDC'
 }
 
 // API 라우트: 김치 프리미엄 계산 (개별 코인 지원)
@@ -461,9 +472,26 @@ app.get('/api/kimchi-premium/:coinId', async (c) => {
     }
     
     // 코인 심볼 가져오기
-    const symbol = coinSymbolMapping[coinId]
+    let symbol = coinSymbolMapping[coinId]
+    
+    // 매핑에 없으면 동적으로 가져오기 (10,000개 코인 지원)
     if (!symbol) {
-      return c.json({ error: '지원하지 않는 코인입니다.' }, 400)
+      try {
+        // CoinGecko API로 심볼 조회
+        const coinInfoRes = await fetch(`${COINGECKO_API_URL}/coins/${coinId}?localization=false&tickers=false&market_data=false&community_data=false&developer_data=false&sparkline=false`)
+        if (coinInfoRes.ok) {
+          const coinInfo = await coinInfoRes.json()
+          symbol = coinInfo.symbol.toUpperCase()
+        }
+      } catch (e) {
+        // 실패 시 ID를 대문자로 변환하여 시도
+        symbol = coinId.toUpperCase()
+      }
+    }
+    
+    // 최후의 수단
+    if (!symbol) {
+      symbol = coinId.toUpperCase()
     }
     
     let koreanPrice = 0
@@ -719,27 +747,31 @@ app.get('/api/ai-forecast', async (c) => {
     
     console.log(`Generating new AI forecast for ${lang}...`)
     
-    // 주요 코인 8개
-    const coins = ['bitcoin', 'ethereum', 'ripple', 'solana', 'cardano', 'dogecoin', 'polkadot', 'avalanche-2']
+    // 주요 코인 TOP 10 (시가총액 기준 - 스테이블코인 제외)
+    const coins = ['bitcoin', 'ethereum', 'binancecoin', 'solana', 'ripple', 'cardano', 'dogecoin', 'avalanche-2', 'tron', 'polkadot']
     const coinSymbols: Record<string, string> = { 
       bitcoin: 'BTC', 
-      ethereum: 'ETH', 
-      ripple: 'XRP', 
-      solana: 'SOL', 
+      ethereum: 'ETH',
+      binancecoin: 'BNB',
+      solana: 'SOL',
+      ripple: 'XRP',
       cardano: 'ADA',
       dogecoin: 'DOGE',
-      polkadot: 'DOT',
-      'avalanche-2': 'AVAX'
+      'avalanche-2': 'AVAX',
+      tron: 'TRX',
+      polkadot: 'DOT'
     }
     const coinNames: Record<string, string> = { 
       bitcoin: 'Bitcoin', 
-      ethereum: 'Ethereum', 
-      ripple: 'Ripple', 
-      solana: 'Solana', 
+      ethereum: 'Ethereum',
+      binancecoin: 'BNB',
+      solana: 'Solana',
+      ripple: 'Ripple',
       cardano: 'Cardano',
       dogecoin: 'Dogecoin',
-      polkadot: 'Polkadot',
-      'avalanche-2': 'Avalanche'
+      'avalanche-2': 'Avalanche',
+      tron: 'Tron',
+      polkadot: 'Polkadot'
     }
     
     // 1. 가격 데이터 가져오기
@@ -767,7 +799,7 @@ app.get('/api/ai-forecast', async (c) => {
     // 언어별 프롬프트 설정
     const languagePrompts: Record<string, any> = {
       ko: {
-        systemRole: '당신은 경력 10년 이상의 전문 암호화폐 애널리스트입니다. 데이터 기반의 상세하고 정확한 분석을 제공하며, reasoning은 반드시 100자 이상이어야 합니다. 항상 JSON 형식으로만 응답하며, 구체적인 수치와 근거를 반드시 포함합니다. 모든 응답은 한국어로 작성합니다.',
+        systemRole: '당신은 경력 10년 이상의 전문 암호화폐 애널리스트입니다. 데이터 기반의 매우 상세하고 심층적인 분석을 제공해야 합니다. reasoning은 반드시 500자 이상이어야 하며, 기술적/거시경제적 관점을 모두 포함해야 합니다. 항상 JSON 형식으로만 응답하며, 구체적인 수치와 근거를 반드시 포함합니다. 모든 응답은 한국어로 작성합니다.',
         intro: '당신은 경력 10년 이상의 전문 암호화폐 애널리스트입니다. 다음 시장 데이터를 바탕으로',
         outlookLabels: { bullish: '상승', bearish: '하락', neutral: '중립' },
         sections: {
@@ -775,7 +807,7 @@ app.get('/api/ai-forecast', async (c) => {
           recentNews: '최근 암호화폐 뉴스',
           requiredAnalysis: '필수 분석 사항 (반드시 모두 포함)',
           outlookCriteria: '전망 결정 기준',
-          reasoning: '근거 설명 (필수 2-3문장, 100자 이상)',
+          reasoning: '상세 분석 (필수 500자 이상, 다각도 분석)',
           confidence: '신뢰도 (1-100)',
           advice: '투자 조언 (필수 1-2문장)'
         }
@@ -923,33 +955,48 @@ ${lang === 'ko' ? 'JSON 형식으로만 응답해주세요' : lang === 'en' ? 'R
 }`
 
       try {
-        // OpenAI API 사용 (GPT-5.2 - 2025년 12월 최신 모델)
+        // OpenAI API 사용 (GPT-5.2 우선 시도, 실패 시 GPT-4o 폴백)
         const apiKey = c.env.OPENAI_API_KEY
         if (!apiKey) {
-          throw new Error('OPENAI_API_KEY not configured')
+          console.error('OPENAI_API_KEY is missing in env')
+          throw new Error('API 키가 설정되지 않았습니다.')
         }
         
-        const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-          },
-          body: JSON.stringify({
-            model: 'gpt-5.2',
-            messages: [
-              { role: 'system', content: langConfig.systemRole },
-              { role: 'user', content: prompt }
-            ],
-            temperature: 0.3,
-            max_completion_tokens: 700
+        const callOpenAI = async (model: string) => {
+          return await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+              model: model,
+              messages: [
+                { role: 'system', content: langConfig.systemRole },
+                { role: 'user', content: prompt }
+              ],
+              temperature: 0.3,
+              max_tokens: 2000 
+            })
           })
-        })
+        }
+        
+        // 1차 시도: GPT-5.2 (사용자 요청)
+        let openaiResponse = await callOpenAI('gpt-5.2')
         
         if (!openaiResponse.ok) {
           const errorText = await openaiResponse.text()
-          console.error('OpenAI API error:', openaiResponse.status, errorText)
-          throw new Error(`AI 분석 실패: ${openaiResponse.status}`)
+          console.warn(`GPT-5.2 failed (${openaiResponse.status}): ${errorText.substring(0, 100)}`)
+          console.log('Trying fallback to gpt-4o...')
+          
+          // 2차 시도: GPT-4o (Fallback)
+          openaiResponse = await callOpenAI('gpt-4o')
+          
+          if (!openaiResponse.ok) {
+             const fallbackError = await openaiResponse.text()
+             console.error('OpenAI API error (Fallback):', openaiResponse.status, fallbackError)
+             throw new Error(`AI 분석 실패: ${openaiResponse.status}`)
+          }
         }
         
         const aiResult = await openaiResponse.json()
@@ -1265,7 +1312,7 @@ app.get('/', (c) => {
             onmouseout="this.style.background='rgba(251, 146, 60, 0.2)'; this.style.transform='translateY(0)'"
           >
             <i class="fas fa-blog" style={{fontSize: '1.1rem'}}></i>
-            <span id="navPortfolio">{t.navPortfolio}</span>
+            <span id="navBlog">{t.navBlog}</span>
           </button>
         </div>
       </nav>
@@ -1314,32 +1361,12 @@ app.get('/', (c) => {
         <div class="loading">데이터 로딩 중...</div>
       </main>
       
-      {/* 광고 영역 3: 하단 배너 (페이지 맨 아래) - 데스크톱용 */}
-      <div class="ad-container ad-bottom ad-desktop-only" style={{marginTop: '2rem', marginBottom: '3rem'}}>
+      {/* 광고 영역 3: 하단 배너 (페이지 맨 아래) */}
+      <div class="ad-container ad-bottom" style={{marginTop: '2rem', marginBottom: '3rem'}}>
         <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998', pointerEvents: 'auto'}}>
           <iframe 
             data-aa='2421971' 
             src='//acceptable.a-ads.com/2421971/?size=Adaptive'
-            style={{
-              border: '0',
-              padding: '0',
-              width: '70%',
-              height: 'auto',
-              overflow: 'hidden',
-              display: 'block',
-              margin: 'auto',
-              pointerEvents: 'auto'
-            }}
-          />
-        </div>
-      </div>
-      
-      {/* 모바일 전용 광고 - 하단 (A-Ads) */}
-      <div class="ad-banner-mobile ad-mobile-bottom">
-        <div id="frame" style={{width: '100%', margin: 'auto', position: 'relative', zIndex: '99998', pointerEvents: 'auto'}}>
-          <iframe 
-            data-aa='2422071' 
-            src='//acceptable.a-ads.com/2422071/?size=Adaptive'
             style={{
               border: '0',
               padding: '0',
@@ -1432,51 +1459,24 @@ app.get('/', (c) => {
           </div>
           <div class="portfolio-form">
             <input type="hidden" id="portfolioCoinId" />
-            
             <div class="form-group">
-              <label for="portfolioAmount" id="portfolioAmountLabel">
-                <i class="fas fa-coins"></i> 보유 수량
-              </label>
-              <input 
-                type="number" 
-                id="portfolioAmount" 
-                placeholder="0.0000" 
-                step="0.0001"
-                oninput="onPortfolioInputChange()"
-              />
+              <label for="portfolioAmount" id="portfolioAmountLabel"><i class="fas fa-coins"></i> 보유 수량</label>
+              <input type="number" id="portfolioAmount" step="any" placeholder="예: 0.5" oninput="onPortfolioInputChange()" />
             </div>
-            
             <div class="form-group">
-              <label for="portfolioAvgPrice" id="portfolioAvgPriceLabel">
-                <i class="fas fa-dollar-sign"></i> 평균 매수가 (USD)
-              </label>
-              <input 
-                type="number" 
-                id="portfolioAvgPrice" 
-                placeholder="0.00" 
-                step="0.01"
-                oninput="onPortfolioInputChange()"
-              />
+              <label for="portfolioAvgPrice" id="portfolioAvgPriceLabel"><i class="fas fa-dollar-sign"></i> 평균 매수가 (USD)</label>
+              <input type="number" id="portfolioAvgPrice" step="any" placeholder="예: 50000" oninput="onPortfolioInputChange()" />
             </div>
-            
-            <div class="form-group">
-              <label id="portfolioCurrentPriceLabel">
-                <i class="fas fa-chart-line"></i> 현재가 (USD)
-              </label>
-              <div class="current-price-display" id="currentPrice">-</div>
+            <div class="current-price-info">
+              <label id="portfolioCurrentPriceLabel"><i class="fas fa-chart-line"></i> 현재가:</label>
+              <span id="currentPrice" class="price-value">$0.00</span>
             </div>
-            
-            <div class="profit-calculation" id="profitCalculation">
-              <p class="text-gray-400" id="portfolioPlaceholder">수량과 평균 매수가를 입력하세요.</p>
+            <div id="profitCalculation" class="profit-calculation">
+              <p class="text-gray-400" id="portfolioPlaceholder">수량과 평균 매수가를 입력하세요</p>
             </div>
-            
             <div class="form-actions">
-              <button class="btn-save" onclick="savePortfolioData()" id="portfolioSaveBtn">
-                <i class="fas fa-save"></i> 저장
-              </button>
-              <button class="btn-cancel" onclick="closePortfolioModal()" id="portfolioCancelBtn">
-                취소
-              </button>
+              <button class="btn-cancel" onclick="closePortfolioModal()" id="portfolioCancelBtn">취소</button>
+              <button class="btn-save" onclick="savePortfolioData()" id="portfolioSaveBtn"><i class="fas fa-save"></i> 저장</button>
             </div>
           </div>
         </div>
@@ -1631,7 +1631,33 @@ app.get('/', (c) => {
             </p>
           </div>
           
-          {/* 건너뛰기 버튼 (5초 후 활성화) */}
+          {/* 💙 API 비용 도움 메시지 */}
+          <div style={{
+            textAlign: 'center',
+            padding: '1rem',
+            background: 'rgba(59, 130, 246, 0.1)',
+            borderRadius: '12px',
+            marginBottom: '1rem',
+            border: '1px solid rgba(59, 130, 246, 0.2)'
+          }}>
+            <p style={{
+              margin: '0',
+              color: '#60a5fa',
+              fontSize: '0.9rem',
+              fontWeight: '600'
+            }} id="adHelpMessage">
+              💡 광고 시청은 무료 API 운영에 큰 도움이 됩니다
+            </p>
+            <p style={{
+              margin: '0.5rem 0 0 0',
+              color: '#94a3b8',
+              fontSize: '0.8rem'
+            }}>
+              감사합니다! 🙏
+            </p>
+          </div>
+          
+          {/* 건너뛰기 버튼 */}
           <button 
             id="skipAdBtn"
             onclick="closeAdModal()" 
@@ -1649,7 +1675,7 @@ app.get('/', (c) => {
               transition: 'all 0.2s ease'
             }}
           >
-            <span id="skipBtnText">건너뛰기 (5초 대기...)</span>
+            <span id="skipBtnText">5초 대기 중...</span>
           </button>
         </div>
       </div>
@@ -2073,6 +2099,12 @@ app.get('/', (c) => {
   )
 })
 
+// 거래소 가격 캐시 (30초)
+const exchangePriceCache = {
+  data: {} as Record<string, { data: any, timestamp: number }>,
+  ttl: 30000 // 30초
+}
+
 // 🌍 국가별 거래소 가격 API
 // 각 국가별로 여러 거래소의 가격을 모두 보여줌 (거래소마다 가격이 다름)
 app.get('/api/exchange-prices/:coinSymbol', async (c) => {
@@ -2080,119 +2112,165 @@ app.get('/api/exchange-prices/:coinSymbol', async (c) => {
     const coinSymbol = c.req.param('coinSymbol').toUpperCase()
     const country = c.req.query('country') || 'kr' // kr, us, fr, de, es
     
+    // 캐시 키
+    const cacheKey = `${country}_${coinSymbol}`
+    const now = Date.now()
+    
+    // 캐시 체크
+    if (exchangePriceCache.data[cacheKey] && (now - exchangePriceCache.data[cacheKey].timestamp) < exchangePriceCache.ttl) {
+      // console.log(`Returning cached exchange prices for ${coinSymbol} (${country})`)
+      return c.json(exchangePriceCache.data[cacheKey].data)
+    }
+    
     const exchanges: any[] = []
     let currency = 'USD'
+    
+    // 타임아웃 래퍼 함수 (5초) - 헤더 추가
+    const fetchWithTimeout = async (url: string, timeout = 5000) => {
+      const controller = new AbortController()
+      const id = setTimeout(() => controller.abort(), timeout)
+      try {
+        const response = await fetch(url, { 
+          signal: controller.signal,
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+          }
+        })
+        clearTimeout(id)
+        return response
+      } catch (error) {
+        clearTimeout(id)
+        throw error
+      }
+    }
     
     switch (country) {
       case 'kr':
         // 🇰🇷 한국: 업비트, 빗썸, 코인원
         currency = 'KRW'
         
-        // 업비트
-        try {
-          const upbitResponse = await fetch(`https://api.upbit.com/v1/ticker?markets=KRW-${coinSymbol}`)
-          const upbitData = await upbitResponse.json()
-          if (upbitData.length > 0 && !upbitData[0].error) {
-            exchanges.push({
-              name: '업비트',
-              price: upbitData[0].trade_price,
-              change24h: upbitData[0].signed_change_rate * 100,
-              volume24h: upbitData[0].acc_trade_price_24h
-            })
-          }
-        } catch (error) {
-          console.error('Upbit API error:', error)
-        }
-        
-        // 빗썸
-        try {
-          const bithumbResponse = await fetch(`https://api.bithumb.com/public/ticker/${coinSymbol}_KRW`)
-          const bithumbData = await bithumbResponse.json()
-          if (bithumbData.status === '0000' && bithumbData.data) {
-            exchanges.push({
-              name: '빗썸',
-              price: parseFloat(bithumbData.data.closing_price),
-              change24h: parseFloat(bithumbData.data.fluctate_rate_24H),
-              volume24h: parseFloat(bithumbData.data.acc_trade_value_24H)
-            })
-          }
-        } catch (error) {
-          console.error('Bithumb API error:', error)
-        }
-        
-        // 코인원
-        try {
-          const coinoneResponse = await fetch(`https://api.coinone.co.kr/ticker/?currency=${coinSymbol.toLowerCase()}`)
-          const coinoneData = await coinoneResponse.json()
-          if (coinoneData.result === 'success') {
-            const currentPrice = parseFloat(coinoneData.last)
-            const yesterdayPrice = parseFloat(coinoneData.yesterday_last)
-            const change24h = yesterdayPrice > 0 ? ((currentPrice - yesterdayPrice) / yesterdayPrice) * 100 : 0
-            
-            exchanges.push({
-              name: '코인원',
-              price: currentPrice,
-              change24h: change24h,
-              volume24h: parseFloat(coinoneData.volume) * currentPrice
-            })
-          }
-        } catch (error) {
-          console.error('Coinone API error:', error)
-        }
+        // 병렬 요청으로 속도 개선
+        await Promise.all([
+          // 업비트
+          (async () => {
+            try {
+              const upbitResponse = await fetchWithTimeout(`https://api.upbit.com/v1/ticker?markets=KRW-${coinSymbol}`)
+              const upbitData = await upbitResponse.json()
+              if (upbitData.length > 0 && !upbitData[0].error) {
+                exchanges.push({
+                  name: '업비트',
+                  price: upbitData[0].trade_price,
+                  change24h: upbitData[0].signed_change_rate * 100,
+                  volume24h: upbitData[0].acc_trade_price_24h
+                })
+              }
+            } catch (error) {
+              // console.error('Upbit API error:', error)
+            }
+          })(),
+          
+          // 빗썸
+          (async () => {
+            try {
+              const bithumbResponse = await fetchWithTimeout(`https://api.bithumb.com/public/ticker/${coinSymbol}_KRW`)
+              const bithumbData = await bithumbResponse.json()
+              if (bithumbData.status === '0000' && bithumbData.data) {
+                exchanges.push({
+                  name: '빗썸',
+                  price: parseFloat(bithumbData.data.closing_price),
+                  change24h: parseFloat(bithumbData.data.fluctate_rate_24H),
+                  volume24h: parseFloat(bithumbData.data.acc_trade_value_24H)
+                })
+              }
+            } catch (error) {
+              // console.error('Bithumb API error:', error)
+            }
+          })(),
+          
+          // 코인원
+          (async () => {
+            try {
+              const coinoneResponse = await fetchWithTimeout(`https://api.coinone.co.kr/ticker/?currency=${coinSymbol.toLowerCase()}`)
+              const coinoneData = await coinoneResponse.json()
+              if (coinoneData.result === 'success') {
+                const currentPrice = parseFloat(coinoneData.last)
+                const yesterdayPrice = parseFloat(coinoneData.yesterday_last)
+                const change24h = yesterdayPrice > 0 ? ((currentPrice - yesterdayPrice) / yesterdayPrice) * 100 : 0
+                
+                exchanges.push({
+                  name: '코인원',
+                  price: currentPrice,
+                  change24h: change24h,
+                  volume24h: parseFloat(coinoneData.volume) * currentPrice
+                })
+              }
+            } catch (error) {
+              // console.error('Coinone API error:', error)
+            }
+          })()
+        ])
         break
         
       case 'us':
         // 🇺🇸 미국: Coinbase, Kraken, Gemini
         currency = 'USD'
         
-        // Coinbase
-        try {
-          const coinbaseResponse = await fetch(`https://api.coinbase.com/v2/prices/${coinSymbol}-USD/spot`)
-          const coinbaseData = await coinbaseResponse.json()
-          if (coinbaseData.data) {
-            exchanges.push({
-              name: 'Coinbase',
-              price: parseFloat(coinbaseData.data.amount)
-            })
-          }
-        } catch (error) {
-          console.error('Coinbase API error:', error)
-        }
-        
-        // Kraken (USD)
-        try {
-          const krakenResponse = await fetch(`https://api.kraken.com/0/public/Ticker?pair=${coinSymbol}USD`)
-          const krakenData = await krakenResponse.json()
-          if (krakenData.result) {
-            const pairKey = Object.keys(krakenData.result)[0]
-            if (pairKey) {
-              const data = krakenData.result[pairKey]
-              exchanges.push({
-                name: 'Kraken',
-                price: parseFloat(data.c[0]),
-                change24h: parseFloat(data.o) > 0 ? ((parseFloat(data.c[0]) - parseFloat(data.o)) / parseFloat(data.o)) * 100 : 0,
-                volume24h: parseFloat(data.v[1]) * parseFloat(data.c[0])
-              })
+        await Promise.all([
+          // Coinbase
+          (async () => {
+            try {
+              const coinbaseResponse = await fetchWithTimeout(`https://api.coinbase.com/v2/prices/${coinSymbol}-USD/spot`)
+              const coinbaseData = await coinbaseResponse.json()
+              if (coinbaseData.data) {
+                exchanges.push({
+                  name: 'Coinbase',
+                  price: parseFloat(coinbaseData.data.amount)
+                })
+              }
+            } catch (error) {
+              // console.error('Coinbase API error:', error)
             }
-          }
-        } catch (error) {
-          console.error('Kraken API error:', error)
-        }
-        
-        // Gemini
-        try {
-          const geminiResponse = await fetch(`https://api.gemini.com/v1/pubticker/${coinSymbol.toLowerCase()}usd`)
-          const geminiData = await geminiResponse.json()
-          if (geminiData.last) {
-            exchanges.push({
-              name: 'Gemini',
-              price: parseFloat(geminiData.last),
-              volume24h: parseFloat(geminiData.volume?.USD || 0)
-            })
-          }
-        } catch (error) {
-          console.error('Gemini API error:', error)
-        }
+          })(),
+          
+          // Kraken (USD)
+          (async () => {
+            try {
+              const krakenResponse = await fetchWithTimeout(`https://api.kraken.com/0/public/Ticker?pair=${coinSymbol}USD`)
+              const krakenData = await krakenResponse.json()
+              if (krakenData.result) {
+                const pairKey = Object.keys(krakenData.result)[0]
+                if (pairKey) {
+                  const data = krakenData.result[pairKey]
+                  exchanges.push({
+                    name: 'Kraken',
+                    price: parseFloat(data.c[0]),
+                    change24h: parseFloat(data.o) > 0 ? ((parseFloat(data.c[0]) - parseFloat(data.o)) / parseFloat(data.o)) * 100 : 0,
+                    volume24h: parseFloat(data.v[1]) * parseFloat(data.c[0])
+                  })
+                }
+              }
+            } catch (error) {
+              // console.error('Kraken API error:', error)
+            }
+          })(),
+          
+          // Gemini
+          (async () => {
+            try {
+              const geminiResponse = await fetchWithTimeout(`https://api.gemini.com/v1/pubticker/${coinSymbol.toLowerCase()}usd`)
+              const geminiData = await geminiResponse.json()
+              if (geminiData.last) {
+                exchanges.push({
+                  name: 'Gemini',
+                  price: parseFloat(geminiData.last),
+                  volume24h: parseFloat(geminiData.volume?.USD || 0)
+                })
+              }
+            } catch (error) {
+              // console.error('Gemini API error:', error)
+            }
+          })()
+        ])
         break
         
       case 'fr':
@@ -2201,56 +2279,99 @@ app.get('/api/exchange-prices/:coinSymbol', async (c) => {
         // 🇪🇺 유럽: Bitstamp, Kraken, Coinbase (EUR)
         currency = 'EUR'
         
-        // Bitstamp
-        try {
-          const bitstampResponse = await fetch(`https://www.bitstamp.net/api/v2/ticker/${coinSymbol.toLowerCase()}eur/`)
-          const bitstampData = await bitstampResponse.json()
-          if (bitstampData.last) {
-            exchanges.push({
-              name: 'Bitstamp',
-              price: parseFloat(bitstampData.last),
-              change24h: parseFloat(bitstampData.open) > 0 ? ((parseFloat(bitstampData.last) - parseFloat(bitstampData.open)) / parseFloat(bitstampData.open)) * 100 : 0,
-              volume24h: parseFloat(bitstampData.volume) * parseFloat(bitstampData.last)
-            })
-          }
-        } catch (error) {
-          console.error('Bitstamp API error:', error)
-        }
-        
-        // Kraken (EUR)
-        try {
-          const krakenResponse = await fetch(`https://api.kraken.com/0/public/Ticker?pair=${coinSymbol}EUR`)
-          const krakenData = await krakenResponse.json()
-          if (krakenData.result) {
-            const pairKey = Object.keys(krakenData.result)[0]
-            if (pairKey) {
-              const data = krakenData.result[pairKey]
-              exchanges.push({
-                name: 'Kraken',
-                price: parseFloat(data.c[0]),
-                change24h: parseFloat(data.o) > 0 ? ((parseFloat(data.c[0]) - parseFloat(data.o)) / parseFloat(data.o)) * 100 : 0,
-                volume24h: parseFloat(data.v[1]) * parseFloat(data.c[0])
-              })
+        await Promise.all([
+          // Bitstamp
+          (async () => {
+            try {
+              const bitstampResponse = await fetchWithTimeout(`https://www.bitstamp.net/api/v2/ticker/${coinSymbol.toLowerCase()}eur/`)
+              const bitstampData = await bitstampResponse.json()
+              if (bitstampData.last) {
+                exchanges.push({
+                  name: 'Bitstamp',
+                  price: parseFloat(bitstampData.last),
+                  change24h: parseFloat(bitstampData.open) > 0 ? ((parseFloat(bitstampData.last) - parseFloat(bitstampData.open)) / parseFloat(bitstampData.open)) * 100 : 0,
+                  volume24h: parseFloat(bitstampData.volume) * parseFloat(bitstampData.last)
+                })
+              }
+            } catch (error) {
+              // console.error('Bitstamp API error:', error)
             }
-          }
-        } catch (error) {
-          console.error('Kraken API error:', error)
-        }
-        
-        // Coinbase (EUR)
-        try {
-          const coinbaseResponse = await fetch(`https://api.coinbase.com/v2/prices/${coinSymbol}-EUR/spot`)
-          const coinbaseData = await coinbaseResponse.json()
-          if (coinbaseData.data) {
+          })(),
+          
+          // Kraken (EUR)
+          (async () => {
+            try {
+              const krakenResponse = await fetchWithTimeout(`https://api.kraken.com/0/public/Ticker?pair=${coinSymbol}EUR`)
+              const krakenData = await krakenResponse.json()
+              if (krakenData.result) {
+                const pairKey = Object.keys(krakenData.result)[0]
+                if (pairKey) {
+                  const data = krakenData.result[pairKey]
+                  exchanges.push({
+                    name: 'Kraken',
+                    price: parseFloat(data.c[0]),
+                    change24h: parseFloat(data.o) > 0 ? ((parseFloat(data.c[0]) - parseFloat(data.o)) / parseFloat(data.o)) * 100 : 0,
+                    volume24h: parseFloat(data.v[1]) * parseFloat(data.c[0])
+                  })
+                }
+              }
+            } catch (error) {
+              // console.error('Kraken API error:', error)
+            }
+          })(),
+          
+          // Coinbase (EUR)
+          (async () => {
+            try {
+              const coinbaseResponse = await fetchWithTimeout(`https://api.coinbase.com/v2/prices/${coinSymbol}-EUR/spot`)
+              const coinbaseData = await coinbaseResponse.json()
+              if (coinbaseData.data) {
+                exchanges.push({
+                  name: 'Coinbase',
+                  price: parseFloat(coinbaseData.data.amount)
+                })
+              }
+            } catch (error) {
+              // console.error('Coinbase API error:', error)
+            }
+          })()
+        ])
+        break
+    }
+    
+    // 🇰🇷 한국인데 데이터가 없는 경우 (특히 스테이블코인) Fallback
+    if (country === 'kr' && exchanges.length === 0 && (coinSymbol === 'USDT' || coinSymbol === 'USDC')) {
+      try {
+        const id = coinSymbol === 'USDT' ? 'tether' : 'usd-coin'
+        const response = await fetch(`${COINGECKO_API_URL}/simple/price?ids=${id}&vs_currencies=krw`)
+        if (response.ok) {
+          const data = await response.json()
+          const price = data[id]?.krw
+          if (price) {
             exchanges.push({
-              name: 'Coinbase',
-              price: parseFloat(coinbaseData.data.amount)
+              name: 'Global Avg',
+              price: price,
+              change24h: 0
             })
           }
-        } catch (error) {
-          console.error('Coinbase API error:', error)
         }
-        break
+      } catch (e) {
+        console.error('Fallback fetch failed:', e)
+      }
+    }
+    
+    // 정렬 (가격 내림차순) - 항상 일관된 순서 보장
+    if (exchanges.length > 0) {
+      exchanges.sort((a, b) => b.price - a.price)
+    }
+    
+    // 결과 생성
+    const result = {
+      coinSymbol,
+      country,
+      currency,
+      exchanges,
+      summary: null as any
     }
     
     if (exchanges.length > 0) {
@@ -2260,27 +2381,28 @@ app.get('/api/exchange-prices/:coinSymbol', async (c) => {
       const maxPrice = Math.max(...prices)
       const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length
       const priceSpread = maxPrice - minPrice
-      const spreadPercent = (priceSpread / avgPrice) * 100
+      const spreadPercent = avgPrice > 0 ? (priceSpread / avgPrice) * 100 : 0
       
-      return c.json({
-        coinSymbol,
-        country,
-        currency,
-        exchanges,
-        summary: {
-          minPrice,
-          maxPrice,
-          avgPrice,
-          priceSpread,
-          spreadPercent: parseFloat(spreadPercent.toFixed(2))
-        }
-      })
+      result.summary = {
+        minPrice,
+        maxPrice,
+        avgPrice,
+        priceSpread,
+        spreadPercent: parseFloat(spreadPercent.toFixed(2))
+      }
+    }
+    
+    // 캐시 저장
+    exchangePriceCache.data[cacheKey] = {
+      data: result,
+      timestamp: now
+    }
+    
+    if (exchanges.length > 0) {
+      return c.json(result)
     } else {
-      return c.json({ 
-        error: '거래소 가격을 가져올 수 없습니다.',
-        coinSymbol,
-        country
-      }, 404)
+      // 데이터가 없어도 에러 대신 빈 결과 반환 (캐시된 걸로 처리)
+      return c.json(result)
     }
   } catch (error) {
     console.error('Exchange price API error:', error)
@@ -2854,23 +2976,110 @@ app.get('/faq', (c) => {
   `)
 })
 
-// 📝 블로그 목록 페이지 (로컬 데이터 사용)
+// 🔍 SEO: robots.txt
+app.get('/robots.txt', (c) => {
+  return c.text(`User-agent: *
+Allow: /
+Sitemap: https://crypto-darugi.com/sitemap.xml`)
+})
+
+// 📝 블로그 목록 페이지 (로컬/KV 데이터 병합)
 app.get('/blog', async (c) => {
-  const lang = c.req.query('lang') || 'ko'
-  const posts = getAllBlogPosts()
+  const lang = (c.req.query('lang') || 'ko') as string
+  let posts = getAllBlogPosts()
   
-  const i18n = {
+  // KV에서 자동 생성된 글 가져오기
+  try {
+    const { BLOG_KV } = c.env
+    if (BLOG_KV) {
+      const kvListStr = await BLOG_KV.get('blog:list')
+      if (kvListStr) {
+        try {
+          const kvPosts = JSON.parse(kvListStr)
+          if (Array.isArray(kvPosts)) {
+            // 중복 방지 (슬러그 기준) 및 병합
+            const staticSlugs = new Set(posts.map(p => p.slug))
+            const newPosts = kvPosts.filter((p: any) => p && p.slug && !staticSlugs.has(p.slug))
+            posts = [...newPosts, ...posts]
+          }
+        } catch (parseError) {
+          console.error('Failed to parse blog list JSON:', parseError)
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Failed to fetch KV blog list:', e)
+    // KV 에러가 나도 로컬 포스트는 보여줘야 함
+  }
+  
+  // 날짜 내림차순 정렬
+  posts.sort((a, b) => {
+    try {
+      return new Date(b.date).getTime() - new Date(a.date).getTime()
+    } catch {
+      return 0
+    }
+  })
+  
+  // 조회수 가져오기 (비동기 병렬 처리)
+  const viewsMap: Record<string, number> = {}
+  try {
+    const { BLOG_KV } = c.env
+    if (BLOG_KV) {
+      // 병렬 요청으로 속도 개선
+      const viewPromises = posts.map(async (post) => {
+        try {
+          const views = await BLOG_KV.get(`views:${post.slug}`)
+          return { slug: post.slug, views: views ? parseInt(views) : 0 }
+        } catch {
+          return { slug: post.slug, views: 0 }
+        }
+      })
+      
+      const results = await Promise.all(viewPromises)
+      results.forEach(item => {
+        viewsMap[item.slug] = item.views
+      })
+    }
+  } catch (e) {
+    console.error('Failed to fetch views:', e)
+  }
+  
+  const i18n: any = {
     ko: {
-      title: '📝 암호화폐 투자 블로그',
-      subtitle: '실전 투자 노하우와 AI 기반 시장 분석을 공유합니다',
-      backHome: '홈으로 돌아가기',
-      readMore: '자세히 보기'
+      title: '인사이트 블로그',
+      subtitle: '암호화폐 시장의 흐름을 읽는 깊이 있는 분석과 투자 전략',
+      backHome: '메인으로',
+      readMore: '자세히 보기',
+      mins: '분'
     },
     en: {
-      title: '📝 Crypto Investment Blog',
-      subtitle: 'Share practical investment know-how and AI-based market analysis',
-      backHome: 'Back to Home',
-      readMore: 'Read More'
+      title: 'Insight Blog',
+      subtitle: 'In-depth analysis and investment strategies for the crypto market',
+      backHome: 'Home',
+      readMore: 'Read More',
+      mins: 'min'
+    },
+    fr: {
+      title: 'Blog Insights',
+      subtitle: 'Analyses approfondies et stratégies d\'investissement',
+      backHome: 'Accueil',
+      readMore: 'Lire la suite',
+      mins: 'min'
+    },
+    de: {
+      title: 'Insight Blog',
+      subtitle: 'Tiefgehende Analysen und Anlagestrategien',
+      backHome: 'Home',
+      readMore: 'Mehr lesen',
+      mins: 'Min'
+    },
+    es: {
+      title: 'Blog de Insights',
+      subtitle: 'Análisis profundo y estrategias de inversión',
+      backHome: 'Inicio',
+      readMore: 'Leer más',
+      mins: 'min'
     }
   }
   
@@ -2883,73 +3092,181 @@ app.get('/blog', async (c) => {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>${t.title} | Crypto Dashboard</title>
+      <link rel="icon" href="/favicon.svg" type="image/svg+xml">
       <script src="https://cdn.tailwindcss.com"></script>
       <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
       <style>
         body {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          font-family: 'Pretendard', sans-serif;
+          background-color: #0f172a;
+          background-image: 
+            radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+            radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+            radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+          color: #e2e8f0;
           min-height: 100vh;
+        }
+        .glass-card {
+          background: rgba(30, 41, 59, 0.4);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        .glass-card:hover {
+          background: rgba(30, 41, 59, 0.6);
+          border-color: rgba(255, 255, 255, 0.2);
+          transform: translateY(-4px);
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+        .text-gradient {
+          background: linear-gradient(to right, #818cf8, #c084fc, #f472b6);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.8s ease-out forwards;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
       </style>
     </head>
-    <body>
-      <div class="container mx-auto px-4 py-12">
-        <div class="mb-12 text-center">
-          <h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg">
-            ${t.title}
+    <body class="antialiased selection:bg-purple-500 selection:text-white">
+      <!-- 네비게이션 -->
+      <nav class="sticky top-0 z-50 glass-card border-b border-white/10 px-4 py-4 mb-8">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+          <a href="/?lang=${lang}" class="flex items-center gap-2 group">
+            <span class="text-2xl group-hover:scale-110 transition-transform duration-300">💎</span>
+            <span class="font-bold text-xl tracking-tight text-white group-hover:text-purple-300 transition-colors">Crypto Dashboard</span>
+          </a>
+          <button onclick="window.location.href='/?lang=${lang}'" 
+                  class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 border border-white/5">
+            <i class="fas fa-arrow-left"></i> ${t.backHome}
+          </button>
+        </div>
+      </nav>
+
+      <div class="container mx-auto px-4 pb-20 max-w-6xl">
+        <!-- 헤더 섹션 -->
+        <header class="text-center py-16 animate-fade-in">
+          <span class="inline-block px-4 py-1.5 rounded-full bg-purple-500/10 text-purple-300 text-sm font-semibold mb-6 border border-purple-500/20">
+            BLOG & INSIGHTS
+          </span>
+          <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight leading-tight">
+            <span class="text-gradient">Crypto Horizon</span>
           </h1>
-          <p class="text-xl text-white/90">
+          <p class="text-xl md:text-2xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
             ${t.subtitle}
           </p>
-        </div>
+        </header>
 
-        <div class="max-w-4xl mx-auto space-y-6">
-          ${posts.map(post => `
-            <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 hover:bg-white/20 transition-all cursor-pointer" 
-                 onclick="window.location.href='/blog/${post.slug}?lang=${lang}'">
-              <div class="flex items-start gap-4">
-                <div class="text-5xl">📈</div>
-                <div class="flex-1">
-                  <div class="mb-2">
-                    <span class="bg-white/20 text-white px-3 py-1 rounded-full text-sm">${post.category}</span>
-                  </div>
-                  <h2 class="text-2xl font-bold text-white mb-3">${post.title}</h2>
-                  <p class="text-white/80 mb-4">${post.description}</p>
-                  <div class="flex items-center gap-4 text-white/60 text-sm">
-                    <span><i class="far fa-calendar mr-1"></i>${post.date}</span>
-                    <span><i class="far fa-clock mr-1"></i>${post.readTime}</span>
-                  </div>
+        <!-- 블로그 그리드 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+          ${posts.map((post, index) => {
+            // 안전한 접근
+            const category = post?.category?.[lang] || post?.category?.['ko'] || 'General';
+            const title = post?.title?.[lang] || post?.title?.['ko'] || 'Untitled';
+            const description = post?.description?.[lang] || post?.description?.['ko'] || '';
+            const readTime = post?.readTime?.[lang] || post?.readTime?.['ko'] || '5min';
+            const views = viewsMap[post.slug] || 0;
+            const icon = post.slug.includes('guide') ? '📚' : post.slug.includes('market') ? '📊' : '💡';
+            
+            return `
+            <article class="glass-card rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full animate-fade-in" style="animation-delay: ${index * 100}ms">
+              <div class="h-48 bg-gradient-to-br from-slate-700 to-slate-800 relative overflow-hidden group cursor-pointer" onclick="window.location.href='/blog/${post.slug}?lang=${lang}'">
+                <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-300"></div>
+                <div class="absolute top-4 left-4">
+                  <span class="px-3 py-1 bg-black/50 backdrop-blur-sm rounded-lg text-xs font-semibold text-white border border-white/10">
+                    ${category}
+                  </span>
+                </div>
+                <!-- 썸네일 플레이스홀더 (이모지) -->
+                <div class="w-full h-full flex items-center justify-center text-6xl group-hover:scale-110 transition-transform duration-500">
+                  ${icon}
                 </div>
               </div>
-            </div>
-          `).join('')}
-
-          <div class="text-center mt-12">
-            <button onclick="window.location.href='/?lang=${lang}'" 
-                    class="bg-white/20 hover:bg-white/30 text-white font-semibold px-8 py-3 rounded-xl transition-all">
-              <i class="fas fa-home mr-2"></i>${t.backHome}
-            </button>
-          </div>
+              
+              <div class="p-6 flex-1 flex flex-col">
+                <div class="flex items-center gap-2 text-xs text-slate-400 mb-3">
+                  <span><i class="far fa-calendar-alt mr-1"></i>${post.date}</span>
+                  <span class="w-1 h-1 rounded-full bg-slate-500"></span>
+                  <span><i class="far fa-eye mr-1"></i>${views.toLocaleString()}</span>
+                </div>
+                
+                <h2 class="text-xl font-bold text-white mb-3 leading-tight hover:text-purple-400 transition-colors cursor-pointer" onclick="window.location.href='/blog/${post.slug}?lang=${lang}'">
+                  ${title}
+                </h2>
+                
+                <p class="text-slate-400 text-sm mb-6 line-clamp-3 flex-1 leading-relaxed">
+                  ${description}
+                </p>
+                
+                <a href="/blog/${post.slug}?lang=${lang}" class="inline-flex items-center text-purple-400 font-semibold text-sm hover:text-purple-300 transition-colors group">
+                  ${t.readMore} <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform"></i>
+                </a>
+              </div>
+            </article>
+          `}).join('')}
         </div>
+        
+        <!-- 푸터 -->
+        <footer class="mt-24 text-center border-t border-white/5 pt-12 text-slate-500 text-sm">
+          <p>© 2025 Crypto Dashboard. All rights reserved.</p>
+        </footer>
       </div>
     </body>
     </html>
   `)
 })
 
-// 📝 블로그 게시글 상세 페이지 (로컬 데이터 사용)
+// 📝 블로그 게시글 상세 페이지 (로컬/KV 데이터)
 app.get('/blog/:slug', async (c) => {
   const slug = c.req.param('slug')
-  const lang = c.req.query('lang') || 'ko'
-  const post = getBlogPost(slug)
+  const lang = (c.req.query('lang') || 'ko') as string
+  let post = getBlogPost(slug)
+  
+  // 로컬에 없으면 KV에서 확인
+  if (!post) {
+    try {
+      const { BLOG_KV } = c.env
+      if (BLOG_KV) {
+        const kvPostStr = await BLOG_KV.get(`post:${slug}`)
+        if (kvPostStr) {
+          post = JSON.parse(kvPostStr)
+        }
+      }
+    } catch (e) {
+      console.error('Failed to fetch KV blog post:', e)
+    }
+  }
   
   if (!post) {
     return c.html('<h1>게시글을 찾을 수 없습니다.</h1>', 404)
   }
+
+  // 조회수 증가 및 가져오기
+  let views = 0
+  try {
+    const { BLOG_KV } = c.env
+    if (BLOG_KV) {
+      // 조회수 증가
+      const currentViews = await BLOG_KV.get(`views:${slug}`)
+      views = (currentViews ? parseInt(currentViews) : 0) + 1
+      await BLOG_KV.put(`views:${slug}`, views.toString())
+    }
+  } catch (e) {
+    console.error('Failed to update views:', e)
+  }
   
-  const i18n = {
-    ko: { backHome: '홈으로 돌아가기', backBlog: '블로그 목록' },
-    en: { backHome: 'Back to Home', backBlog: 'Blog List' }
+  const i18n: any = {
+    ko: { backHome: '메인으로', backBlog: '목록으로', share: '공유하기' },
+    en: { backHome: 'Home', backBlog: 'Back to List', share: 'Share' },
+    fr: { backHome: 'Accueil', backBlog: 'Retour', share: 'Partager' },
+    de: { backHome: 'Home', backBlog: 'Zurück', share: 'Teilen' },
+    es: { backHome: 'Inicio', backBlog: 'Volver', share: 'Compartir' }
   }
   
   const t = i18n[lang] || i18n.ko
@@ -2960,47 +3277,325 @@ app.get('/blog/:slug', async (c) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>${post.title} | Crypto Dashboard</title>
+      <title>${post.title[lang] || post.title['ko']} | Crypto Dashboard</title>
+      <meta name="description" content="${post.description[lang] || post.description['ko']}">
+      
+      <!-- Open Graph / Social Sharing -->
+      <meta property="og:type" content="article">
+      <meta property="og:title" content="${post.title[lang] || post.title['ko']}">
+      <meta property="og:description" content="${post.description[lang] || post.description['ko']}">
+      <meta property="og:image" content="https://crypto-darugi.com/static/images/crypto-rocket-2026.png">
+      <meta name="twitter:card" content="summary_large_image">
+      <meta name="twitter:title" content="${post.title[lang] || post.title['ko']}">
+      <meta name="twitter:description" content="${post.description[lang] || post.description['ko']}">
+      <meta name="twitter:image" content="https://crypto-darugi.com/static/images/crypto-rocket-2026.png">
+      
       <script src="https://cdn.tailwindcss.com"></script>
       <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
       <style>
         body {
-          background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+          font-family: 'Pretendard', sans-serif;
+          background-color: #0f172a;
+          color: #e2e8f0;
           min-height: 100vh;
+        }
+        .glass-header {
+          background: rgba(15, 23, 42, 0.8);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .content-card {
+          background: rgba(30, 41, 59, 0.3);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Prose Customization for Dark Mode */
+        .prose h1 { color: #f8fafc; font-size: 2.25rem; font-weight: 800; margin-top: 2.5rem; margin-bottom: 1.5rem; letter-spacing: -0.025em; }
+        .prose h2 { color: #f1f5f9; font-size: 1.75rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; }
+        .prose h3 { color: #e2e8f0; font-size: 1.5rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.75rem; }
+        .prose p { color: #cbd5e1; margin-bottom: 1.5rem; line-height: 1.8; font-size: 1.1rem; }
+        .prose ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.5rem; color: #cbd5e1; }
+        .prose li { margin-bottom: 0.5rem; }
+        .prose strong { color: #f8fafc; font-weight: 600; }
+        .prose blockquote { border-left: 4px solid #8b5cf6; padding-left: 1rem; color: #94a3b8; font-style: italic; margin: 2rem 0; background: rgba(139, 92, 246, 0.1); padding: 1rem; border-radius: 0 0.5rem 0.5rem 0; }
+        
+        .animate-slide-up {
+          animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
       </style>
     </head>
-    <body>
-      <div class="container mx-auto px-4 py-12 max-w-4xl">
-        <div class="mb-6 flex gap-2">
-          <button onclick="window.location.href='/blog?lang=${lang}'" 
-                  class="bg-white px-4 py-2 rounded-lg shadow hover:shadow-lg transition">
-            <i class="fas fa-arrow-left mr-2"></i>${t.backBlog}
-          </button>
-          <button onclick="window.location.href='/?lang=${lang}'" 
-                  class="bg-white px-4 py-2 rounded-lg shadow hover:shadow-lg transition">
-            <i class="fas fa-home mr-2"></i>${t.backHome}
-          </button>
+    <body class="antialiased selection:bg-purple-500 selection:text-white">
+      <!-- 헤더 -->
+      <nav class="sticky top-0 z-50 glass-header px-4 py-4">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+          <a href="/blog?lang=${lang}" class="flex items-center gap-2 text-slate-300 hover:text-white transition-colors">
+            <i class="fas fa-arrow-left"></i>
+            <span class="font-medium">${t.backBlog}</span>
+          </a>
+          <a href="/?lang=${lang}" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+            Crypto Dashboard
+          </a>
         </div>
+      </nav>
 
-        <article class="bg-white rounded-2xl shadow-xl p-8">
-          <div class="mb-6">
-            <span class="bg-purple-100 text-purple-700 px-4 py-2 rounded-full font-semibold">${post.category}</span>
+      <div class="container mx-auto px-4 py-12 max-w-4xl">
+        <article class="animate-slide-up">
+          <!-- 게시글 헤더 -->
+          <header class="mb-12 text-center">
+            <div class="flex items-center justify-center gap-3 mb-6">
+              <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm font-semibold border border-purple-500/30">
+                ${post?.category?.[lang] || post?.category?.['ko'] || 'General'}
+              </span>
+              <span class="text-slate-500 text-sm">•</span>
+              <span class="text-slate-400 text-sm"><i class="far fa-calendar-alt mr-1"></i> ${post.date}</span>
+              <span class="text-slate-500 text-sm">•</span>
+              <span class="text-slate-400 text-sm"><i class="far fa-eye mr-1"></i> ${views.toLocaleString()}</span>
+            </div>
+            
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight">
+              ${post?.title?.[lang] || post?.title?.['ko'] || 'Untitled'}
+            </h1>
+            
+            <p class="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
+              ${post?.description?.[lang] || post?.description?.['ko'] || ''}
+            </p>
+          </header>
+
+          <!-- 썸네일 이미지 -->
+          <div class="w-full h-64 md:h-96 rounded-2xl mb-12 overflow-hidden border border-white/5 shadow-2xl group">
+            <img 
+              src="/static/blog-placeholder.png" 
+              alt="${post?.title?.[lang] || 'Blog Image'}" 
+              class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+            />
           </div>
-          <h1 class="text-4xl font-bold mb-4">${post.title}</h1>
-          <p class="text-xl text-gray-600 mb-6">${post.description}</p>
-          <div class="flex gap-4 text-gray-500 mb-8">
-            <span><i class="far fa-calendar mr-1"></i>${post.date}</span>
-            <span><i class="far fa-clock mr-1"></i>${post.readTime}</span>
+
+          <!-- 본문 콘텐츠 -->
+          <div class="content-card rounded-3xl p-8 md:p-12">
+            <div class="prose prose-lg max-w-none prose-invert">
+              ${(() => {
+                const content = post?.content?.[lang] || 'Content not available.';
+                // 소스 분리 (--- 기준)
+                const parts = content.split('---');
+                const mainContent = parts[0];
+                const sourceContent = parts.length > 1 ? parts[1] : '';
+                
+                let html = mainContent
+                  .split('\n')
+                  .map(line => {
+                    // Markdown Parsing
+                    // **Bold** -> <strong>Bold</strong>
+                    let parsed = line
+                      .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" class="w-full rounded-xl my-8 shadow-lg border border-white/10" />')
+                      .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-bold">$1</strong>')
+                      .replace(/\*(.*?)\*/g, '<em class="text-slate-300">$1</em>');
+                      
+                    if (parsed.startsWith('# ')) return `<h1>${parsed.substring(2)}</h1>`;
+                    if (parsed.startsWith('## ')) return `<h2>${parsed.substring(3)}</h2>`;
+                    if (parsed.startsWith('### ')) return `<h3>${parsed.substring(4)}</h3>`;
+                    if (parsed.startsWith('- ')) return `<li>${parsed.substring(2)}</li>`;
+                    if (parsed.startsWith('> ')) return `<blockquote>${parsed.substring(2)}</blockquote>`;
+                    if (parsed.trim() === '') return '';
+                    return `<p>${parsed}</p>`;
+                  })
+                  .join('');
+                  
+                // 출처 섹션 렌더링
+                if (sourceContent) {
+                  html += `
+                    <div class="mt-16 pt-8 border-t border-white/10">
+                      <div class="bg-slate-800/40 rounded-xl p-6 border border-white/5 hover:bg-slate-800/60 transition-colors">
+                        <h4 class="text-sm font-bold text-purple-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                          <i class="fas fa-quote-left"></i> Sources & References
+                        </h4>
+                        <div class="space-y-2">
+                        ${sourceContent.split('\n').map(line => {
+                           // 출처 내부의 **Bold** 제거 또는 스타일링
+                           let parsed = line.replace(/\*\*(.*?)\*\*/g, '$1').trim(); // 제목의 ** 제거
+                           
+                           // 링크 파싱: [Text](URL) -> <a href="...">Text <i class="..."></i></a>
+                           parsed = parsed.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-purple-400 hover:text-purple-300 transition-colors inline-flex items-center gap-1 border-b border-transparent hover:border-purple-400">$1 <i class="fas fa-external-link-alt text-[10px] opacity-70"></i></a>');
+                           
+                           if (!parsed) return '';
+                           if (parsed.includes('출처') || parsed.includes('Source') || parsed.includes('Quellen') || parsed.includes('Sources') || parsed.includes('Fuentes')) return ''; // "출처:" 라인 자체는 숨김 (헤더로 대체됨)
+                           
+                           if (parsed.startsWith('- ')) {
+                             return `<div class="flex items-start gap-3 text-sm text-slate-400 pl-3 border-l-2 border-slate-700 hover:border-purple-500 transition-colors py-2 group/item">
+                               <i class="fas fa-caret-right mt-1 text-slate-600 group-hover/item:text-purple-500 transition-colors"></i>
+                               <span class="leading-relaxed flex-1">${parsed.substring(2)}</span>
+                             </div>`;
+                           }
+                           return `<div class="text-sm text-slate-400 font-medium py-1 ml-3">${parsed}</div>`;
+                        }).join('')}
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                }
+                
+                return html;
+              })()}
+            </div>
           </div>
-          <div class="prose prose-lg max-w-none">
-            ${post.content.split('\n').map(line => `<p class="mb-4">${line}</p>`).join('')}
+          
+          <!-- 하단 네비게이션 -->
+          <div class="mt-12 flex justify-between items-center border-t border-white/10 pt-8">
+            <a href="/blog?lang=${lang}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+              <i class="fas fa-arrow-left transform group-hover:-translate-x-1 transition-transform"></i>
+              <span class="font-medium">${t.backBlog}</span>
+            </a>
+            <div class="flex gap-4">
+              <button class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white transition-all">
+                <i class="fab fa-twitter"></i>
+              </button>
+              <button class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white transition-all">
+                <i class="fab fa-facebook-f"></i>
+              </button>
+              <button class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white transition-all">
+                <i class="fas fa-link"></i>
+              </button>
+            </div>
           </div>
         </article>
       </div>
     </body>
     </html>
   `)
+})
+
+// 🤖 AI 블로그 자동 생성 (GPT-5.2)
+async function generateDailyPost(env: Bindings) {
+  try {
+    if (!env.OPENAI_API_KEY || !env.BLOG_KV) {
+      console.log('Skipping blog generation: Missing API Key or KV')
+      return
+    }
+    
+    const today = new Date()
+    const dateStr = today.toISOString().split('T')[0]
+    
+    // 주제 선정 (랜덤)
+    const topics = [
+      'Global Crypto Market Analysis & Outlook',
+      'Bitcoin Price Action & Future Trends',
+      'Ethereum Ecosystem & DeFi Growth',
+      'Emerging Altcoins to Watch',
+      'Blockchain Technology Innovations',
+      'Crypto Regulation & Global Policy',
+      'Macroeconomics Impact on Crypto',
+      'NFT Market Trends & Opportunities',
+      'Web3 Gaming & Metaverse Updates'
+    ]
+    const topic = topics[Math.floor(Math.random() * topics.length)]
+    
+    console.log(`Generating daily blog post: ${topic}`)
+    
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-5.2', // User requested GPT-5.2
+        messages: [
+          {
+            role: 'system',
+            content: `You are a world-class crypto journalist. Write a high-quality, insightful blog post about "${topic}" in 5 languages (ko, en, fr, de, es).
+            
+            Requirements:
+            1. Professional tone, accurate data, and deep analysis.
+            2. Minimum 500 words per language.
+            3. Use Markdown formatting (## headers, **bold**, - lists).
+            4. Include "Source: Crypto Dashboard AI Team" at the bottom.
+            5. Date: ${dateStr}
+            
+            Return ONLY valid JSON in this format:
+            {
+              "slug": "slug-based-on-english-title-${dateStr}",
+              "title": { "ko": "...", "en": "...", "fr": "...", "de": "...", "es": "..." },
+              "description": { "ko": "...", "en": "...", "fr": "...", "de": "...", "es": "..." },
+              "content": { "ko": "Markdown...", "en": "...", "fr": "...", "de": "...", "es": "..." },
+              "category": { "ko": "...", "en": "...", "fr": "...", "de": "...", "es": "..." },
+              "readTime": { "ko": "5분", "en": "5 min", "fr": "5 min", "de": "5 Min", "es": "5 min" }
+            }`
+          }
+        ],
+        temperature: 0.7
+      })
+    })
+    
+    if (!response.ok) {
+      throw new Error(`OpenAI API Error: ${response.status}`)
+    }
+    
+    const data = await response.json()
+    const content = data.choices[0].message.content
+    
+    // JSON 파싱 (```json ... ``` 제거)
+    const jsonMatch = content.match(/\{[\s\S]*\}/)
+    
+    if (jsonMatch) {
+      const post = JSON.parse(jsonMatch[0])
+      post.date = dateStr
+      
+      // 1. 전체 글 저장 (KV: post:slug)
+      await env.BLOG_KV.put(`post:${post.slug}`, JSON.stringify(post))
+      
+      // 2. 목록 업데이트 (KV: blog:list)
+      const listStr = await env.BLOG_KV.get('blog:list')
+      let list = listStr ? JSON.parse(listStr) : []
+      
+      // 메타데이터만 저장 (content 제외)
+      const meta = { ...post }
+      delete meta.content
+      
+      // 중복 체크
+      const exists = list.find((p: any) => p.slug === post.slug)
+      if (!exists) {
+        list.unshift(meta) // 최신순 추가
+        // 최대 50개 유지
+        if (list.length > 50) list = list.slice(0, 50)
+        await env.BLOG_KV.put('blog:list', JSON.stringify(list))
+      }
+      
+      console.log(`✅ Blog post generated and saved: ${post.slug}`)
+    }
+  } catch (error) {
+    console.error('Failed to generate daily blog post:', error)
+  }
+}
+
+// 🛠️ 봇 수동 실행 API (테스트용)
+app.get('/api/bot/run', async (c) => {
+  const secret = c.req.query('secret')
+  if (secret !== 'crypto-bot-manual-run-key-2025') {
+    return c.text('Unauthorized', 401)
+  }
+  
+  const { env } = c
+  if (!env.TWITTER_API_KEY) {
+    return c.text('Missing Twitter Keys', 500)
+  }
+  
+  c.executionCtx.waitUntil(
+    runCryptoBot({
+      TWITTER_API_KEY: env.TWITTER_API_KEY,
+      TWITTER_API_SECRET: env.TWITTER_API_SECRET!,
+      TWITTER_ACCESS_TOKEN: env.TWITTER_ACCESS_TOKEN!,
+      TWITTER_ACCESS_SECRET: env.TWITTER_ACCESS_SECRET!,
+      OPENAI_API_KEY: env.OPENAI_API_KEY!,
+    })
+  )
+  
+  return c.text('Bot triggered successfully!')
 })
 
 // Cloudflare Cron Trigger (매일 자동 실행)
@@ -3012,11 +3607,14 @@ export default {
     console.log(`실행 시간: ${new Date(event.scheduledTime).toISOString()}`)
     
     try {
-      // 환경 변수 확인
-      if (!env.TWITTER_API_KEY || !env.OPENAI_API_KEY) {
-        console.error('❌ 환경 변수가 설정되지 않았습니다.')
+      // 환경 변수 확인 (트위터 키만 필수)
+      if (!env.TWITTER_API_KEY) {
+        console.error('❌ 트위터 API 키가 설정되지 않았습니다.')
         return
       }
+
+      // 2. 블로그 자동 생성 (GPT-5.2)
+      ctx.waitUntil(generateDailyPost(env))
 
       ctx.waitUntil(
         runCryptoBot({
