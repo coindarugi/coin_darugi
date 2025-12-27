@@ -1130,19 +1130,19 @@ app.get('/', (c) => {
           
           {/* 언어 선택 */}
           <div class="language-selector" role="navigation" aria-label="언어 선택">
-            <button onclick="window.location.href='/?lang=ko'" class="lang-btn ${lang === 'ko' ? 'active' : ''}" data-lang="ko" title="한국어" aria-label="한국어로 변경">
+            <button onclick="window.location.href='/?lang=ko'" class={`lang-btn ${lang === 'ko' ? 'active' : ''}`} data-lang="ko" title="한국어" aria-label="한국어로 변경">
               <span class="fi fi-kr" role="img" aria-label="한국 국기"></span>
             </button>
-            <button onclick="window.location.href='/?lang=en'" class="lang-btn ${lang === 'en' ? 'active' : ''}" data-lang="en" title="English" aria-label="Change to English">
+            <button onclick="window.location.href='/?lang=en'" class={`lang-btn ${lang === 'en' ? 'active' : ''}`} data-lang="en" title="English" aria-label="Change to English">
               <span class="fi fi-us" role="img" aria-label="US flag"></span>
             </button>
-            <button onclick="window.location.href='/?lang=fr'" class="lang-btn ${lang === 'fr' ? 'active' : ''}" data-lang="fr" title="Français" aria-label="Changer en français">
+            <button onclick="window.location.href='/?lang=fr'" class={`lang-btn ${lang === 'fr' ? 'active' : ''}`} data-lang="fr" title="Français" aria-label="Changer en français">
               <span class="fi fi-fr" role="img" aria-label="Drapeau français"></span>
             </button>
-            <button onclick="window.location.href='/?lang=de'" class="lang-btn ${lang === 'de' ? 'active' : ''}" data-lang="de" title="Deutsch" aria-label="Auf Deutsch ändern">
+            <button onclick="window.location.href='/?lang=de'" class={`lang-btn ${lang === 'de' ? 'active' : ''}`} data-lang="de" title="Deutsch" aria-label="Auf Deutsch ändern">
               <span class="fi fi-de" role="img" aria-label="Deutsche Flagge"></span>
             </button>
-            <button onclick="window.location.href='/?lang=es'" class="lang-btn ${lang === 'es' ? 'active' : ''}" data-lang="es" title="Español" aria-label="Cambiar a español">
+            <button onclick="window.location.href='/?lang=es'" class={`lang-btn ${lang === 'es' ? 'active' : ''}`} data-lang="es" title="Español" aria-label="Cambiar a español">
               <span class="fi fi-es" role="img" aria-label="Bandera española"></span>
             </button>
           </div>
