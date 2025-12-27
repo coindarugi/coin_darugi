@@ -320,28 +320,194 @@ function saveSelectedCoins() {
 
 // 코인 선택 토글
 function toggleCoin(coinId, coinName, coinSymbol) {
+  console.log('🔥 toggleCoin 호출:', coinId, coinName, coinSymbol);
+  
   const index = selectedCoins.indexOf(coinId);
+  const wasAdded = index === -1; // 추가되었는지 확인
+  
+  console.log('현재 selectedCoins:', selectedCoins);
+  console.log('wasAdded:', wasAdded);
+  
   if (index > -1) {
     // 최소 1개는 선택되어야 함
     if (selectedCoins.length > 1) {
       selectedCoins.splice(index, 1);
+      console.log('✅ 코인 제거:', coinId);
     } else {
       alert(t('minOneCoinRequired'));
       return;
     }
   } else {
     selectedCoins.push(coinId);
+    console.log('✅ 코인 추가:', coinId);
   }
   saveSelectedCoins();
   
-  // Top 100 브라우저가 열려있으면 모달만 다시 로드 (페이지 전체 리로드 없이)
+  console.log('업데이트된 selectedCoins:', selectedCoins);
+  
+  // Top 100 브라우저가 열려있으면 모달 업데이트
   const coinBrowserModal = document.getElementById('coinBrowserModal');
   if (coinBrowserModal && coinBrowserModal.style.display === 'flex') {
-    // 모달이 열려있으면 모달만 업데이트
     showCoinBrowser();
+  }
+  
+  // 대시보드 업데이트
+  if (wasAdded) {
+    // 코인 추가: 해당 코인만 추가
+    console.log('🚀 addCoinToDashboard 호출:', coinId);
+    addCoinToDashboard(coinId);
   } else {
-    // 모달이 닫혀있으면 페이지 전체 리로드
-    loadPrices();
+    // 코인 제거: 해당 코인만 제거
+    console.log('🗑️ removeCoinFromDashboard 호출:', coinId);
+    removeCoinFromDashboard(coinId);
+  }
+}
+
+// 대시보드에 코인 추가 (페이지 새로고침 없이)
+async function addCoinToDashboard(coinId) {
+  console.log('🚀 addCoinToDashboard 시작:', coinId);
+  
+  try {
+    // 가격 데이터 가져오기
+    console.log('📡 API 요청:', `/api/prices?coins=${coinId}`);
+    const response = await axios.get(`/api/prices?coins=${coinId}`);
+    const prices = response.data;
+    
+    console.log('📊 API 응답:', prices);
+    
+    if (!prices[coinId]) {
+      console.error('❌ 코인 데이터를 가져올 수 없습니다:', coinId);
+      return;
+    }
+    
+    const data = prices[coinId];
+    console.log('💰 코인 데이터:', data);
+    const change = data.usd_24h_change || 0;
+    const marketCapKRW = data.krw_market_cap || 0;
+    const volume24h = data.usd_24h_vol || 0;
+    
+    // 코인 이름
+    let coinName = coinId.charAt(0).toUpperCase() + coinId.slice(1);
+    let coinSymbol = coinId.toUpperCase();
+    
+    const isFavorite = favoriteCoins.includes(coinId);
+    
+    // 김치 프리미엄 (한국어일 때만)
+    let kimchiPremiumHTML = '';
+    if (currentLang === 'ko') {
+      // 간단히 빈 값으로 시작 (나중에 로드)
+      kimchiPremiumHTML = `
+        <div class="kimchi-premium" style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(139, 92, 246, 0.1); border-radius: 8px;">
+          <div class="kimchi-title" style="font-size: 0.85rem; color: #a78bfa; margin-bottom: 0.25rem; font-weight: 600;">
+            <i class="fas fa-fire"></i> ${t('kimchiPremium')}
+          </div>
+          <div class="kimchi-exchanges" style="font-size: 0.75rem; color: #cbd5e1;">
+            <i class="fas fa-spinner fa-spin"></i> Loading...
+          </div>
+        </div>
+      `;
+    }
+    
+    // 포트폴리오 정보
+    let portfolioHTML = '';
+    if (portfolio[coinId]) {
+      const { amount, avgPrice } = portfolio[coinId];
+      const currentValue = amount * data.usd;
+      const profit = currentValue - (amount * avgPrice);
+      const profitRate = ((profit / (amount * avgPrice)) * 100).toFixed(2);
+      const isProfitable = profit >= 0;
+      
+      portfolioHTML = `
+        <div class="portfolio-info">
+          <div class="portfolio-row">
+            <span>${t('holdings')}:</span>
+            <span>${amount} ${coinSymbol}</span>
+          </div>
+          <div class="portfolio-row portfolio-profit ${isProfitable ? 'text-green-400' : 'text-red-400'}">
+            <span>${t('profitRate')}:</span>
+            <span><strong>${isProfitable ? '+' : ''}${profitRate}%</strong></span>
+          </div>
+        </div>
+      `;
+    }
+    
+    // 코인 카드 HTML
+    const coinCardHTML = `
+      <div class="coin-card ${isFavorite ? 'favorite-coin' : ''}" data-coin-id="${coinId}">
+        <div class="coin-header">
+          <div class="coin-name">
+            <button class="favorite-btn ${isFavorite ? 'active' : ''}" onclick="toggleFavorite('${coinId}')" title="${isFavorite ? t('removeFromFavorites') : t('addToFavorites')}">
+              <i class="${isFavorite ? 'fas' : 'far'} fa-star"></i>
+            </button>
+            ${coinName} (${coinSymbol})
+          </div>
+          <button class="remove-coin-btn" onclick="toggleCoin('${coinId}')" title="${t('removeCoin')}">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="coin-price">
+          ${currentLang === 'ko' ? formatPrice(data.krw, 'krw') : formatPrice(data.usd, 'usd')}
+        </div>
+        <div class="coin-price-krw" style="display: none;">
+          ₩${data.krw ? data.krw.toLocaleString() : 'N/A'}
+        </div>
+        <div class="coin-price-sub">
+          ${currentLang === 'ko' ? formatPrice(data.usd, 'usd') : ''}
+        </div>
+        ${getPriceChangeHTML(change)}
+        ${kimchiPremiumHTML}
+        <div class="market-cap">
+          <i class="fas fa-chart-pie"></i> ${t('marketCap')}: ${formatMarketCap(currentLang === 'ko' ? marketCapKRW : data.usd_market_cap, currentLang === 'ko' ? 'krw' : 'usd')}
+        </div>
+        <div class="volume-info">
+          <i class="fas fa-exchange-alt"></i> ${t('volume24h')}: ${formatMarketCap(volume24h, 'usd')}
+        </div>
+        <div class="exchange-price-info" id="exchange-${coinId}" style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem;">
+          <i class="fas fa-building"></i> ${t('localExchange')}: <span style="color: #3b82f6;">Loading...</span>
+        </div>
+        ${portfolioHTML}
+        <div class="coin-actions">
+          <button class="action-btn" onclick="openChartModal('${coinId}', '${coinName}')">
+            <i class="fas fa-chart-line"></i> ${t('chart')}
+          </button>
+          <button class="action-btn" onclick="openPortfolioModal('${coinId}', '${coinName}', ${data.usd})">
+            <i class="fas fa-wallet"></i> ${t('portfolio')}
+          </button>
+        </div>
+      </div>
+    `;
+    
+    // coin-grid에 추가
+    const coinGrid = document.querySelector('.coin-grid');
+    console.log('🎯 coin-grid 찾기:', coinGrid);
+    
+    if (coinGrid) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = coinCardHTML;
+      coinGrid.appendChild(tempDiv.firstElementChild);
+      
+      console.log('✅ DOM에 코인 카드 추가됨');
+      
+      // 거래소 가격 로드
+      if (currentLang === 'ko' || currentLang === 'en' || currentLang === 'fr' || currentLang === 'de' || currentLang === 'es') {
+        loadExchangePriceForCoin(coinId, currentLang);
+      }
+      
+      console.log(`✅ 코인 추가됨: ${coinId}`);
+    } else {
+      console.error('❌ coin-grid를 찾을 수 없습니다!');
+    }
+  } catch (error) {
+    console.error('코인 추가 실패:', error);
+  }
+}
+
+// 대시보드에서 코인 제거 (페이지 새로고침 없이)
+function removeCoinFromDashboard(coinId) {
+  const coinCard = document.querySelector(`[data-coin-id="${coinId}"]`);
+  if (coinCard) {
+    coinCard.remove();
+    console.log(`✅ 코인 제거됨: ${coinId}`);
   }
 }
 
@@ -565,13 +731,13 @@ function formatMarketCap(value, currency = 'krw') {
 // 가격 변화율 표시
 function getPriceChangeHTML(change) {
   if (!change || isNaN(change)) {
-    return `<span class="price-change">0.00%</span>`;
+    return `<span class="coin-change price-change">0.00%</span>`;
   }
   change = Number(change);
   const isPositive = change >= 0;
   const arrow = isPositive ? '▲' : '▼';
   const className = isPositive ? 'positive' : 'negative';
-  return `<span class="price-change ${className}">${arrow} ${Math.abs(change).toFixed(2)}%</span>`;
+  return `<span class="coin-change price-change ${className}">${arrow} ${Math.abs(change).toFixed(2)}%</span>`;
 }
 
 // 현재 선택된 코인 (차트용)
@@ -1948,7 +2114,7 @@ async function loadPrices() {
       }
       
       coinsHTML += `
-        <div class="coin-card ${isFavorite ? 'favorite-coin' : ''}">
+        <div class="coin-card ${isFavorite ? 'favorite-coin' : ''}" data-coin-id="${coinId}">
           <div class="coin-header">
             <div class="coin-name">
               <button class="favorite-btn ${isFavorite ? 'active' : ''}" onclick="toggleFavorite('${coinId}')" title="${isFavorite ? t('removeFromFavorites') : t('addToFavorites')}">
@@ -1962,6 +2128,9 @@ async function loadPrices() {
           </div>
           <div class="coin-price">
             ${currentLang === 'ko' ? formatPrice(data.krw, 'krw') : formatPrice(data.usd, 'usd')}
+          </div>
+          <div class="coin-price-krw" style="display: none;">
+            ₩${data.krw ? data.krw.toLocaleString() : 'N/A'}
           </div>
           <div class="coin-price-sub">
             ${currentLang === 'ko' ? formatPrice(data.usd, 'usd') : ''}
@@ -2051,6 +2220,65 @@ async function loadPrices() {
 }
 
 // 🌍 국가별 거래소 가격 로드
+// 단일 코인 거래소 가격 로드
+async function loadExchangePriceForCoin(coinId, lang) {
+  const country = countryMapping[lang] || 'us';
+  const coinSymbol = coinSymbolMap[coinId];
+  
+  if (!coinSymbol) return;
+  
+  const exchangeEl = document.getElementById(`exchange-${coinId}`);
+  if (!exchangeEl) return;
+  
+  try {
+    const response = await axios.get(`/api/exchange-prices/${coinSymbol}?country=${country}`);
+    const data = response.data;
+    
+    if (data.exchanges && data.exchanges.length > 0) {
+      let exchangesHTML = '<div style="margin-top: 0.5rem;">';
+      exchangesHTML += `<div style="font-weight: 600; color: #64748b; margin-bottom: 0.25rem;"><i class="fas fa-building"></i> ${t('localExchange')}:</div>`;
+      
+      data.exchanges.forEach((exchange) => {
+        let formattedPrice = '';
+        if (data.currency === 'USD') {
+          formattedPrice = `$${exchange.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        } else if (data.currency === 'EUR') {
+          formattedPrice = `€${exchange.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        } else if (data.currency === 'KRW') {
+          formattedPrice = `₩${exchange.price.toLocaleString('ko-KR', { minimumFractionDigits: 0 })}`;
+        }
+        
+        let changeHTML = '';
+        if (exchange.change24h !== undefined && exchange.change24h !== null) {
+          const changeColor = exchange.change24h >= 0 ? '#10b981' : '#ef4444';
+          const changeIcon = exchange.change24h >= 0 ? '▲' : '▼';
+          changeHTML = `<span style="color: ${changeColor}; font-size: 0.75rem;">${changeIcon} ${Math.abs(exchange.change24h).toFixed(2)}%</span>`;
+        }
+        
+        exchangesHTML += `<div style="display: flex; align-items: center; padding: 0.25rem 0; font-size: 0.85rem; gap: 0.5rem;">`;
+        exchangesHTML += `<span style="color: #94a3b8; min-width: 70px;">${exchange.name}</span>`;
+        exchangesHTML += `<span style="color: #3b82f6; font-weight: 600; min-width: 130px; text-align: right; font-family: 'Courier New', monospace; letter-spacing: 0.02em;">${formattedPrice}</span>`;
+        exchangesHTML += `<span style="min-width: 80px; text-align: right; font-family: 'Courier New', monospace;">${changeHTML}</span>`;
+        exchangesHTML += `</div>`;
+      });
+      
+      if (data.summary && data.summary.spreadPercent > 0) {
+        let spreadColor = data.summary.spreadPercent > 1 ? '#ef4444' : '#64748b';
+        exchangesHTML += `<div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #e2e8f0; font-size: 0.8rem; color: ${spreadColor};">`;
+        exchangesHTML += `<i class="fas fa-chart-line"></i> ${t('priceSpread')}: ${data.summary.spreadPercent.toFixed(2)}%</div>`;
+      }
+      
+      exchangesHTML += '</div>';
+      exchangeEl.innerHTML = exchangesHTML;
+    } else {
+      exchangeEl.innerHTML = `<i class="fas fa-building"></i> ${t('localExchange')}: <span style="color: #94a3b8;">N/A</span>`;
+    }
+  } catch (error) {
+    console.error(`거래소 가격 로드 실패 (${coinId}):`, error);
+    exchangeEl.innerHTML = `<i class="fas fa-building"></i> ${t('localExchange')}: <span style="color: #94a3b8;">N/A</span>`;
+  }
+}
+
 async function loadExchangePrices(coinsData) {
   const country = countryMapping[currentLang] || 'us';
   
@@ -2117,6 +2345,135 @@ async function loadExchangePrices(coinsData) {
   }
 }
 
+// 단일 코인의 거래소 가격 로드
+async function loadExchangePriceForCoin(coinId, lang) {
+  const country = countryMapping[lang] || 'us';
+  const coinSymbol = coinSymbolMap[coinId];
+  
+  if (!coinSymbol) return;
+  
+  const exchangeEl = document.getElementById(`exchange-${coinId}`);
+  if (!exchangeEl) return;
+  
+  try {
+    const response = await axios.get(`/api/exchange-prices/${coinSymbol}?country=${country}`);
+    const data = response.data;
+    
+    if (data.exchanges && data.exchanges.length > 0) {
+      let exchangesHTML = '<div style="margin-top: 0.5rem;">';
+      exchangesHTML += `<div style="font-weight: 600; color: #64748b; margin-bottom: 0.25rem;"><i class="fas fa-building"></i> ${t('localExchange')}:</div>`;
+      
+      data.exchanges.forEach((exchange) => {
+        let formattedPrice = '';
+        if (data.currency === 'USD') {
+          formattedPrice = `$${exchange.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        } else if (data.currency === 'EUR') {
+          formattedPrice = `€${exchange.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        } else if (data.currency === 'KRW') {
+          formattedPrice = `₩${exchange.price.toLocaleString('ko-KR', { minimumFractionDigits: 0 })}`;
+        }
+        
+        let changeHTML = '';
+        if (exchange.change24h !== undefined && exchange.change24h !== null) {
+          const changeColor = exchange.change24h >= 0 ? '#10b981' : '#ef4444';
+          const changeIcon = exchange.change24h >= 0 ? '▲' : '▼';
+          changeHTML = `<span style="color: ${changeColor}; font-size: 0.75rem;">${changeIcon} ${Math.abs(exchange.change24h).toFixed(2)}%</span>`;
+        }
+        
+        exchangesHTML += `<div style="display: flex; align-items: center; padding: 0.25rem 0; font-size: 0.85rem; gap: 0.5rem;">`;
+        exchangesHTML += `<span style="color: #94a3b8; min-width: 70px;">${exchange.name}</span>`;
+        exchangesHTML += `<span style="color: #3b82f6; font-weight: 600; min-width: 130px; text-align: right; font-family: 'Courier New', monospace; letter-spacing: 0.02em;">${formattedPrice}</span>`;
+        exchangesHTML += `<span style="min-width: 80px; text-align: right; font-family: 'Courier New', monospace;">${changeHTML}</span>`;
+        exchangesHTML += `</div>`;
+      });
+      
+      if (data.summary && data.summary.spreadPercent > 0) {
+        let spreadColor = data.summary.spreadPercent > 1 ? '#ef4444' : '#64748b';
+        exchangesHTML += `<div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #e2e8f0; font-size: 0.8rem; color: ${spreadColor};">`;
+        exchangesHTML += `<i class="fas fa-chart-line"></i> ${t('priceSpread')}: ${data.summary.spreadPercent}%`;
+        exchangesHTML += `</div>`;
+      }
+      
+      exchangesHTML += '</div>';
+      exchangeEl.innerHTML = exchangesHTML;
+    } else {
+      exchangeEl.innerHTML = `<i class="fas fa-building"></i> ${t('localExchange')}: <span style="color: #9ca3af;">N/A</span>`;
+    }
+  } catch (error) {
+    console.error(`거래소 가격 로드 실패 (${coinId}):`, error);
+    exchangeEl.innerHTML = `<i class="fas fa-building"></i> ${t('localExchange')}: <span style="color: #9ca3af;">N/A</span>`;
+  }
+}
+
+// 가격만 업데이트하는 함수 (페이지 새로고침 없이)
+async function updatePricesOnly() {
+  try {
+    // 선택한 코인들을 쿼리 파라미터로 전송
+    const coinsParam = selectedCoins.join(',');
+    const response = await axios.get(`/api/prices?coins=${coinsParam}`);
+    const prices = response.data;
+    
+    // 에러 체크
+    if (prices.error) {
+      console.error('가격 업데이트 실패:', prices.message);
+      return;
+    }
+    
+    // 각 코인 카드의 가격만 업데이트
+    for (const [coinId, data] of Object.entries(prices)) {
+      const card = document.querySelector(`[data-coin-id="${coinId}"]`);
+      if (!card) continue;
+      
+      // 가격 업데이트
+      const priceEl = card.querySelector('.coin-price');
+      if (priceEl) {
+        priceEl.textContent = formatPrice(data.usd);
+      }
+      
+      // KRW 가격 업데이트
+      const krwPriceEl = card.querySelector('.coin-price-krw');
+      if (krwPriceEl && currentLang === 'ko') {
+        krwPriceEl.textContent = `₩${data.krw ? data.krw.toLocaleString() : 'N/A'}`;
+      }
+      
+      // 변동률 업데이트
+      const changeEl = card.querySelector('.coin-change');
+      if (changeEl && data.usd_24h_change !== undefined) {
+        const change = data.usd_24h_change;
+        const isPositive = change >= 0;
+        changeEl.className = `coin-change ${isPositive ? 'positive' : 'negative'}`;
+        changeEl.textContent = `${isPositive ? '+' : ''}${change.toFixed(2)}%`;
+      }
+      
+      // 포트폴리오 수익률 업데이트
+      if (portfolio[coinId]) {
+        const { amount, avgPrice } = portfolio[coinId];
+        const currentValue = amount * data.usd;
+        const profit = currentValue - (amount * avgPrice);
+        const profitRate = ((profit / (amount * avgPrice)) * 100).toFixed(2);
+        
+        const profitEl = card.querySelector('.portfolio-profit');
+        if (profitEl) {
+          const isProfitable = profit >= 0;
+          profitEl.className = `portfolio-profit ${isProfitable ? 'text-green-400' : 'text-red-400'}`;
+          profitEl.textContent = `${isProfitable ? '+' : ''}${profitRate}%`;
+        }
+      }
+    }
+    
+    // 시간 업데이트
+    const timeElements = document.querySelectorAll('.stats-grid .text-lg');
+    if (timeElements.length > 0) {
+      const lastTimeEl = timeElements[timeElements.length - 1];
+      lastTimeEl.textContent = new Date().toLocaleTimeString(currentLang === 'ko' ? 'ko-KR' : 'en-US');
+    }
+    
+    console.log('✅ 가격 업데이트 완료 (새로고침 없음)');
+  } catch (error) {
+    console.error('가격 업데이트 실패:', error);
+  }
+}
+
 // 자동 새로고침 (30초마다 - 최적화)
 let autoRefreshInterval;
 
@@ -2125,7 +2482,7 @@ function startAutoRefresh() {
     clearInterval(autoRefreshInterval);
   }
   autoRefreshInterval = setInterval(() => {
-    loadPrices(); // 메인 가격 갱신
+    updatePricesOnly(); // 가격만 업데이트 (새로고침 없음)
   }, 30000); // 30초
 }
 
