@@ -2885,6 +2885,16 @@ app.get('/blog', async (c) => {
           </h1>`
     )
     
+    // 시간 표시 숨기기
+    html = html.replace(
+      /<\/head>/,
+      `<style>
+        .fa-clock, .fa-clock + span { display: none !important; }
+        span.text-xs.text-gray-400.flex.items-center.gap-1:has(.fa-clock) { display: none !important; }
+      </style>
+      </head>`
+    )
+    
     return c.html(html)
   } catch (error) {
     // crypto-darugi.com 접근 불가 시 자체 페이지 제공 (다국어 지원)
