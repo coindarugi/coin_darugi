@@ -1,7 +1,9 @@
-// Cloudflare Workers/Node.js 호환 트위터 봇 (라이브러리 없이 fetch 사용)
+import crypto from 'crypto';
 
+// 사이트 URL
 const SITE_URL = 'https://crypto-darugi.com/';
 
+// 언어 설정 및 홍보 문구
 const LANGUAGES = {
   ko: { 
     name: '한국어', 
@@ -30,11 +32,8 @@ const LANGUAGES = {
   },
 };
 
-// Node.js 환경에서 fetch가 없을 경우를 대비 (Node 18+은 기본 내장)
-const fetch = globalThis.fetch || require('node-fetch');
-const crypto = require('node:crypto');
-
-async function getOAuthHeader(method, url, consumerKey, consumerSecret, token, tokenSecret) {
+// OAuth 1.0a 서명 생성
+function getOAuthHeader(method, url, consumerKey, consumerSecret, token, tokenSecret) {
   const timestamp = Math.floor(Date.now() / 1000).toString();
   const nonce = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
   
@@ -71,12 +70,13 @@ async function getOAuthHeader(method, url, consumerKey, consumerSecret, token, t
   return `OAuth ${headerString}`;
 }
 
+// 트윗 발행
 async function postTweet(text, language, keys) {
   const url = 'https://api.twitter.com/2/tweets';
   const method = 'POST';
   
   try {
-    const authHeader = await getOAuthHeader(
+    const authHeader = getOAuthHeader(
       method, 
       url, 
       keys.appKey, 
@@ -109,6 +109,7 @@ async function postTweet(text, language, keys) {
   }
 }
 
+// 김프 데이터 조회
 async function getKimchiPremiumData() {
   try {
     const globalRes = await fetch('https://api.coincap.io/v2/assets/bitcoin');
@@ -131,6 +132,7 @@ async function getKimchiPremiumData() {
   }
 }
 
+// 트윗 텍스트 생성
 function createTweetText(kimchiPremium, language) {
   const langConfig = LANGUAGES[language];
   let content = '';
@@ -151,19 +153,14 @@ function createTweetText(kimchiPremium, language) {
   return content;
 }
 
+// 메인 실행
 async function run() {
-  console.log('🚀 GitHub Actions 트위터 봇 시작...');
+  console.log('🚀 GitHub Actions 트위터 봇 시작 (ESM 모드)...');
 
   const { TWITTER_API_KEY, TWITTER_API_SECRET, TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_SECRET } = process.env;
 
   if (!TWITTER_API_KEY || !TWITTER_API_SECRET || !TWITTER_ACCESS_TOKEN || !TWITTER_ACCESS_SECRET) {
     console.error('❌ 트위터 API 키가 설정되지 않았습니다.');
-    console.error('Environment variables:', {
-        TWITTER_API_KEY: TWITTER_API_KEY ? 'Set' : 'Missing',
-        TWITTER_API_SECRET: TWITTER_API_SECRET ? 'Set' : 'Missing',
-        TWITTER_ACCESS_TOKEN: TWITTER_ACCESS_TOKEN ? 'Set' : 'Missing',
-        TWITTER_ACCESS_SECRET: TWITTER_ACCESS_SECRET ? 'Set' : 'Missing',
-    });
     process.exit(1);
   }
 
