@@ -2877,11 +2877,37 @@ app.get('/blog', async (c) => {
       throw new Error('Cloudflare blocked')
     }
     
-    // 제목을 두 줄로 수정 (완전 가운데 정렬)
+    // 언어별 제목 매핑
+    const titleMap = {
+      ko: {
+        original: '📝 암호화폐 투자 블로그',
+        replaced: '📝<br/>암호화폐<br/>투자 블로그'
+      },
+      en: {
+        original: '📝 Cryptocurrency Investment Blog',
+        replaced: '📝<br/>Cryptocurrency<br/>Investment Blog'
+      },
+      fr: {
+        original: '📝 Blog d\'investissement crypto',
+        replaced: '📝<br/>Blog crypto<br/>d\'investissement'
+      },
+      de: {
+        original: '📝 Krypto-Investment-Blog',
+        replaced: '📝<br/>Krypto<br/>Investment Blog'
+      },
+      es: {
+        original: '📝 Blog de inversión en criptomonedas',
+        replaced: '📝<br/>Blog de<br/>inversión cripto'
+      }
+    }
+    
+    const titleConfig = titleMap[lang] || titleMap.ko
+    
+    // 제목을 세 줄로 수정 (완전 가운데 정렬)
     html = html.replace(
-      /<h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg">\s*📝 암호화폐 투자 블로그\s*<\/h1>/,
+      new RegExp(`<h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg">\\s*${titleConfig.original}\\s*</h1>`),
       `<h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg text-center" style="line-height: 1.3;">
-            📝<br/>암호화폐<br/>투자 블로그
+            ${titleConfig.replaced}
           </h1>`
     )
     
