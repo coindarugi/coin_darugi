@@ -1241,7 +1241,7 @@ app.get('/', (c) => {
           </button>
           
           <button 
-            onclick="window.location.href='/blog'"
+            onclick="const currentLang = new URLSearchParams(window.location.search).get('lang') || 'ko'; window.location.href='/blog?lang=' + currentLang;"
             class="nav-btn"
             style={{
               display: 'flex',
