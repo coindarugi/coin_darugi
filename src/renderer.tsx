@@ -7,6 +7,7 @@ export const renderer = jsxRenderer(({ children, lang }) => {
   // 🌍 언어별 OG 이미지 사용
   const currentLang = (lang as string) || 'ko'
   const validLangs = ['ko', 'en', 'fr', 'de', 'es']
+  const imageLang = validLangs.includes(currentLang) ? currentLang : 'ko'
   
   // 언어별 이미지가 있으면 사용, 없으면 기본값(ko) 또는 공용
   // public 폴더에 og-image-ko.png, og-image-en.png 등이 존재함

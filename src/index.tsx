@@ -1652,7 +1652,7 @@ app.get('/', (c) => {
               margin: '0.5rem 0 0 0',
               color: '#94a3b8',
               fontSize: '0.8rem'
-            }}>
+            }} id="adThankYou">
               감사합니다! 🙏
             </p>
           </div>
@@ -3585,17 +3585,25 @@ app.get('/api/bot/run', async (c) => {
     return c.text('Missing Twitter Keys', 500)
   }
   
-  c.executionCtx.waitUntil(
-    runCryptoBot({
+  try {
+    // 디버깅을 위해 await로 실행 결과 대기
+    const result = await runCryptoBot({
       TWITTER_API_KEY: env.TWITTER_API_KEY,
       TWITTER_API_SECRET: env.TWITTER_API_SECRET!,
       TWITTER_ACCESS_TOKEN: env.TWITTER_ACCESS_TOKEN!,
       TWITTER_ACCESS_SECRET: env.TWITTER_ACCESS_SECRET!,
-      OPENAI_API_KEY: env.OPENAI_API_KEY!,
+      OPENAI_API_KEY: env.OPENAI_API_KEY!, // 선택적
     })
-  )
-  
-  return c.text('Bot triggered successfully!')
+    
+    return c.json(result)
+  } catch (error: any) {
+    return c.json({ 
+      success: false, 
+      error: error.message,
+      stack: error.stack,
+      details: error.data || 'No details' // 트위터 API 에러 상세
+    }, 500)
+  }
 })
 
 // Cloudflare Cron Trigger (매일 자동 실행)

@@ -137,7 +137,10 @@ body::before {
   margin: 1rem 0;
   clear: both;
   min-height: 100px;
-  overflow: visible !important;
+  overflow: hidden !important; /* 가로 스크롤 방지 */
+  max-width: 100vw !important;
+  display: flex;
+  justify-content: center;
 }
 
 .ad-mobile-bottom {

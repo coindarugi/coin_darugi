@@ -91,6 +91,13 @@ window.addEventListener('DOMContentLoaded', () => {
   if (binanceCTA) binanceCTA.textContent = t('binanceCTA');
   if (adCountdownText) adCountdownText.textContent = t('adCountdownText');
   
+  // 광고 메시지 번역
+  const adHelpMessage = document.getElementById('adHelpMessage');
+  if (adHelpMessage) adHelpMessage.textContent = t('adHelpMessage');
+  
+  const adThankYou = document.getElementById('adThankYou');
+  if (adThankYou) adThankYou.textContent = t('thankYou');
+  
   // 사용설명서 언어별 가이드 표시/숨김
   document.querySelectorAll('.guide-lang').forEach(guide => {
     guide.style.display = 'none';

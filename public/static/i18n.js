@@ -162,7 +162,8 @@ const translations = {
     secondsWait: '초 대기 중...',
     skipAdNow: 'AI 전망 확인하기 →',
     adHelpMessage: '💡 광고 시청은 무료 API 운영에 큰 도움이 됩니다',
-    change24h: '24시간 변동'
+    change24h: '24시간 변동',
+    thankYou: '감사합니다! 🙏'
   },
   
   en: {
@@ -302,6 +303,7 @@ const translations = {
     aiForecastDisclaimer: '⚠️ AI analysis is for reference only and not investment advice.',
     lastUpdate: 'Last Update',
     change24h: '24h Change',
+    thankYou: 'Thank you! 🙏',
     
     // Binance Ad
     adModalTitle: 'AI Forecast Sponsored by Binance',
@@ -450,6 +452,8 @@ const translations = {
     aiForecastDisclaimer: '⚠️ L\'analyse de l\'IA est à titre de référence uniquement et non un conseil d\'investissement.',
     lastUpdate: 'Dernière Mise à Jour',
     change24h: 'Changement 24h',
+    adHelpMessage: '💡 Regarder les publicités aide à soutenir ce service gratuit',
+    thankYou: 'Merci ! 🙏',
     
     // Binance Ad
     adModalTitle: 'Prévision IA sponsorisée par Binance',
@@ -598,6 +602,8 @@ const translations = {
     aiForecastDisclaimer: '⚠️ Die KI-Analyse dient nur als Referenz und ist keine Anlageberatung.',
     lastUpdate: 'Letztes Update',
     change24h: '24h Änderung',
+    adHelpMessage: '💡 Werbung schauen hilft, diesen Service kostenlos zu halten',
+    thankYou: 'Vielen Dank! 🙏',
     
     // Binance Ad
     adModalTitle: 'KI-Prognose gesponsert von Binance',
@@ -745,7 +751,9 @@ const translations = {
     outlookNeutral: 'Neutral',
     aiForecastDisclaimer: '⚠️ El análisis de IA es solo de referencia y no es asesoramiento de inversión.',
     lastUpdate: 'Última Actualización',
-    change24h: 'Cambio 24h'
+    change24h: 'Cambio 24h',
+    adHelpMessage: '💡 Ver anuncios ayuda a mantener este servicio gratuito',
+    thankYou: '¡Gracias! 🙏'
   }
 };
 
