@@ -1,50 +1,114 @@
-const { TwitterApi } = require('twitter-api-v2');
+// Cloudflare Workers/Node.js 호환 트위터 봇 (라이브러리 없이 fetch 사용)
 
-// 사이트 URL
 const SITE_URL = 'https://crypto-darugi.com/';
 
-// 언어 설정 및 홍보 문구
 const LANGUAGES = {
   ko: { 
     name: '한국어', 
-    currency: 'krw', 
-    symbol: '₩', 
-    hashtags: '#비트코인 #김치프리미엄 #업비트 #코인전망 #투자',
+    hashtags: '#비트코인 #김치프리미엄 #코인전망 #가상화폐 #투자',
     promotion: '⚡ 10,000+ 코인 실시간 시세와 AI 전망을 한눈에!\n💎 암호화폐 투자의 필수품, 크립토 대시보드'
   },
   en: { 
     name: 'English', 
-    currency: 'usd', 
-    symbol: '$', 
-    hashtags: '#Bitcoin #Crypto #Trading #Invest #AI',
+    hashtags: '#Bitcoin #Crypto #Trading #AI #Investment',
     promotion: '🚀 Track 10,000+ coins real-time & Check AI Forecasts!\n💎 Your all-in-one Cryptocurrency Dashboard.\n\n✅ AI-powered Market Analysis\n✅ Real-time Portfolio Tracker\n✅ Global Exchange Prices'
   },
   fr: { 
     name: 'Français', 
-    currency: 'eur', 
-    symbol: '€', 
     hashtags: '#Bitcoin #Crypto #Trading #Finance #IA',
     promotion: '🚀 Suivez 10 000+ cryptos en temps réel & Prévisions IA !\n💎 Votre tableau de bord crypto tout-en-un.\n\n✅ Analyse de marché par IA\n✅ Suivi de portefeuille en temps réel'
   },
   de: { 
     name: 'Deutsch', 
-    currency: 'eur', 
-    symbol: '€', 
     hashtags: '#Bitcoin #Krypto #Trading #Investieren #KI',
     promotion: '🚀 Echtzeit-Kurse für 10.000+ Coins & KI-Prognosen!\n💎 Ihr All-in-One Krypto-Dashboard.\n\n✅ KI-gestützte Marktanalyse\n✅ Echtzeit-Portfolio-Tracker'
   },
   es: { 
     name: 'Español', 
-    currency: 'eur', 
-    symbol: '€', 
     hashtags: '#Bitcoin #Cripto #Trading #Inversión #IA',
     promotion: '🚀 ¡Sigue más de 10,000 monedas y pronósticos de IA!\n💎 Tu panel de control de criptomonedas todo en uno.\n\n✅ Análisis de mercado impulsado por IA\n✅ Rastreador de cartera en tiempo real'
   },
 };
 
-/**
- * 김치 프리미엄 데이터 조회
- */
+// Node.js 환경에서 fetch가 없을 경우를 대비 (Node 18+은 기본 내장)
+const fetch = globalThis.fetch || require('node-fetch');
+const crypto = require('node:crypto');
+
+async function getOAuthHeader(method, url, consumerKey, consumerSecret, token, tokenSecret) {
+  const timestamp = Math.floor(Date.now() / 1000).toString();
+  const nonce = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
+  
+  const percentEncode = (str) => {
+    return encodeURIComponent(str).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
+  };
+
+  const oauthParams = {
+    oauth_consumer_key: consumerKey,
+    oauth_nonce: nonce,
+    oauth_signature_method: 'HMAC-SHA1',
+    oauth_timestamp: timestamp,
+    oauth_token: token,
+    oauth_version: '1.0'
+  };
+
+  const sortedParams = Object.keys(oauthParams).sort().map(k => {
+    return `${percentEncode(k)}=${percentEncode(oauthParams[k])}`;
+  }).join('&');
+
+  const signatureBaseString = `${method.toUpperCase()}&${percentEncode(url)}&${percentEncode(sortedParams)}`;
+  const signingKey = `${percentEncode(consumerSecret)}&${percentEncode(tokenSecret)}`;
+
+  const signature = crypto
+    .createHmac('sha1', signingKey)
+    .update(signatureBaseString)
+    .digest('base64');
+
+  const headerParams = { ...oauthParams, oauth_signature: signature };
+  const headerString = Object.keys(headerParams).sort().map(k => {
+    return `${percentEncode(k)}="${percentEncode(headerParams[k])}"`;
+  }).join(', ');
+
+  return `OAuth ${headerString}`;
+}
+
+async function postTweet(text, language, keys) {
+  const url = 'https://api.twitter.com/2/tweets';
+  const method = 'POST';
+  
+  try {
+    const authHeader = await getOAuthHeader(
+      method, 
+      url, 
+      keys.appKey, 
+      keys.appSecret, 
+      keys.accessToken, 
+      keys.accessSecret
+    );
+
+    const response = await fetch(url, {
+      method: method,
+      headers: {
+        'Authorization': authHeader,
+        'Content-Type': 'application/json',
+        'User-Agent': 'CryptoDashboardBot/1.0'
+      },
+      body: JSON.stringify({ text })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(`Twitter API Error: ${response.status} ${JSON.stringify(data)}`);
+    }
+
+    console.log(`✅ [${language}] 트윗 성공! ID: ${data.data.id}`);
+    return { success: true, id: data.data.id };
+  } catch (error) {
+    console.error(`❌ [${language}] 트윗 실패:`, error);
+    return { success: false, error: error.message };
+  }
+}
+
 async function getKimchiPremiumData() {
   try {
     const globalRes = await fetch('https://api.coincap.io/v2/assets/bitcoin');
@@ -62,14 +126,11 @@ async function getKimchiPremiumData() {
 
     return ((krwPrice - globalKrwPrice) / globalKrwPrice) * 100;
   } catch (error) {
-    console.error('김프 조회 실패 (무시됨):', error.message);
+    console.error('김프 조회 실패:', error.message);
     return null;
   }
 }
 
-/**
- * 트윗 텍스트 생성
- */
 function createTweetText(kimchiPremium, language) {
   const langConfig = LANGUAGES[language];
   let content = '';
@@ -90,9 +151,6 @@ function createTweetText(kimchiPremium, language) {
   return content;
 }
 
-/**
- * 메인 실행 함수
- */
 async function run() {
   console.log('🚀 GitHub Actions 트위터 봇 시작...');
 
@@ -100,33 +158,29 @@ async function run() {
 
   if (!TWITTER_API_KEY || !TWITTER_API_SECRET || !TWITTER_ACCESS_TOKEN || !TWITTER_ACCESS_SECRET) {
     console.error('❌ 트위터 API 키가 설정되지 않았습니다.');
+    console.error('Environment variables:', {
+        TWITTER_API_KEY: TWITTER_API_KEY ? 'Set' : 'Missing',
+        TWITTER_API_SECRET: TWITTER_API_SECRET ? 'Set' : 'Missing',
+        TWITTER_ACCESS_TOKEN: TWITTER_ACCESS_TOKEN ? 'Set' : 'Missing',
+        TWITTER_ACCESS_SECRET: TWITTER_ACCESS_SECRET ? 'Set' : 'Missing',
+    });
     process.exit(1);
   }
 
-  const client = new TwitterApi({
+  const keys = {
     appKey: TWITTER_API_KEY,
     appSecret: TWITTER_API_SECRET,
     accessToken: TWITTER_ACCESS_TOKEN,
-    accessSecret: TWITTER_ACCESS_SECRET,
-  });
+    accessSecret: TWITTER_ACCESS_SECRET
+  };
 
   try {
     const kimchiPremium = await getKimchiPremiumData();
 
     for (const lang of Object.keys(LANGUAGES)) {
       const text = createTweetText(kimchiPremium, lang);
-      
       console.log(`\n🐦 [${lang}] 트윗 발행 중...`);
-      console.log(text);
-      
-      try {
-        const tweet = await client.v2.tweet(text);
-        console.log(`✅ 성공! ID: ${tweet.data.id}`);
-      } catch (e) {
-        console.error(`❌ 실패: ${e.message}`);
-      }
-      
-      // API 제한 방지
+      await postTweet(text, lang, keys);
       await new Promise(resolve => setTimeout(resolve, 2000));
     }
     
