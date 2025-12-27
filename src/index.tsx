@@ -1241,7 +1241,7 @@ app.get('/', (c) => {
           </button>
           
           <button 
-            onclick="setTimeout(() => { const portfolioCards = document.querySelectorAll('.coin-card'); if (portfolioCards.length > 0) portfolioCards[0].scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50)"
+            onclick="window.location.href='/blog'"
             class="nav-btn"
             style={{
               display: 'flex',
@@ -1261,8 +1261,8 @@ app.get('/', (c) => {
             onmouseover="this.style.background='rgba(251, 146, 60, 0.3)'; this.style.transform='translateY(-2px)'"
             onmouseout="this.style.background='rgba(251, 146, 60, 0.2)'; this.style.transform='translateY(0)'"
           >
-            <i class="fas fa-briefcase" style={{fontSize: '1.1rem'}}></i>
-            <span id="navPortfolio">포트폴리오</span>
+            <i class="fas fa-blog" style={{fontSize: '1.1rem'}}></i>
+            <span id="navPortfolio">블로그</span>
           </button>
         </div>
       </nav>
