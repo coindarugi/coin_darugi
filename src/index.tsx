@@ -2301,6 +2301,50 @@ app.get('/sitemap.xml', async (c) => {
   
   const languages = ['ko', 'en', 'fr', 'de', 'es']
   
+  // 블로그 포스트 목록
+  const blogPosts = [
+    {
+      slug: '2025-crypto-investment-guide',
+      title: '2025년 암호화폐 투자 완벽 가이드',
+      description: '초보자부터 전문가까지, 2025년 암호화폐 시장 전망과 투자 전략을 완벽 정리했습니다.',
+      date: '2024-12-27',
+      category: '투자 가이드',
+      readTime: '10분'
+    },
+    {
+      slug: 'kimchi-premium-arbitrage',
+      title: '김치 프리미엄으로 돈 버는 법',
+      description: '한국 거래소와 해외 거래소의 가격 차이를 활용한 차익거래 완벽 가이드',
+      date: '2024-12-26',
+      category: '트레이딩',
+      readTime: '8분'
+    },
+    {
+      slug: 'ai-crypto-prediction-guide',
+      title: 'AI가 예측하는 암호화폐, 믿어도 될까?',
+      description: 'AI 기반 암호화폐 전망의 정확도와 올바른 활용법을 알아봅니다.',
+      date: '2024-12-25',
+      category: 'AI & 기술',
+      readTime: '7분'
+    },
+    {
+      slug: 'defi-beginners-guide',
+      title: '초보자를 위한 DeFi 완벽 입문',
+      description: 'DeFi가 뭔지, 어떻게 시작하는지, 주의할 점은 무엇인지 쉽게 설명합니다.',
+      date: '2024-12-24',
+      category: 'DeFi',
+      readTime: '12분'
+    },
+    {
+      slug: 'bitcoin-vs-altcoins-2025',
+      title: '2025년, 비트코인 vs 알트코인 어디에 투자?',
+      description: '비트코인과 알트코인의 장단점 비교와 포트폴리오 구성 전략',
+      date: '2024-12-23',
+      category: '시장 분석',
+      readTime: '9분'
+    }
+  ]
+  
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -2345,6 +2389,28 @@ app.get('/sitemap.xml', async (c) => {
     <loc>https://crypto-darugi.com/coin/${coin}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+`
+  }
+  
+  // 블로그 메인 페이지
+  xml += `  
+  <url>
+    <loc>https://crypto-darugi.com/blog</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+`
+  
+  // 블로그 포스트들
+  for (const post of blogPosts) {
+    xml += `  
+  <url>
+    <loc>https://crypto-darugi.com/blog/${post.slug}</loc>
+    <lastmod>${post.date}</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 `
@@ -2779,6 +2845,315 @@ app.get('/faq', (c) => {
         </a>
       </div>
     </main>
+  </div>
+</body>
+</html>
+  `)
+})
+
+// 🔍 SEO: 블로그 메인 페이지
+app.get('/blog', (c) => {
+  const blogPosts = [
+    {
+      slug: '2025-crypto-investment-guide',
+      title: '2025년 암호화폐 투자 완벽 가이드',
+      description: '초보자부터 전문가까지, 2025년 암호화폐 시장 전망과 투자 전략을 완벽 정리했습니다.',
+      date: '2024-12-27',
+      category: '투자 가이드',
+      readTime: '10분',
+      image: '💰'
+    },
+    {
+      slug: 'kimchi-premium-arbitrage',
+      title: '김치 프리미엄으로 돈 버는 법',
+      description: '한국 거래소와 해외 거래소의 가격 차이를 활용한 차익거래 완벽 가이드',
+      date: '2024-12-26',
+      category: '트레이딩',
+      readTime: '8분',
+      image: '🇰🇷'
+    },
+    {
+      slug: 'ai-crypto-prediction-guide',
+      title: 'AI가 예측하는 암호화폐, 믿어도 될까?',
+      description: 'AI 기반 암호화폐 전망의 정확도와 올바른 활용법을 알아봅니다.',
+      date: '2024-12-25',
+      category: 'AI & 기술',
+      readTime: '7분',
+      image: '🤖'
+    },
+    {
+      slug: 'defi-beginners-guide',
+      title: '초보자를 위한 DeFi 완벽 입문',
+      description: 'DeFi가 뭔지, 어떻게 시작하는지, 주의할 점은 무엇인지 쉽게 설명합니다.',
+      date: '2024-12-24',
+      category: 'DeFi',
+      readTime: '12분',
+      image: '🏦'
+    },
+    {
+      slug: 'bitcoin-vs-altcoins-2025',
+      title: '2025년, 비트코인 vs 알트코인 어디에 투자?',
+      description: '비트코인과 알트코인의 장단점 비교와 포트폴리오 구성 전략',
+      date: '2024-12-23',
+      category: '시장 분석',
+      readTime: '9분',
+      image: '⚖️'
+    }
+  ]
+  
+  return c.html(`
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>암호화폐 투자 블로그 | 크립토 대시보드</title>
+  <meta name="description" content="암호화폐 투자 가이드, AI 전망 분석, 김치 프리미엄, DeFi 입문 등 유익한 크립토 정보를 제공합니다."/>
+  <meta name="keywords" content="암호화폐 블로그, 비트코인 투자, 코인 분석, 김치 프리미엄, DeFi, NFT"/>
+  <link rel="canonical" href="https://crypto-darugi.com/blog"/>
+  <link href="https://cdn.tailwindcss.com" rel="stylesheet"/>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "암호화폐 투자 블로그",
+    "description": "암호화폐 투자 가이드와 시장 분석 블로그",
+    "url": "https://crypto-darugi.com/blog",
+    "publisher": {
+      "@type": "Organization",
+      "name": "크립토 대시보드"
+    }
+  }
+  </script>
+</head>
+<body class="bg-gray-900 text-white">
+  <div class="container mx-auto px-4 py-8 max-w-6xl">
+    <header class="mb-12">
+      <a href="/" class="text-blue-400 hover:underline mb-4 inline-block">← 대시보드로 돌아가기</a>
+      <h1 class="text-5xl font-bold mb-4">📝 암호화폐 투자 블로그</h1>
+      <p class="text-xl text-gray-300">실전 투자 노하우와 시장 분석을 공유합니다</p>
+    </header>
+    
+    <main>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${blogPosts.map(post => `
+          <article class="bg-gray-800 rounded-lg overflow-hidden hover:transform hover:scale-105 transition">
+            <a href="/blog/${post.slug}" class="block">
+              <div class="p-6">
+                <div class="text-5xl mb-4">${post.image}</div>
+                <div class="flex items-center gap-3 mb-3">
+                  <span class="text-xs bg-blue-600 px-2 py-1 rounded">${post.category}</span>
+                  <span class="text-xs text-gray-400">${post.readTime} 읽기</span>
+                </div>
+                <h2 class="text-xl font-bold mb-2 hover:text-blue-400">${post.title}</h2>
+                <p class="text-gray-400 text-sm mb-4">${post.description}</p>
+                <div class="text-xs text-gray-500">${post.date}</div>
+              </div>
+            </a>
+          </article>
+        `).join('')}
+      </div>
+      
+      <section class="mt-16 bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-lg p-8 text-center">
+        <h2 class="text-2xl font-bold mb-4">💡 새 글 알림 받기</h2>
+        <p class="text-gray-300 mb-6">매주 최신 암호화폐 투자 정보를 받아보세요 (준비 중)</p>
+        <a href="/" class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 px-8 py-3 rounded-lg font-bold hover:scale-105 transition">
+          대시보드 사용하기 →
+        </a>
+      </section>
+    </main>
+    
+    <footer class="mt-16 text-center text-gray-500">
+      <p>© 2024 크립토 대시보드 | <a href="/" class="text-blue-400 hover:underline">메인으로</a></p>
+    </footer>
+  </div>
+</body>
+</html>
+  `)
+})
+
+// 📝 블로그: 2025년 암호화폐 투자 가이드
+app.get('/blog/2025-crypto-investment-guide', (c) => {
+  return c.html(`
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>2025년 암호화폐 투자 완벽 가이드 | 크립토 블로그</title>
+  <meta name="description" content="초보자부터 전문가까지, 2025년 암호화폐 시장 전망과 투자 전략을 완벽 정리. 비트코인, 알트코인, DeFi 투자법까지."/>
+  <meta name="keywords" content="2025 암호화폐, 비트코인 투자, 알트코인 전망, 크립토 투자 전략, 코인 추천"/>
+  <link rel="canonical" href="https://crypto-darugi.com/blog/2025-crypto-investment-guide"/>
+  <link href="https://cdn.tailwindcss.com" rel="stylesheet"/>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "2025년 암호화폐 투자 완벽 가이드",
+    "description": "초보자부터 전문가까지, 2025년 암호화폐 시장 전망과 투자 전략",
+    "datePublished": "2024-12-27",
+    "dateModified": "2024-12-27",
+    "author": {
+      "@type": "Organization",
+      "name": "크립토 대시보드"
+    }
+  }
+  </script>
+</head>
+<body class="bg-gray-900 text-white">
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <a href="/blog" class="text-blue-400 hover:underline mb-6 inline-block">← 블로그 목록</a>
+    
+    <article>
+      <header class="mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-xs bg-blue-600 px-3 py-1 rounded">투자 가이드</span>
+          <span class="text-xs text-gray-400">10분 읽기</span>
+          <span class="text-xs text-gray-500">2024-12-27</span>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">💰 2025년 암호화폐 투자 완벽 가이드</h1>
+        <p class="text-xl text-gray-300">초보자부터 전문가까지, 2025년 암호화폐 시장 전망과 투자 전략</p>
+      </header>
+      
+      <div class="prose prose-invert max-w-none">
+        <section class="mb-8">
+          <h2 class="text-3xl font-bold mb-4">📊 2025년 암호화폐 시장 전망</h2>
+          <p class="text-gray-300 mb-4">2024년은 비트코인 현물 ETF 승인, 반감기 등 큰 이벤트들이 있었습니다. 2025년은 어떨까요?</p>
+          
+          <div class="bg-gray-800 rounded-lg p-6 mb-6">
+            <h3 class="text-xl font-bold mb-3">🔮 주요 전망</h3>
+            <ul class="space-y-3 text-gray-300">
+              <li>✅ <strong>비트코인:</strong> $100,000-$150,000 예상 (기관 투자 지속 증가)</li>
+              <li>✅ <strong>이더리움:</strong> ETF 승인 가능성 + 업그레이드로 $5,000-$8,000</li>
+              <li>✅ <strong>알트코인:</strong> AI, RWA, DePIN 섹터 주목</li>
+              <li>✅ <strong>규제:</strong> 전 세계적으로 명확한 규제 프레임워크 형성</li>
+              <li>✅ <strong>채택:</strong> 기업들의 암호화폐 결제 도입 가속화</li>
+            </ul>
+          </div>
+        </section>
+        
+        <section class="mb-8">
+          <h2 class="text-3xl font-bold mb-4">🎯 투자 전략 3가지</h2>
+          
+          <div class="space-y-6">
+            <div class="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-lg p-6">
+              <h3 class="text-2xl font-bold mb-3">1️⃣ 안정형: 비트코인·이더리움 중심 (70%+)</h3>
+              <p class="text-gray-300 mb-3"><strong>추천 대상:</strong> 초보자, 위험 회피 성향</p>
+              <p class="text-gray-300 mb-3"><strong>포트폴리오 예시:</strong></p>
+              <ul class="text-gray-300 space-y-2">
+                <li>• 비트코인 (BTC): 50%</li>
+                <li>• 이더리움 (ETH): 30%</li>
+                <li>• 안정적인 알트코인 (SOL, BNB 등): 20%</li>
+              </ul>
+              <p class="text-gray-300 mt-3"><strong>장점:</strong> 변동성 낮음, 장기적으로 안정적 수익</p>
+              <p class="text-gray-300"><strong>단점:</strong> 폭발적인 수익은 기대하기 어려움</p>
+            </div>
+            
+            <div class="bg-gradient-to-r from-green-900/30 to-blue-900/30 rounded-lg p-6">
+              <h3 class="text-2xl font-bold mb-3">2️⃣ 균형형: 알트코인 믹스 (50-50)</h3>
+              <p class="text-gray-300 mb-3"><strong>추천 대상:</strong> 중급자, 적당한 위험 감수</p>
+              <p class="text-gray-300 mb-3"><strong>포트폴리오 예시:</strong></p>
+              <ul class="text-gray-300 space-y-2">
+                <li>• 메이저 (BTC, ETH): 50%</li>
+                <li>• 대형 알트 (SOL, ADA, DOT): 30%</li>
+                <li>• 중형 알트 (성장 가능성 높은 코인): 20%</li>
+              </ul>
+              <p class="text-gray-300 mt-3"><strong>장점:</strong> 안정성 + 성장 가능성 균형</p>
+              <p class="text-gray-300"><strong>단점:</strong> 알트코인 선택이 중요 (리서치 필수)</p>
+            </div>
+            
+            <div class="bg-gradient-to-r from-yellow-900/30 to-red-900/30 rounded-lg p-6">
+              <h3 class="text-2xl font-bold mb-3">3️⃣ 공격형: 알트코인 중심 (70%+)</h3>
+              <p class="text-gray-300 mb-3"><strong>추천 대상:</strong> 전문가, 고위험 고수익</p>
+              <p class="text-gray-300 mb-3"><strong>포트폴리오 예시:</strong></p>
+              <ul class="text-gray-300 space-y-2">
+                <li>• 메이저 (BTC, ETH): 30%</li>
+                <li>• 중대형 알트: 40%</li>
+                <li>• 소형 알트 (폭발 가능성): 30%</li>
+              </ul>
+              <p class="text-gray-300 mt-3"><strong>장점:</strong> 10배, 100배 수익 가능성</p>
+              <p class="text-gray-300"><strong>단점:</strong> 손실 위험 매우 높음, 전문 지식 필수</p>
+            </div>
+          </div>
+        </section>
+        
+        <section class="mb-8">
+          <h2 class="text-3xl font-bold mb-4">💡 2025년 주목할 섹터</h2>
+          
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-gray-800 rounded-lg p-5">
+              <h3 class="text-lg font-bold mb-2">🤖 AI + 크립토</h3>
+              <p class="text-sm text-gray-300">AI 기술과 블록체인의 융합. 예: Render, FET, AGIX</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-5">
+              <h3 class="text-lg font-bold mb-2">🏦 RWA (Real World Assets)</h3>
+              <p class="text-sm text-gray-300">부동산, 채권 등 실물 자산의 토큰화. 예: ONDO, MKR</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-5">
+              <h3 class="text-lg font-bold mb-2">📡 DePIN (물리 인프라)</h3>
+              <p class="text-sm text-gray-300">탈중앙 물리 인프라. 예: Helium, Filecoin</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-5">
+              <h3 class="text-lg font-bold mb-2">⚡ Layer 2 솔루션</h3>
+              <p class="text-sm text-gray-300">이더리움 확장성 개선. 예: ARB, OP, MATIC</p>
+            </div>
+          </div>
+        </section>
+        
+        <section class="mb-8">
+          <h2 class="text-3xl font-bold mb-4">⚠️ 투자 시 주의사항</h2>
+          
+          <div class="bg-red-900/20 border border-red-500 rounded-lg p-6">
+            <ul class="space-y-3 text-gray-300">
+              <li>🚫 <strong>여유 자금으로만 투자:</strong> 잃어도 괜찮은 돈만 투자하세요</li>
+              <li>🚫 <strong>FOMO 금지:</strong> 급등한 코인 쫓아가지 마세요</li>
+              <li>🚫 <strong>레버리지 주의:</strong> 초보자는 현물 투자만!</li>
+              <li>🚫 <strong>분산 투자:</strong> 한 코인에 올인 절대 금지</li>
+              <li>🚫 <strong>손절매 설정:</strong> 손실 -20% 이상 시 정리 고려</li>
+              <li>🚫 <strong>감정 컨트롤:</strong> 공포와 탐욕에 휘둘리지 마세요</li>
+            </ul>
+          </div>
+        </section>
+        
+        <section class="mb-8">
+          <h2 class="text-3xl font-bold mb-4">📈 실전 매매 팁</h2>
+          
+          <div class="space-y-4">
+            <div class="bg-gray-800 rounded-lg p-5">
+              <h3 class="font-bold mb-2">1. 분할 매수 (DCA)</h3>
+              <p class="text-sm text-gray-300">매달 일정 금액을 꾸준히 매수하여 평균 매수가 낮추기</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-5">
+              <h3 class="font-bold mb-2">2. 목표가 설정</h3>
+              <p class="text-sm text-gray-300">+50%, +100% 등 목표 수익률 도달 시 일부 매도</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-5">
+              <h3 class="font-bold mb-2">3. 리밸런싱</h3>
+              <p class="text-sm text-gray-300">분기별로 포트폴리오 비중 조정 (오른 코인 일부 매도 → 떨어진 코인 매수)</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-5">
+              <h3 class="font-bold mb-2">4. 뉴스 & 차트 분석</h3>
+              <p class="text-sm text-gray-300">주요 뉴스 확인 + 기술적 분석 (지지선/저항선)</p>
+            </div>
+          </div>
+        </section>
+        
+        <section class="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-lg p-8 text-center">
+          <h2 class="text-2xl font-bold mb-4">🚀 지금 바로 시작하기</h2>
+          <p class="text-gray-300 mb-6">우리 대시보드에서 10,000+ 코인 추적, AI 전망, 포트폴리오 관리를 무료로 이용하세요!</p>
+          <a href="/" class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 px-8 py-3 rounded-lg font-bold text-lg hover:scale-105 transition">
+            대시보드 사용하기 →
+          </a>
+        </section>
+      </div>
+    </article>
+    
+    <footer class="mt-12 pt-8 border-t border-gray-700">
+      <div class="flex justify-between items-center">
+        <a href="/blog" class="text-blue-400 hover:underline">← 블로그 목록으로</a>
+        <a href="/" class="text-blue-400 hover:underline">메인으로 →</a>
+      </div>
+    </footer>
   </div>
 </body>
 </html>
