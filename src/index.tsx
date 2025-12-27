@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { renderer } from './renderer'
 import { runCryptoBot } from './crypto-bot'
+import { translations, type SupportedLanguage } from './i18n/translations'
 
 // 환경 변수 타입 정의
 type Bindings = {
@@ -1114,7 +1115,8 @@ app.use(renderer)
 
 app.get('/', (c) => {
   // 🌍 언어 파라미터 감지 (쿼리 또는 쿠키)
-  const lang = c.req.query('lang') || 'ko'
+  const lang = (c.req.query('lang') || 'ko') as SupportedLanguage
+  const t = translations[lang] || translations.ko
   
   return c.render(
     <div class="container">
@@ -1122,7 +1124,7 @@ app.get('/', (c) => {
         <div class="header-content">
           <div class="header-main">
             <div class="header-icon" role="img" aria-label="돈 아이콘">💰</div>
-            <h1 id="pageTitle">Crypto Real-time Dashboard</h1>
+            <h1 id="pageTitle">{t.title}</h1>
           </div>
           
           {/* 언어 선택 */}
@@ -1187,7 +1189,7 @@ app.get('/', (c) => {
             onmouseout="this.style.background='rgba(102, 126, 234, 0.2)'; this.style.transform='translateY(0)'"
           >
             <i class="fas fa-coins" style={{fontSize: '1.1rem'}}></i>
-            <span id="navCoins">코인 목록</span>
+            <span id="navCoins">{t.navCoins}</span>
           </button>
           
           <button 
@@ -1212,7 +1214,7 @@ app.get('/', (c) => {
             onmouseout="this.style.background='rgba(139, 92, 246, 0.2)'; this.style.transform='translateY(0)'"
           >
             <i class="fas fa-brain" style={{fontSize: '1.1rem'}}></i>
-            <span id="navAI">AI 전망</span>
+            <span id="navAI">{t.navAI}</span>
           </button>
           
           <button 
@@ -1237,7 +1239,7 @@ app.get('/', (c) => {
             onmouseout="this.style.background='rgba(34, 197, 94, 0.2)'; this.style.transform='translateY(0)'"
           >
             <i class="fas fa-newspaper" style={{fontSize: '1.1rem'}}></i>
-            <span id="navNews">최신 뉴스</span>
+            <span id="navNews">{t.navNews}</span>
           </button>
           
           <button 
@@ -1262,7 +1264,7 @@ app.get('/', (c) => {
             onmouseout="this.style.background='rgba(251, 146, 60, 0.2)'; this.style.transform='translateY(0)'"
           >
             <i class="fas fa-blog" style={{fontSize: '1.1rem'}}></i>
-            <span id="navPortfolio">블로그</span>
+            <span id="navPortfolio">{t.navPortfolio}</span>
           </button>
         </div>
       </nav>
