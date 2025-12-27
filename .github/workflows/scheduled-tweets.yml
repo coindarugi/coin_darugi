@@ -46,7 +46,5 @@ jobs:
 
       - name: 🎉 완료
         if: success()
-        run: |
-          echo "✅ 모든 트윗 발행 완료!"
-          echo "🌐 5개 언어 (한국어, English, Français, Deutsch, Español)"
-          echo "⏰ 다음 실행: UTC 00:00 / 12:00"
+       echo "⏰ 다음 실행: UTC 00:00 / 08:00 / 16:00 (8시간 주기)"
+echo "📊 하루 총 15개 트윗 (Free API 17개 제한 내)"
