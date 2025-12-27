@@ -2887,15 +2887,71 @@ app.get('/blog', async (c) => {
     
     return c.html(html)
   } catch (error) {
-    // crypto-darugi.com 접근 불가 시 자체 페이지 제공
+    // crypto-darugi.com 접근 불가 시 자체 페이지 제공 (다국어 지원)
     const lang = c.req.query('lang') || 'ko'
+    
+    const i18n = {
+      ko: {
+        title: '📝 암호화폐 투자 블로그',
+        titleLine1: '📝 암호화폐',
+        titleLine2: '투자 블로그',
+        subtitle: '실전 투자 노하우와 AI 기반 시장 분석을 공유합니다',
+        postTitle: '2025 암호화폐 투자 가이드',
+        postDesc: '2025년 암호화폐 시장 전망과 투자 전략을 상세히 분석합니다. 비트코인 ETF 승인 이후 달라진 시장 환경과 알트코인 투자 포인트를 다룹니다.',
+        readTime: '10분 소요',
+        backHome: '홈으로 돌아가기'
+      },
+      en: {
+        title: '📝 Crypto Investment Blog',
+        titleLine1: '📝 Crypto',
+        titleLine2: 'Investment Blog',
+        subtitle: 'Share practical investment know-how and AI-based market analysis',
+        postTitle: '2025 Cryptocurrency Investment Guide',
+        postDesc: 'Detailed analysis of 2025 cryptocurrency market outlook and investment strategies. Covers the changed market environment after Bitcoin ETF approval and altcoin investment points.',
+        readTime: '10 min read',
+        backHome: 'Back to Home'
+      },
+      fr: {
+        title: '📝 Blog d\'investissement crypto',
+        titleLine1: '📝 Blog crypto',
+        titleLine2: 'd\'investissement',
+        subtitle: 'Partagez votre savoir-faire en investissement et l\'analyse de marché basée sur l\'IA',
+        postTitle: 'Guide d\'investissement en crypto-monnaies 2025',
+        postDesc: 'Analyse détaillée des perspectives du marché des crypto-monnaies 2025 et des stratégies d\'investissement. Couvre l\'environnement de marché modifié après l\'approbation de l\'ETF Bitcoin.',
+        readTime: '10 min de lecture',
+        backHome: 'Retour à l\'accueil'
+      },
+      de: {
+        title: '📝 Krypto-Investment-Blog',
+        titleLine1: '📝 Krypto',
+        titleLine2: 'Investment Blog',
+        subtitle: 'Teilen Sie praktisches Investitions-Know-how und KI-basierte Marktanalysen',
+        postTitle: '2025 Kryptowährungs-Investitionsleitfaden',
+        postDesc: 'Detaillierte Analyse der Kryptowährungsmarktaussichten 2025 und Investitionsstrategien. Behandelt das veränderte Marktumfeld nach der Bitcoin-ETF-Genehmigung.',
+        readTime: '10 Min. Lesezeit',
+        backHome: 'Zurück zur Startseite'
+      },
+      es: {
+        title: '📝 Blog de inversión en criptomonedas',
+        titleLine1: '📝 Blog de',
+        titleLine2: 'inversión cripto',
+        subtitle: 'Comparta conocimientos prácticos de inversión y análisis de mercado basado en IA',
+        postTitle: 'Guía de inversión en criptomonedas 2025',
+        postDesc: 'Análisis detallado de las perspectivas del mercado de criptomonedas 2025 y estrategias de inversión. Cubre el entorno de mercado cambiado después de la aprobación del ETF de Bitcoin.',
+        readTime: '10 min de lectura',
+        backHome: 'Volver al inicio'
+      }
+    }
+    
+    const t = i18n[lang] || i18n.ko
+    
     return c.html(`
       <!DOCTYPE html>
       <html lang="${lang}">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>📝 암호화폐 투자 블로그</title>
+        <title>${t.title}</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
         <style>
@@ -2910,10 +2966,10 @@ app.get('/blog', async (c) => {
           <!-- 헤더 -->
           <div class="mb-12">
             <h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg" style="line-height: 1.3;">
-              📝 암호화폐<br/><span style="margin-left: 3rem;">투자 블로그</span>
+              ${t.titleLine1}<br/><span style="margin-left: 3rem;">${t.titleLine2}</span>
             </h1>
             <p class="text-xl md:text-2xl text-white/95 leading-relaxed font-medium">
-              실전 투자 노하우와 AI 기반 시장 분석을 공유합니다
+              ${t.subtitle}
             </p>
           </div>
 
@@ -2921,18 +2977,17 @@ app.get('/blog', async (c) => {
           <div class="max-w-4xl mx-auto space-y-6">
             <!-- 게시글 1 -->
             <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 hover:bg-white/20 transition-all cursor-pointer" 
-                 onclick="window.location.href='/blog/2025-crypto-investment-guide'">
+                 onclick="window.location.href='/blog/2025-crypto-investment-guide?lang=${lang}'">
               <div class="flex items-start gap-4">
                 <div class="text-5xl">📈</div>
                 <div class="flex-1">
-                  <h2 class="text-2xl font-bold text-white mb-3">2025 암호화폐 투자 가이드</h2>
+                  <h2 class="text-2xl font-bold text-white mb-3">${t.postTitle}</h2>
                   <p class="text-white/80 mb-4 leading-relaxed">
-                    2025년 암호화폐 시장 전망과 투자 전략을 상세히 분석합니다. 
-                    비트코인 ETF 승인 이후 달라진 시장 환경과 알트코인 투자 포인트를 다룹니다.
+                    ${t.postDesc}
                   </p>
                   <div class="flex items-center gap-4 text-white/60 text-sm">
                     <span><i class="far fa-calendar"></i> 2025-01-15</span>
-                    <span><i class="far fa-clock"></i> 10분 소요</span>
+                    <span><i class="far fa-clock"></i> ${t.readTime}</span>
                   </div>
                 </div>
               </div>
@@ -2940,10 +2995,10 @@ app.get('/blog', async (c) => {
 
             <!-- 홈으로 돌아가기 버튼 -->
             <div class="text-center mt-12">
-              <button onclick="window.location.href='/'" 
+              <button onclick="window.location.href='/?lang=${lang}'" 
                       class="bg-white/20 hover:bg-white/30 text-white font-semibold px-8 py-3 rounded-xl transition-all">
                 <i class="fas fa-home mr-2"></i>
-                홈으로 돌아가기
+                ${t.backHome}
               </button>
             </div>
           </div>
