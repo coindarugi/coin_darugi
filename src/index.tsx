@@ -2877,11 +2877,11 @@ app.get('/blog', async (c) => {
       throw new Error('Cloudflare blocked')
     }
     
-    // 제목을 두 줄로 수정 (좌측 정렬)
+    // 제목을 두 줄로 수정하고 밑줄을 오른쪽으로 이동
     html = html.replace(
       /<h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg">\s*📝 암호화폐 투자 블로그\s*<\/h1>/,
-      `<h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg" style="line-height: 1.3; text-align: left;">
-            📝 암호화폐<br/>투자 블로그
+      `<h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg" style="line-height: 1.3;">
+            📝 암호화폐<br/><span style="margin-left: 3rem;">투자 블로그</span>
           </h1>`
     )
     
@@ -2909,8 +2909,8 @@ app.get('/blog', async (c) => {
         <div class="container mx-auto px-4 py-12">
           <!-- 헤더 -->
           <div class="mb-12">
-            <h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg" style="line-height: 1.3; text-align: left;">
-              📝 암호화폐<br/>투자 블로그
+            <h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg" style="line-height: 1.3;">
+              📝 암호화폐<br/><span style="margin-left: 3rem;">투자 블로그</span>
             </h1>
             <p class="text-xl md:text-2xl text-white/95 leading-relaxed font-medium">
               실전 투자 노하우와 AI 기반 시장 분석을 공유합니다
