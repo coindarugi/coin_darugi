@@ -3,6 +3,7 @@ import { cors } from 'hono/cors'
 import { renderer } from './renderer'
 import { runCryptoBot } from './crypto-bot'
 import { translations, type SupportedLanguage } from './i18n/translations'
+import { getBlogPost, getAllBlogPosts } from './blog-data'
 
 // 환경 변수 타입 정의
 type Bindings = {
@@ -2853,235 +2854,153 @@ app.get('/faq', (c) => {
   `)
 })
 
+// 📝 블로그 목록 페이지 (로컬 데이터 사용)
 app.get('/blog', async (c) => {
-  // crypto-darugi.com에서 블로그 페이지 가져오기
-  try {
-    const lang = c.req.query('lang') || 'ko'
-    const response = await fetch(`https://crypto-darugi.com/blog?lang=${lang}`, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-        'Referer': 'https://crypto-darugi.com/',
-        'Origin': 'https://crypto-darugi.com',
-      }
-    })
-    
-    // 응답이 에러 코드인지 확인
-    if (!response.ok || response.status !== 200) {
-      throw new Error(`HTTP ${response.status}`)
+  const lang = c.req.query('lang') || 'ko'
+  const posts = getAllBlogPosts()
+  
+  const i18n = {
+    ko: {
+      title: '📝 암호화폐 투자 블로그',
+      subtitle: '실전 투자 노하우와 AI 기반 시장 분석을 공유합니다',
+      backHome: '홈으로 돌아가기',
+      readMore: '자세히 보기'
+    },
+    en: {
+      title: '📝 Crypto Investment Blog',
+      subtitle: 'Share practical investment know-how and AI-based market analysis',
+      backHome: 'Back to Home',
+      readMore: 'Read More'
     }
-    
-    let html = await response.text()
-    
-    // error code 체크
-    if (html.includes('error code:')) {
-      throw new Error('Cloudflare blocked')
-    }
-    
-    // 언어별 제목 매핑
-    const titleMap = {
-      ko: {
-        original: '📝 암호화폐 투자 블로그',
-        replaced: '📝<br/>암호화폐<br/>투자 블로그'
-      },
-      en: {
-        original: '📝 Cryptocurrency Investment Blog',
-        replaced: '📝<br/>Cryptocurrency<br/>Investment Blog'
-      },
-      fr: {
-        original: '📝 Blog d\'investissement crypto',
-        replaced: '📝<br/>Blog crypto<br/>d\'investissement'
-      },
-      de: {
-        original: '📝 Krypto-Investment-Blog',
-        replaced: '📝<br/>Krypto<br/>Investment Blog'
-      },
-      es: {
-        original: '📝 Blog de inversión en criptomonedas',
-        replaced: '📝<br/>Blog de<br/>inversión cripto'
-      }
-    }
-    
-    const titleConfig = titleMap[lang] || titleMap.ko
-    
-    // 제목을 세 줄로 수정 (완전 가운데 정렬)
-    html = html.replace(
-      new RegExp(`<h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg">\\s*${titleConfig.original}\\s*</h1>`),
-      `<h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg text-center" style="line-height: 1.3;">
-            ${titleConfig.replaced}
-          </h1>`
-    )
-    
-    // 시간 표시 숨기기
-    html = html.replace(
-      /<\/head>/,
-      `<style>
-        .fa-clock, .fa-clock + span { display: none !important; }
-        span.text-xs.text-gray-400.flex.items-center.gap-1:has(.fa-clock) { display: none !important; }
+  }
+  
+  const t = i18n[lang] || i18n.ko
+  
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="${lang}">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${t.title} | Crypto Dashboard</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+      <style>
+        body {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          min-height: 100vh;
+        }
       </style>
-      </head>`
-    )
-    
-    return c.html(html)
-  } catch (error) {
-    // crypto-darugi.com 접근 불가 시 자체 페이지 제공 (다국어 지원)
-    const lang = c.req.query('lang') || 'ko'
-    
-    const i18n = {
-      ko: {
-        title: '📝 암호화폐 투자 블로그',
-        titleLine1: '📝 암호화폐',
-        titleLine2: '투자 블로그',
-        subtitle: '실전 투자 노하우와 AI 기반 시장 분석을 공유합니다',
-        postTitle: '2025 암호화폐 투자 가이드',
-        postDesc: '2025년 암호화폐 시장 전망과 투자 전략을 상세히 분석합니다. 비트코인 ETF 승인 이후 달라진 시장 환경과 알트코인 투자 포인트를 다룹니다.',
-        readTime: '10분 소요',
-        backHome: '홈으로 돌아가기'
-      },
-      en: {
-        title: '📝 Crypto Investment Blog',
-        titleLine1: '📝 Crypto',
-        titleLine2: 'Investment Blog',
-        subtitle: 'Share practical investment know-how and AI-based market analysis',
-        postTitle: '2025 Cryptocurrency Investment Guide',
-        postDesc: 'Detailed analysis of 2025 cryptocurrency market outlook and investment strategies. Covers the changed market environment after Bitcoin ETF approval and altcoin investment points.',
-        readTime: '10 min read',
-        backHome: 'Back to Home'
-      },
-      fr: {
-        title: '📝 Blog d\'investissement crypto',
-        titleLine1: '📝 Blog crypto',
-        titleLine2: 'd\'investissement',
-        subtitle: 'Partagez votre savoir-faire en investissement et l\'analyse de marché basée sur l\'IA',
-        postTitle: 'Guide d\'investissement en crypto-monnaies 2025',
-        postDesc: 'Analyse détaillée des perspectives du marché des crypto-monnaies 2025 et des stratégies d\'investissement. Couvre l\'environnement de marché modifié après l\'approbation de l\'ETF Bitcoin.',
-        readTime: '10 min de lecture',
-        backHome: 'Retour à l\'accueil'
-      },
-      de: {
-        title: '📝 Krypto-Investment-Blog',
-        titleLine1: '📝 Krypto',
-        titleLine2: 'Investment Blog',
-        subtitle: 'Teilen Sie praktisches Investitions-Know-how und KI-basierte Marktanalysen',
-        postTitle: '2025 Kryptowährungs-Investitionsleitfaden',
-        postDesc: 'Detaillierte Analyse der Kryptowährungsmarktaussichten 2025 und Investitionsstrategien. Behandelt das veränderte Marktumfeld nach der Bitcoin-ETF-Genehmigung.',
-        readTime: '10 Min. Lesezeit',
-        backHome: 'Zurück zur Startseite'
-      },
-      es: {
-        title: '📝 Blog de inversión en criptomonedas',
-        titleLine1: '📝 Blog de',
-        titleLine2: 'inversión cripto',
-        subtitle: 'Comparta conocimientos prácticos de inversión y análisis de mercado basado en IA',
-        postTitle: 'Guía de inversión en criptomonedas 2025',
-        postDesc: 'Análisis detallado de las perspectivas del mercado de criptomonedas 2025 y estrategias de inversión. Cubre el entorno de mercado cambiado después de la aprobación del ETF de Bitcoin.',
-        readTime: '10 min de lectura',
-        backHome: 'Volver al inicio'
-      }
-    }
-    
-    const t = i18n[lang] || i18n.ko
-    
-    return c.html(`
-      <!DOCTYPE html>
-      <html lang="${lang}">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${t.title}</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
-        <style>
-          body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container mx-auto px-4 py-12">
-          <!-- 헤더 -->
-          <div class="mb-12">
-            <h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg text-center" style="line-height: 1.3;">
-              ${t.titleLine1}<br/>${t.titleLine2}
-            </h1>
-            <p class="text-xl md:text-2xl text-white/95 leading-relaxed font-medium">
-              ${t.subtitle}
-            </p>
-          </div>
+    </head>
+    <body>
+      <div class="container mx-auto px-4 py-12">
+        <div class="mb-12 text-center">
+          <h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg">
+            ${t.title}
+          </h1>
+          <p class="text-xl text-white/90">
+            ${t.subtitle}
+          </p>
+        </div>
 
-          <!-- 블로그 게시글 목록 -->
-          <div class="max-w-4xl mx-auto space-y-6">
-            <!-- 게시글 1 -->
+        <div class="max-w-4xl mx-auto space-y-6">
+          ${posts.map(post => `
             <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 hover:bg-white/20 transition-all cursor-pointer" 
-                 onclick="window.location.href='/blog/2025-crypto-investment-guide?lang=${lang}'">
+                 onclick="window.location.href='/blog/${post.slug}?lang=${lang}'">
               <div class="flex items-start gap-4">
                 <div class="text-5xl">📈</div>
                 <div class="flex-1">
-                  <h2 class="text-2xl font-bold text-white mb-3">${t.postTitle}</h2>
-                  <p class="text-white/80 mb-4 leading-relaxed">
-                    ${t.postDesc}
-                  </p>
+                  <div class="mb-2">
+                    <span class="bg-white/20 text-white px-3 py-1 rounded-full text-sm">${post.category}</span>
+                  </div>
+                  <h2 class="text-2xl font-bold text-white mb-3">${post.title}</h2>
+                  <p class="text-white/80 mb-4">${post.description}</p>
                   <div class="flex items-center gap-4 text-white/60 text-sm">
-                    <span><i class="far fa-calendar"></i> 2025-01-15</span>
-                    <span><i class="far fa-clock"></i> ${t.readTime}</span>
+                    <span><i class="far fa-calendar mr-1"></i>${post.date}</span>
+                    <span><i class="far fa-clock mr-1"></i>${post.readTime}</span>
                   </div>
                 </div>
               </div>
             </div>
+          `).join('')}
 
-            <!-- 홈으로 돌아가기 버튼 -->
-            <div class="text-center mt-12">
-              <button onclick="window.location.href='/?lang=${lang}'" 
-                      class="bg-white/20 hover:bg-white/30 text-white font-semibold px-8 py-3 rounded-xl transition-all">
-                <i class="fas fa-home mr-2"></i>
-                ${t.backHome}
-              </button>
-            </div>
+          <div class="text-center mt-12">
+            <button onclick="window.location.href='/?lang=${lang}'" 
+                    class="bg-white/20 hover:bg-white/30 text-white font-semibold px-8 py-3 rounded-xl transition-all">
+              <i class="fas fa-home mr-2"></i>${t.backHome}
+            </button>
           </div>
         </div>
-      </body>
-      </html>
-    `)
-  }
+      </div>
+    </body>
+    </html>
+  `)
 })
 
-// 📝 블로그 게시글 라우트
-app.get('/blog/2025-crypto-investment-guide', async (c) => {
-  try {
-    const lang = c.req.query('lang') || 'ko'
-    const response = await fetch(`https://crypto-darugi.com/blog/2025-crypto-investment-guide?lang=${lang}`, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-      }
-    })
-    const html = await response.text()
-    return c.html(html)
-  } catch (error) {
-    return c.html('<h1>게시글을 불러올 수 없습니다.</h1>', 500)
-  }
-})
-
-// 📝 블로그 와일드카드 라우트 (다른 모든 블로그 글)
+// 📝 블로그 게시글 상세 페이지 (로컬 데이터 사용)
 app.get('/blog/:slug', async (c) => {
-  try {
-    const slug = c.req.param('slug')
-    const lang = c.req.query('lang') || 'ko'
-    const response = await fetch(`https://crypto-darugi.com/blog/${slug}?lang=${lang}`, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-      }
-    })
-    const html = await response.text()
-    return c.html(html)
-  } catch (error) {
-    return c.html('<h1>게시글을 불러올 수 없습니다.</h1>', 500)
+  const slug = c.req.param('slug')
+  const lang = c.req.query('lang') || 'ko'
+  const post = getBlogPost(slug)
+  
+  if (!post) {
+    return c.html('<h1>게시글을 찾을 수 없습니다.</h1>', 404)
   }
+  
+  const i18n = {
+    ko: { backHome: '홈으로 돌아가기', backBlog: '블로그 목록' },
+    en: { backHome: 'Back to Home', backBlog: 'Blog List' }
+  }
+  
+  const t = i18n[lang] || i18n.ko
+  
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="${lang}">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${post.title} | Crypto Dashboard</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+      <style>
+        body {
+          background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+          min-height: 100vh;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container mx-auto px-4 py-12 max-w-4xl">
+        <div class="mb-6 flex gap-2">
+          <button onclick="window.location.href='/blog?lang=${lang}'" 
+                  class="bg-white px-4 py-2 rounded-lg shadow hover:shadow-lg transition">
+            <i class="fas fa-arrow-left mr-2"></i>${t.backBlog}
+          </button>
+          <button onclick="window.location.href='/?lang=${lang}'" 
+                  class="bg-white px-4 py-2 rounded-lg shadow hover:shadow-lg transition">
+            <i class="fas fa-home mr-2"></i>${t.backHome}
+          </button>
+        </div>
+
+        <article class="bg-white rounded-2xl shadow-xl p-8">
+          <div class="mb-6">
+            <span class="bg-purple-100 text-purple-700 px-4 py-2 rounded-full font-semibold">${post.category}</span>
+          </div>
+          <h1 class="text-4xl font-bold mb-4">${post.title}</h1>
+          <p class="text-xl text-gray-600 mb-6">${post.description}</p>
+          <div class="flex gap-4 text-gray-500 mb-8">
+            <span><i class="far fa-calendar mr-1"></i>${post.date}</span>
+            <span><i class="far fa-clock mr-1"></i>${post.readTime}</span>
+          </div>
+          <div class="prose prose-lg max-w-none">
+            ${post.content.split('\n').map(line => `<p class="mb-4">${line}</p>`).join('')}
+          </div>
+        </article>
+      </div>
+    </body>
+    </html>
+  `)
 })
 
 // Cloudflare Cron Trigger (매일 자동 실행)
