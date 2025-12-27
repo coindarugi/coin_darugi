@@ -2877,10 +2877,10 @@ app.get('/blog', async (c) => {
       throw new Error('Cloudflare blocked')
     }
     
-    // 제목을 두 줄로 수정 (가운데 정렬, 같은 위치에서 시작)
+    // 제목을 두 줄로 수정 (가운데 정렬)
     html = html.replace(
       /<h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg">\s*📝 암호화폐 투자 블로그\s*<\/h1>/,
-      `<h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg">
+      `<h1 class="text-5xl md:text-7xl font-black mb-6 text-white drop-shadow-lg" style="line-height: 1.3;">
             📝 암호화폐<br/>투자 블로그
           </h1>`
     )
