@@ -688,8 +688,16 @@ const translations = {
   }
 };
 
-// 현재 언어
-let currentLang = localStorage.getItem('language') || 'ko';
+// 현재 언어 (URL 파라미터 우선, 그 다음 localStorage, 마지막으로 기본값)
+const urlParams = new URLSearchParams(window.location.search);
+const urlLang = urlParams.get('lang');
+let currentLang = urlLang || localStorage.getItem('language') || 'ko';
+
+// URL 파라미터가 있으면 localStorage에도 저장
+if (urlLang) {
+  localStorage.setItem('language', urlLang);
+}
+
 
 // 텍스트 가져오기
 function t(key) {
