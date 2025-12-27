@@ -2288,6 +2288,503 @@ app.get('/api/exchange-prices/:coinSymbol', async (c) => {
   }
 })
 
+// 🔍 SEO: 동적 Sitemap 생성
+app.get('/sitemap.xml', async (c) => {
+  const today = new Date().toISOString().split('T')[0]
+  
+  const mainCoins = [
+    'bitcoin', 'ethereum', 'ripple', 'cardano', 'solana', 
+    'polkadot', 'dogecoin', 'shiba-inu', 'polygon', 'litecoin',
+    'binancecoin', 'avalanche-2', 'chainlink', 'stellar', 'uniswap',
+    'monero', 'tron', 'cosmos', 'ethereum-classic', 'vechain'
+  ]
+  
+  const languages = ['ko', 'en', 'fr', 'de', 'es']
+  
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <!-- 메인 페이지 - 다국어 지원 -->
+  <url>
+    <loc>https://crypto-darugi.com/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://crypto-darugi.com/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://crypto-darugi.com/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://crypto-darugi.com/?lang=fr" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://crypto-darugi.com/?lang=de" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://crypto-darugi.com/?lang=es" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://crypto-darugi.com/" />
+  </url>
+`
+
+  // 정적 페이지들
+  const staticPages = [
+    { url: '/guide', changefreq: 'weekly', priority: '0.9' },
+    { url: '/faq', changefreq: 'weekly', priority: '0.9' },
+    { url: '/about', changefreq: 'monthly', priority: '0.7' }
+  ]
+  
+  for (const page of staticPages) {
+    xml += `  
+  <url>
+    <loc>https://crypto-darugi.com${page.url}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
+  </url>
+`
+  }
+  
+  // 주요 코인 개별 페이지
+  for (const coin of mainCoins) {
+    xml += `  
+  <url>
+    <loc>https://crypto-darugi.com/coin/${coin}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+`
+  }
+  
+  xml += `</urlset>`
+  
+  c.header('Content-Type', 'application/xml')
+  return c.body(xml)
+})
+
+// 🔍 SEO: 비트코인 전용 페이지
+app.get('/coin/bitcoin', (c) => {
+  return c.html(`
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>비트코인 (BTC) 실시간 시세 및 AI 전망 | 크립토 대시보드</title>
+  <meta name="description" content="비트코인(BTC) 실시간 가격, AI 기반 전망 분석, 김치 프리미엄, 차트 분석. 업비트, 빗썸, 코인원 가격 비교. 무료 비트코인 추적 도구."/>
+  <meta name="keywords" content="비트코인, BTC, 비트코인 시세, 비트코인 전망, 비트코인 AI 분석, 김치 프리미엄, 업비트, 빗썸"/>
+  <link rel="canonical" href="https://crypto-darugi.com/coin/bitcoin"/>
+  <link href="https://cdn.tailwindcss.com" rel="stylesheet"/>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "비트코인 (BTC) 실시간 시세 및 AI 전망",
+    "description": "비트코인 실시간 가격 추적, AI 기반 전망 분석, 김치 프리미엄 계산",
+    "author": {
+      "@type": "Organization",
+      "name": "크립토 대시보드"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "크립토 대시보드",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://crypto-darugi.com/og-image.png"
+      }
+    },
+    "datePublished": "${new Date().toISOString()}",
+    "dateModified": "${new Date().toISOString()}"
+  }
+  </script>
+</head>
+<body class="bg-gray-900 text-white">
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <header class="mb-8">
+      <h1 class="text-4xl font-bold mb-4">💰 비트코인 (BTC) 실시간 추적</h1>
+      <p class="text-lg text-gray-300">세계 1위 암호화폐 비트코인의 실시간 가격, AI 전망, 김치 프리미엄을 확인하세요.</p>
+    </header>
+    
+    <main>
+      <section class="bg-gray-800 rounded-lg p-6 mb-6">
+        <h2 class="text-2xl font-bold mb-4">📊 비트코인이란?</h2>
+        <p class="text-gray-300 mb-4">
+          비트코인(Bitcoin, BTC)은 2009년 사토시 나카모토가 만든 세계 최초의 암호화폐입니다. 
+          블록체인 기술을 기반으로 하며, 중앙 기관 없이 P2P 네트워크에서 거래가 이루어집니다.
+        </p>
+        <ul class="list-disc list-inside text-gray-300 space-y-2">
+          <li><strong>시가총액 순위:</strong> 1위 (세계 최대 암호화폐)</li>
+          <li><strong>최대 발행량:</strong> 2,100만 BTC (디플레이션 설계)</li>
+          <li><strong>블록 생성 시간:</strong> 약 10분</li>
+          <li><strong>주요 용도:</strong> 가치 저장, 결제 수단, 투자 자산</li>
+        </ul>
+      </section>
+      
+      <section class="bg-gray-800 rounded-lg p-6 mb-6">
+        <h2 class="text-2xl font-bold mb-4">🤖 AI 전망 분석</h2>
+        <p class="text-gray-300 mb-4">
+          우리의 AI는 비트코인의 24시간 가격 변동, 거래량, 시장 심리를 분석하여 
+          <strong>단기 전망</strong>을 제공합니다.
+        </p>
+        <div class="bg-blue-900/30 border border-blue-500 rounded-lg p-4">
+          <p class="text-blue-300">💡 <strong>팁:</strong> 메인 대시보드에서 실시간 AI 전망을 확인하세요!</p>
+        </div>
+      </section>
+      
+      <section class="bg-gray-800 rounded-lg p-6 mb-6">
+        <h2 class="text-2xl font-bold mb-4">💰 김치 프리미엄이란?</h2>
+        <p class="text-gray-300 mb-4">
+          김치 프리미엄은 한국 거래소(업비트, 빗썸, 코인원)와 해외 거래소의 비트코인 가격 차이를 말합니다.
+        </p>
+        <ul class="list-disc list-inside text-gray-300 space-y-2">
+          <li><strong>양수(+):</strong> 한국이 비싸다 → 해외 매수 / 한국 매도 고려</li>
+          <li><strong>음수(-):</strong> 한국이 싸다 → 한국 매수 기회</li>
+          <li><strong>0% 근처:</strong> 정상 범위</li>
+        </ul>
+      </section>
+      
+      <section class="bg-gray-800 rounded-lg p-6 mb-6">
+        <h2 class="text-2xl font-bold mb-4">📈 투자 전략</h2>
+        <div class="space-y-4">
+          <div>
+            <h3 class="text-xl font-semibold text-green-400 mb-2">✅ 장기 투자 (HODLing)</h3>
+            <p class="text-gray-300">비트코인은 "디지털 금"으로 불리며, 장기 보유 시 가치 상승 가능성이 높습니다.</p>
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold text-yellow-400 mb-2">⚡ 단기 트레이딩</h3>
+            <p class="text-gray-300">변동성을 활용한 단기 매매. AI 전망과 차트 분석 필수.</p>
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold text-blue-400 mb-2">💎 분할 매수 (DCA)</h3>
+            <p class="text-gray-300">매달 일정 금액을 꾸준히 매수하여 평균 매수가를 낮추는 전략.</p>
+          </div>
+        </div>
+      </section>
+      
+      <section class="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-lg p-6 text-center">
+        <h2 class="text-2xl font-bold mb-4">🚀 지금 바로 비트코인 추적하기</h2>
+        <p class="text-gray-300 mb-6">실시간 가격, AI 전망, 김치 프리미엄을 무료로 확인하세요!</p>
+        <a href="/" class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 px-8 py-3 rounded-lg font-bold text-lg hover:scale-105 transition">
+          대시보드로 이동 →
+        </a>
+      </section>
+    </main>
+    
+    <footer class="mt-12 text-center text-gray-500">
+      <p>© 2024 크립토 대시보드 | <a href="/" class="text-blue-400 hover:underline">메인으로</a></p>
+    </footer>
+  </div>
+</body>
+</html>
+  `)
+})
+
+// 🔍 SEO: 이더리움 전용 페이지
+app.get('/coin/ethereum', (c) => {
+  return c.html(`
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>이더리움 (ETH) 실시간 시세 및 AI 전망 | 크립토 대시보드</title>
+  <meta name="description" content="이더리움(ETH) 실시간 가격, 스마트 컨트랙트 플랫폼, AI 기반 전망 분석. DeFi, NFT의 핵심 암호화폐 추적."/>
+  <meta name="keywords" content="이더리움, ETH, 이더리움 시세, 스마트 컨트랙트, DeFi, NFT, 이더리움 전망"/>
+  <link rel="canonical" href="https://crypto-darugi.com/coin/ethereum"/>
+  <link href="https://cdn.tailwindcss.com" rel="stylesheet"/>
+</head>
+<body class="bg-gray-900 text-white">
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <header class="mb-8">
+      <h1 class="text-4xl font-bold mb-4">⚡ 이더리움 (ETH) 실시간 추적</h1>
+      <p class="text-lg text-gray-300">스마트 컨트랙트 플랫폼 1위, 이더리움의 실시간 가격과 AI 전망을 확인하세요.</p>
+    </header>
+    
+    <main>
+      <section class="bg-gray-800 rounded-lg p-6 mb-6">
+        <h2 class="text-2xl font-bold mb-4">📊 이더리움이란?</h2>
+        <p class="text-gray-300 mb-4">
+          이더리움(Ethereum, ETH)은 2015년 비탈릭 부테린이 만든 스마트 컨트랙트 플랫폼입니다. 
+          단순한 화폐를 넘어 <strong>탈중앙화 애플리케이션(DApp)</strong>을 구축할 수 있는 생태계입니다.
+        </p>
+        <ul class="list-disc list-inside text-gray-300 space-y-2">
+          <li><strong>시가총액 순위:</strong> 2위</li>
+          <li><strong>주요 특징:</strong> 스마트 컨트랙트, DeFi, NFT 플랫폼</li>
+          <li><strong>합의 알고리즘:</strong> PoS (Proof of Stake) - 2022년 "The Merge" 이후</li>
+          <li><strong>블록 생성 시간:</strong> 약 12초</li>
+        </ul>
+      </section>
+      
+      <section class="bg-gray-800 rounded-lg p-6 mb-6">
+        <h2 class="text-2xl font-bold mb-4">🌐 이더리움 생태계</h2>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="bg-blue-900/30 p-4 rounded-lg">
+            <h3 class="font-bold text-lg mb-2">🏦 DeFi (탈중앙 금융)</h3>
+            <p class="text-sm text-gray-300">Uniswap, Aave, Compound 등 DeFi 프로토콜의 기반</p>
+          </div>
+          <div class="bg-purple-900/30 p-4 rounded-lg">
+            <h3 class="font-bold text-lg mb-2">🎨 NFT (대체불가토큰)</h3>
+            <p class="text-sm text-gray-300">OpenSea, Rarible 등 NFT 마켓플레이스의 핵심</p>
+          </div>
+          <div class="bg-green-900/30 p-4 rounded-lg">
+            <h3 class="font-bold text-lg mb-2">🎮 게임 & 메타버스</h3>
+            <p class="text-sm text-gray-300">Decentraland, Axie Infinity 등</p>
+          </div>
+          <div class="bg-yellow-900/30 p-4 rounded-lg">
+            <h3 class="font-bold text-lg mb-2">🔗 Layer 2 솔루션</h3>
+            <p class="text-sm text-gray-300">Polygon, Optimism, Arbitrum 확장성 개선</p>
+          </div>
+        </div>
+      </section>
+      
+      <section class="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-lg p-6 text-center">
+        <h2 class="text-2xl font-bold mb-4">🚀 지금 바로 이더리움 추적하기</h2>
+        <a href="/" class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 px-8 py-3 rounded-lg font-bold text-lg hover:scale-105 transition">
+          대시보드로 이동 →
+        </a>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
+  `)
+})
+
+// 🔍 SEO: 사용 가이드 페이지
+app.get('/guide', (c) => {
+  return c.html(`
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>암호화폐 대시보드 사용 가이드 | 초보자 완벽 가이드</title>
+  <meta name="description" content="크립토 대시보드 완벽 사용 가이드. 코인 추적, AI 전망, 포트폴리오 관리, 김치 프리미엄 활용법을 배우세요."/>
+  <meta name="keywords" content="암호화폐 가이드, 코인 추적 방법, AI 전망 사용법, 포트폴리오 관리, 초보자 가이드"/>
+  <link rel="canonical" href="https://crypto-darugi.com/guide"/>
+  <link href="https://cdn.tailwindcss.com" rel="stylesheet"/>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "암호화폐 대시보드 사용 방법",
+    "description": "10,000개 이상 암호화폐를 추적하고 AI 전망을 활용하는 완벽 가이드",
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "코인 검색하기",
+        "text": "상단 검색창에 코인 이름이나 심볼을 입력하여 원하는 암호화폐를 찾으세요."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "AI 전망 확인하기",
+        "text": "AI 전망 버튼을 클릭하여 주요 코인의 단기 전망과 투자 조언을 확인하세요."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "포트폴리오 추가하기",
+        "text": "코인 카드의 포트폴리오 버튼으로 보유 수량과 매수가를 입력하여 수익률을 추적하세요."
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-gray-900 text-white">
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <header class="mb-8">
+      <h1 class="text-4xl font-bold mb-4">📖 암호화폐 대시보드 사용 가이드</h1>
+      <p class="text-lg text-gray-300">초보자도 쉽게 따라할 수 있는 완벽 가이드</p>
+    </header>
+    
+    <main>
+      <section class="bg-gray-800 rounded-lg p-6 mb-6">
+        <h2 class="text-2xl font-bold mb-4">🚀 빠른 시작</h2>
+        <ol class="space-y-4">
+          <li class="flex gap-4">
+            <span class="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center font-bold">1</span>
+            <div>
+              <h3 class="font-bold mb-1">코인 검색하기</h3>
+              <p class="text-gray-300">상단 검색창에서 원하는 코인 이름 또는 심볼(BTC, ETH 등)을 입력하세요. 10,000개 이상의 코인을 지원합니다.</p>
+            </div>
+          </li>
+          <li class="flex gap-4">
+            <span class="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center font-bold">2</span>
+            <div>
+              <h3 class="font-bold mb-1">Top 100 브라우저 활용</h3>
+              <p class="text-gray-300">"Top 100 🏆" 버튼을 클릭하여 시가총액 상위 코인을 시총순, 거래량순, 등락률순으로 정렬하여 확인하세요.</p>
+            </div>
+          </li>
+          <li class="flex gap-4">
+            <span class="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center font-bold">3</span>
+            <div>
+              <h3 class="font-bold mb-1">즐겨찾기 추가</h3>
+              <p class="text-gray-300">⭐ 별 아이콘을 클릭하여 자주 보는 코인을 즐겨찾기에 추가하세요.</p>
+            </div>
+          </li>
+          <li class="flex gap-4">
+            <span class="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center font-bold">4</span>
+            <div>
+              <h3 class="font-bold mb-1">AI 전망 확인</h3>
+              <p class="text-gray-300">🤖 AI 버튼을 클릭하여 주요 8개 코인의 1주일 단기 전망, 신뢰도, 투자 조언을 확인하세요.</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+      
+      <section class="bg-gray-800 rounded-lg p-6 mb-6">
+        <h2 class="text-2xl font-bold mb-4">💡 고급 기능</h2>
+        <div class="space-y-4">
+          <div class="border-l-4 border-purple-500 pl-4">
+            <h3 class="font-bold text-lg mb-2">📊 포트폴리오 관리</h3>
+            <p class="text-gray-300">코인 카드의 "포트폴리오" 버튼을 클릭하여 보유 수량과 평균 매수가를 입력하면, 실시간 수익률과 손익을 자동 계산합니다.</p>
+          </div>
+          <div class="border-l-4 border-green-500 pl-4">
+            <h3 class="font-bold text-lg mb-2">💰 김치 프리미엄 추적</h3>
+            <p class="text-gray-300">한국어 모드에서는 업비트, 빗썸, 코인원 가격과 김치 프리미엄(%)이 자동 표시됩니다. 차익거래 기회를 놓치지 마세요!</p>
+          </div>
+          <div class="border-l-4 border-yellow-500 pl-4">
+            <h3 class="font-bold text-lg mb-2">📈 차트 분석</h3>
+            <p class="text-gray-300">"차트" 버튼으로 7일, 30일, 90일 가격 추이를 확인할 수 있습니다.</p>
+          </div>
+          <div class="border-l-4 border-blue-500 pl-4">
+            <h3 class="font-bold text-lg mb-2">📰 실시간 뉴스</h3>
+            <p class="text-gray-300">하단 뉴스 섹션에서 최신 암호화폐 뉴스를 읽고, "번역" 버튼으로 한글로 변환하세요.</p>
+          </div>
+        </div>
+      </section>
+      
+      <section class="bg-gray-800 rounded-lg p-6 mb-6">
+        <h2 class="text-2xl font-bold mb-4">🔍 정렬 기능 활용</h2>
+        <p class="text-gray-300 mb-4">상단의 정렬 버튼으로 코인을 다양한 기준으로 정렬할 수 있습니다:</p>
+        <ul class="list-disc list-inside text-gray-300 space-y-2">
+          <li><strong>가격 높은순/낮은순:</strong> 코인 가격 기준 정렬</li>
+          <li><strong>변동률 높은순/낮은순:</strong> 24시간 등락률 기준</li>
+          <li><strong>즐겨찾기순:</strong> 내가 추가한 코인만 표시</li>
+          <li><strong>김프순:</strong> 김치 프리미엄 높은 순 (한국어 모드)</li>
+          <li><strong>수익률순:</strong> 포트폴리오 수익률 기준</li>
+        </ul>
+      </section>
+      
+      <section class="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-lg p-6 text-center">
+        <h2 class="text-2xl font-bold mb-4">🚀 지금 바로 시작하기</h2>
+        <a href="/" class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 px-8 py-3 rounded-lg font-bold text-lg hover:scale-105 transition">
+          대시보드로 이동 →
+        </a>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
+  `)
+})
+
+// 🔍 SEO: FAQ 페이지
+app.get('/faq', (c) => {
+  return c.html(`
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>자주 묻는 질문 (FAQ) | 크립토 대시보드</title>
+  <meta name="description" content="암호화폐 대시보드 사용법, AI 전망, 포트폴리오, 김치 프리미엄에 대한 자주 묻는 질문과 답변"/>
+  <meta name="keywords" content="암호화폐 FAQ, 크립토 대시보드 질문, AI 전망 정확도, 김치 프리미엄 계산"/>
+  <link rel="canonical" href="https://crypto-darugi.com/faq"/>
+  <link href="https://cdn.tailwindcss.com" rel="stylesheet"/>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "정말 무료인가요?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "네! 100% 무료입니다. 회원가입도 필요 없고, 숨겨진 비용도 없습니다. 모든 기능을 완전히 무료로 사용하실 수 있습니다."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "AI 전망은 얼마나 정확한가요?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "AI는 24시간 가격 변동, 거래량, 시장 심리를 분석하여 단기 전망을 제공합니다. 하지만 암호화폐 시장은 예측 불가능한 변수가 많으므로, AI 분석은 참고용으로만 활용하시고 본인의 판단과 리스크 관리가 필수입니다."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "포트폴리오 데이터는 어디에 저장되나요?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "포트폴리오 데이터는 브라우저의 로컬 스토리지에만 저장됩니다. 서버로 전송되지 않으며, 본인의 브라우저에만 존재합니다. 시크릿 모드에서는 저장되지 않습니다."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-gray-900 text-white">
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <header class="mb-8">
+      <h1 class="text-4xl font-bold mb-4">❓ 자주 묻는 질문</h1>
+      <p class="text-lg text-gray-300">궁금한 점을 빠르게 해결하세요</p>
+    </header>
+    
+    <main class="space-y-4">
+      <div class="bg-gray-800 rounded-lg p-6">
+        <h2 class="text-xl font-bold mb-3 text-blue-400">Q. 정말 무료인가요?</h2>
+        <p class="text-gray-300">A. 네! <strong>100% 무료</strong>입니다. 회원가입도 필요 없고, 숨겨진 비용도 없습니다. 모든 기능을 완전히 무료로 사용하실 수 있습니다.</p>
+      </div>
+      
+      <div class="bg-gray-800 rounded-lg p-6">
+        <h2 class="text-xl font-bold mb-3 text-blue-400">Q. AI 전망은 얼마나 정확한가요?</h2>
+        <p class="text-gray-300">A. AI는 24시간 가격 변동, 거래량, 시장 심리를 분석하여 단기 전망을 제공합니다. 하지만 암호화폐 시장은 예측 불가능한 변수가 많으므로, <strong>AI 분석은 참고용</strong>으로만 활용하시고 본인의 판단과 리스크 관리가 필수입니다.</p>
+      </div>
+      
+      <div class="bg-gray-800 rounded-lg p-6">
+        <h2 class="text-xl font-bold mb-3 text-blue-400">Q. 몇 개의 코인을 추적할 수 있나요?</h2>
+        <p class="text-gray-300">A. <strong>10,000개 이상</strong>의 암호화폐를 추적할 수 있습니다. 비트코인, 이더리움 같은 메이저 코인부터 신규 알트코인까지 거의 모든 코인을 지원합니다.</p>
+      </div>
+      
+      <div class="bg-gray-800 rounded-lg p-6">
+        <h2 class="text-xl font-bold mb-3 text-blue-400">Q. 김치 프리미엄이란 무엇인가요?</h2>
+        <p class="text-gray-300">A. 김치 프리미엄은 <strong>한국 거래소와 해외 거래소의 가격 차이</strong>를 의미합니다. 양수(+)면 한국이 비싸고, 음수(-)면 한국이 싸다는 뜻입니다. 차익거래 기회를 찾는 데 유용합니다.</p>
+      </div>
+      
+      <div class="bg-gray-800 rounded-lg p-6">
+        <h2 class="text-xl font-bold mb-3 text-blue-400">Q. 포트폴리오 데이터는 어디에 저장되나요?</h2>
+        <p class="text-gray-300">A. 포트폴리오 데이터는 <strong>브라우저의 로컬 스토리지</strong>에만 저장됩니다. 서버로 전송되지 않으며, 본인의 브라우저에만 존재합니다. (시크릿 모드에서는 저장 안 됨)</p>
+      </div>
+      
+      <div class="bg-gray-800 rounded-lg p-6">
+        <h2 class="text-xl font-bold mb-3 text-blue-400">Q. 가격이 업데이트 안 돼요</h2>
+        <p class="text-gray-300">A. 가격은 <strong>30초마다 자동 업데이트</strong>됩니다. 만약 업데이트가 안 되면 "새로고침" 버튼을 클릭하거나 페이지를 새로고침하세요.</p>
+      </div>
+      
+      <div class="bg-gray-800 rounded-lg p-6">
+        <h2 class="text-xl font-bold mb-3 text-blue-400">Q. 모바일에서도 사용 가능한가요?</h2>
+        <p class="text-gray-300">A. 네! <strong>모바일, 태블릿, 데스크톱</strong> 모두 지원합니다. 반응형 디자인으로 어떤 기기에서든 최적화된 화면을 제공합니다.</p>
+      </div>
+      
+      <div class="bg-gray-800 rounded-lg p-6">
+        <h2 class="text-xl font-bold mb-3 text-blue-400">Q. 다른 언어로도 볼 수 있나요?</h2>
+        <p class="text-gray-300">A. 네! <strong>5개 언어</strong>를 지원합니다: 한국어, English, Français, Deutsch, Español. 우측 상단의 국기 아이콘을 클릭하여 변경하세요.</p>
+      </div>
+      
+      <div class="bg-gray-800 rounded-lg p-6">
+        <h2 class="text-xl font-bold mb-3 text-blue-400">Q. 알림 기능이 있나요?</h2>
+        <p class="text-gray-300">A. 현재는 지원하지 않지만, <strong>곧 추가될 예정</strong>입니다! 가격 알림, AI 전망 업데이트 알림 등을 준비 중입니다.</p>
+      </div>
+      
+      <div class="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-lg p-6 text-center mt-8">
+        <h2 class="text-2xl font-bold mb-4">더 궁금한 점이 있으신가요?</h2>
+        <p class="text-gray-300 mb-4">대시보드 우측 하단의 💬 도움말 버튼을 클릭하세요!</p>
+        <a href="/" class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 px-8 py-3 rounded-lg font-bold text-lg hover:scale-105 transition">
+          대시보드로 이동 →
+        </a>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
+  `)
+})
+
 // 🤖 트위터 봇 Cron 엔드포인트 (수동 트리거용)
 app.get('/api/run-crypto-bot', async (c) => {
   try {
