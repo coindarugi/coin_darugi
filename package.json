@@ -2,9 +2,14 @@
   "name": "coin-darugi",
   "version": "1.0.0",
   "description": "A crypto tweet bot",
+  "type": "module",
   "main": "crypto-tweet-bot.js",
   "scripts": {
-    "start": "node crypto-tweet-bot.js"
+    "start": "node crypto-tweet-bot.js",
+    "test": "node test-tweet.js"
+  },
+  "dependencies": {
+    "twitter-api-v2": "^1.14.0"
   },
   "keywords": [],
   "author": "",
