@@ -1,25 +1,28 @@
-name: Crypto Twitter Bot
+name: Twitter Bot
 
 on:
   schedule:
-    - cron: '0 */12 * * *' # 12시간마다 실행 (하루 2번)
-  workflow_dispatch:      # 수동 실행 버튼
+    - cron: '0 */6 * * *'  # Run every 6 hours
+  workflow_dispatch:
 
 jobs:
-  run-bot:
+  twitter-bot:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+      
       - name: Install dependencies
-        run: npm install twitter-api-v2
-      - name: Run Bot
+        run: npm install
+      
+      - name: Run bot script
+        run: node bot.js
         env:
           TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
           TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
           TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
-          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
-        run: node scripts/run-twitter-bot.cjs
+          TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
