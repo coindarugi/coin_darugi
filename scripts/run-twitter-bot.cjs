@@ -1,9 +1,7 @@
-import crypto from 'crypto';
+// scripts/run-twitter-bot.cjs (CommonJS)
 
-// 사이트 URL
 const SITE_URL = 'https://crypto-darugi.com/';
 
-// 언어 설정 및 홍보 문구
 const LANGUAGES = {
   ko: { 
     name: '한국어', 
@@ -32,10 +30,12 @@ const LANGUAGES = {
   },
 };
 
-// OAuth 1.0a 서명 생성
+const crypto = require('crypto');
+
+// OAuth 1.0a 서명 생성 함수
 function getOAuthHeader(method, url, consumerKey, consumerSecret, token, tokenSecret) {
   const timestamp = Math.floor(Date.now() / 1000).toString();
-  const nonce = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
+  const nonce = crypto.randomBytes(16).toString('hex');
   
   const percentEncode = (str) => {
     return encodeURIComponent(str).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
@@ -70,7 +70,7 @@ function getOAuthHeader(method, url, consumerKey, consumerSecret, token, tokenSe
   return `OAuth ${headerString}`;
 }
 
-// 트윗 발행
+// Native fetch 사용 (Node 18+)
 async function postTweet(text, language, keys) {
   const url = 'https://api.twitter.com/2/tweets';
   const method = 'POST';
@@ -109,7 +109,6 @@ async function postTweet(text, language, keys) {
   }
 }
 
-// 김프 데이터 조회
 async function getKimchiPremiumData() {
   try {
     const globalRes = await fetch('https://api.coincap.io/v2/assets/bitcoin');
@@ -132,7 +131,6 @@ async function getKimchiPremiumData() {
   }
 }
 
-// 트윗 텍스트 생성
 function createTweetText(kimchiPremium, language) {
   const langConfig = LANGUAGES[language];
   let content = '';
@@ -153,9 +151,8 @@ function createTweetText(kimchiPremium, language) {
   return content;
 }
 
-// 메인 실행
 async function run() {
-  console.log('🚀 GitHub Actions 트위터 봇 시작 (ESM 모드)...');
+  console.log('🚀 GitHub Actions 트위터 봇 시작 (CJS Mode)...');
 
   const { TWITTER_API_KEY, TWITTER_API_SECRET, TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_SECRET } = process.env;
 
