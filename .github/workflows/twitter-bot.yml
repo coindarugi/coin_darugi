@@ -1,25 +1,25 @@
-이름: 크립토 트위터 봇
+name: Crypto Twitter Bot
 
-위에:
- 스케쥴:
- - 크론: '0 */12 * * *' # 12시간마다 실행 (하루 2번)
- 워크플로우_dispatch: # 수동 실행 버튼
+on:
+  schedule:
+    - cron: '0 */12 * * *' # 12시간마다 실행 (하루 2번)
+  workflow_dispatch:      # 수동 실행 버튼
 
-직업:
- 런봇:
- 실행 중: 우분투-latest
- 단계:
- - 용도: actions/checkout@v3
- - 이름: Node.js 설정
- 용도: actions/setup-node@v3
- 와 함께:
- 노드 버전: '18'
- - 이름: 종속성 설치
- 실행: npm 설치 twitter-api-v2
- - 이름: 봇 실행
- 부러움:
- 트위터_API_KEY: ${비밀}.트위터_API_KEY }}
- 트위터_API_SECRET: ${비밀}.트위터_API_SECRET }}
- 트위터_ACCESS_TOKEN: ${비밀}.트위터_ACCESS_TOKEN }}
- 트위터_ACCESS_SECRET: ${비밀}.트위터_ACCESS_SECRET }}
- run: 노드 스크립트/run-twitter-bot.cjs
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm install twitter-api-v2
+      - name: Run Bot
+        env:
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+        run: node scripts/run-twitter-bot.cjs
