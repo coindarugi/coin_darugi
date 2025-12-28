@@ -1,13 +1,12 @@
-name: Crypto Bot Workflow
+name: Crypto Bot Notification
 
 on:
   schedule:
-    # Run every 8 hours (00:00, 08:00, 16:00 UTC)
-    - cron: '0 0,8,16 * * *'
+    - cron: '0 */8 * * *'
   workflow_dispatch:
     inputs:
       language:
-        description: 'Select language for bot execution'
+        description: 'Select language for notification'
         required: true
         default: 'english'
         type: choice
@@ -17,48 +16,17 @@ on:
           - french
           - german
           - spanish
-          - japanese
-          - chinese
 
 jobs:
   crypto-bot:
     runs-on: ubuntu-latest
-    
     strategy:
       matrix:
-        language: 
-          - korean
-          - english
-          - french
-          - german
-          - spanish
-          - japanese
-          - chinese
-    
+        language: [korean, english, french, german, spanish]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      
-      - name: Run crypto bot for ${{ matrix.language }}
+      - name: Run crypto bot
         run: |
           echo "Running crypto bot for language: ${{ matrix.language }}"
-          # Add your bot execution command here
-          # python bot.py --language ${{ matrix.language }}
-        env:
-          LANGUAGE: ${{ matrix.language }}
-      
-      - name: Handle manual trigger
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          echo "Manual trigger detected for language: ${{ github.event.inputs.language }}"
-          # Add custom logic for manual trigger if needed
+          # Add your crypto bot script here
