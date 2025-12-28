@@ -1,62 +1,64 @@
-name: Cryptocurrency Promotion Twitter Bot
+name: Crypto Bot Workflow
 
 on:
   schedule:
-    # Run every 6 hours
-    - cron: '0 */6 * * *'
+    # Run every 8 hours (00:00, 08:00, 16:00 UTC)
+    - cron: '0 0,8,16 * * *'
   workflow_dispatch:
+    inputs:
+      language:
+        description: 'Select language for bot execution'
+        required: true
+        default: 'english'
+        type: choice
+        options:
+          - korean
+          - english
+          - french
+          - german
+          - spanish
+          - japanese
+          - chinese
 
 jobs:
   crypto-bot:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    env:
-      TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
-      TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
-      TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
-      TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
-      TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_BEARER_TOKEN }}
-
+    
     strategy:
       matrix:
-        language: ['en', 'ko', 'es', 'fr', 'de', 'ja', 'zh']
-      fail-fast: false
-
+        language: 
+          - korean
+          - english
+          - french
+          - german
+          - spanish
+          - japanese
+          - chinese
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+      
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-
+      
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          pip install tweepy requests python-dotenv
-
-      - name: Run cryptocurrency bot - ${{ matrix.language }}
+      
+      - name: Run crypto bot for ${{ matrix.language }}
+        run: |
+          echo "Running crypto bot for language: ${{ matrix.language }}"
+          # Add your bot execution command here
+          # python bot.py --language ${{ matrix.language }}
         env:
           LANGUAGE: ${{ matrix.language }}
+      
+      - name: Handle manual trigger
+        if: github.event_name == 'workflow_dispatch'
         run: |
-          python scripts/crypto_bot.py --language ${{ matrix.language }}
-
-      - name: Log execution result
-        if: always()
-        run: |
-          echo "Cryptocurrency bot execution completed for language: ${{ matrix.language }}"
-          echo "Timestamp: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
-
-  notify-on-failure:
-    runs-on: ubuntu-latest
-    needs: crypto-bot
-    if: failure()
-
-    steps:
-      - name: Send failure notification
-        run: |
-          echo "⚠️  Cryptocurrency bot workflow failed"
-          echo "Check the logs at: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          echo "Manual trigger detected for language: ${{ github.event.inputs.language }}"
+          # Add custom logic for manual trigger if needed
