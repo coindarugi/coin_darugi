@@ -2,16 +2,16 @@
 
 위에:
  스케쥴:
- - 크론: '0 */12 * * *'0 */8 * * *' # 8시간마다 실행
- 워크플로우_dispatch:
+ - 크론: '0 */12 * * *' # 12시간마다 실행 (하루 2번)
+ 워크플로우_dispatch: # 수동 실행 버튼
 
 직업:
  런봇:
  실행 중: 우분투-latest
  단계:
- - 용도: 액션/checkout@v3
+ - 용도: actions/checkout@v3
  - 이름: Node.js 설정
- 용도: 액션/setup-노드@v3
+ 용도: actions/setup-node@v3
  와 함께:
  노드 버전: '18'
  - 이름: 종속성 설치
@@ -22,4 +22,4 @@
  트위터_API_SECRET: ${비밀}.트위터_API_SECRET }}
  트위터_ACCESS_TOKEN: ${비밀}.트위터_ACCESS_TOKEN }}
  트위터_ACCESS_SECRET: ${비밀}.트위터_ACCESS_SECRET }}
- 실행: 노드 스크립트/런 twitter-봇.cj
+ run: 노드 스크립트/run-twitter-bot.cjs
