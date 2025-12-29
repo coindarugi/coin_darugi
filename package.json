@@ -1,16 +1,17 @@
 {
-  "name": "coin-darugi",
+  "name": "coin_darugi",
   "version": "1.0.0",
-  "description": "A crypto tweet bot",
-  "type": "module",
-  "main": "crypto-tweet-bot.js",
+  "description": "Coin Darugi Application",
+  "main": "index.js",
   "scripts": {
-    "start": "node crypto-tweet-bot.js",
-    "test": "node test-tweet.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "jest"
   },
   "dependencies": {
-    "twitter-api-v2": "^1.14.0"
+    "axios": "^1.6.0"
   },
+  "devDependencies": {},
   "keywords": [],
   "author": "",
   "license": "ISC"
