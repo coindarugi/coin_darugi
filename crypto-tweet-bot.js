@@ -10,16 +10,6 @@
 const { TwitterApi } = require('twitter-api-v2');
 require('dotenv').config();
 
-// Initialize Twitter API Client
-const client = new TwitterApi({
-  appKey: process.env.TWITTER_API_KEY,
-  appSecret: process.env.TWITTER_API_SECRET,
-  accessToken: process.env.TWITTER_ACCESS_TOKEN,
-  accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
-});
-
-const twitterClient = client.readWrite;
-
 // Promotional messages in 5 languages with localized URLs
 // Each language has at least 5 variations
 const promotionalMessages = {
@@ -64,6 +54,21 @@ const promotionalMessages = {
 const languages = Object.keys(promotionalMessages);
 
 /**
+ * Initialize Twitter API client
+ * @returns {object} Twitter client instance
+ */
+function initTwitterClient() {
+  const client = new TwitterApi({
+    appKey: process.env.TWITTER_API_KEY,
+    appSecret: process.env.TWITTER_API_SECRET,
+    accessToken: process.env.TWITTER_ACCESS_TOKEN,
+    accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
+  });
+
+  return client.readWrite;
+}
+
+/**
  * Validate Twitter API credentials
  * @throws {Error} If any required credential is missing
  */
@@ -105,6 +110,9 @@ function selectRandomTweet(language) {
  */
 async function postRandomLanguageTweet() {
   try {
+    // Initialize Twitter client
+    const twitterClient = initTwitterClient();
+    
     // Select random language
     const randomLanguage = languages[Math.floor(Math.random() * languages.length)];
     
