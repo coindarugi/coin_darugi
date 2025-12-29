@@ -3,8 +3,13 @@
  * Generates and posts tweets about cryptocurrency with language-specific URLs
  */
 
-const axios = require('axios');
-const { TwitterApi } = require('twitter-api-v2');
+import axios from 'axios';
+import { TwitterApi } from 'twitter-api-v2';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Twitter API configuration
 const client = new TwitterApi({
@@ -126,8 +131,10 @@ async function main(language = 'ko') {
   }
 }
 
-// Run the bot
-const language = process.env.TWEET_LANGUAGE || 'ko';
-main(language);
+// Run the bot only when executed directly (not when imported as a module)
+if (process.argv[1] === __filename) {
+  const language = process.env.TWEET_LANGUAGE || 'ko';
+  main(language);
+}
 
-module.exports = { buildLanguageUrl, generateTweet, fetchCryptoData, postTweet };
+export { buildLanguageUrl, generateTweet, fetchCryptoData, postTweet };
