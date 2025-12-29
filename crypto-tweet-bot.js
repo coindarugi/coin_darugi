@@ -126,8 +126,10 @@ async function main(language = 'ko') {
   }
 }
 
-// Run the bot
-const language = process.env.TWEET_LANGUAGE || 'ko';
-main(language);
+// Run the bot only when executed directly (not when imported as a module)
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const language = process.env.TWEET_LANGUAGE || 'ko';
+  main(language);
+}
 
 export { buildLanguageUrl, generateTweet, fetchCryptoData, postTweet };
